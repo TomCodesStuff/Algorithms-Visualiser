@@ -83,7 +83,11 @@ class TraversalModel():
     def getEdge(self, nodes : tuple) -> int: 
         if(nodes in self.__edges): return self.__edges[nodes] 
         else: return -1 
-    def addEdge(self, nodes : tuple, edge : CanvasEdge) -> None: self.__edges[nodes] = edge  
+    def addEdge(self, nodes : tuple, edge : CanvasEdge) -> None: 
+        self.__edges[nodes] = edge  
+    def deleteEdge(self, nodes : tuple) -> None:
+         self.__edges.pop(nodes)
+
 
     # Getters for edge weight 
     def getMinWeight(self) -> int: return self.__minWeight

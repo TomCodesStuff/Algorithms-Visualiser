@@ -116,6 +116,7 @@ class TraversalScreen(sc.Screen, sc.ScreenTemplate):
         self.__updateWeight("No Edge Selected")
         self.__weightSlider.pack()
 
+    # Updates text in label abive weight slider 
     def __updateWeight(self, value : str) -> None:
         self.__weightSlider.config(label = f"Weight: {value}")    
 
@@ -172,6 +173,8 @@ class TraversalScreen(sc.Screen, sc.ScreenTemplate):
         self.clearNodeLabelsText()
 
     def __deleteEdge(self):  
+        # Deletes newly drawn weight or prexising weight 
+        self.__controller.deleteEdge()
         # Add function to delete edge  
         self.disableWeightOptions()
         # Clear text in labels  
@@ -200,8 +203,6 @@ class TraversalScreen(sc.Screen, sc.ScreenTemplate):
     
     # Resets position and disables weight slider 
     def resetWeightSlider(self): 
-        # Moves slider to far left
-        self.__weightSlider.set(self.__model.getMinWeight()) 
         # Resets text
         self.__updateWeight("No Edge Selected") 
         # Disables slider 

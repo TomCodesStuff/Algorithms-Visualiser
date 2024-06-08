@@ -13,6 +13,8 @@ class TraversalController():
     def __init__(self, screen, model : TraversalModel): 
         self.__screen = screen 
         self.__model = model  
+        
+        # Attributes that handle drawing edges 
         self.__isEdgeBeingDrawn = False 
         self.__fromNode = None 
         self.__toNode = None 
@@ -66,11 +68,14 @@ class TraversalController():
             # Disable canvas event listeners and sets boolean variable 
             self.__stopMovingEdge() 
             # Sets node, edge ends at to CanvasNode
-            self.__toNode = canvasNode 
-            self.__handleEdge() 
-            self.__isEdgeBeingEdited = True
+            self.__toNode = canvasNode
+            # Sets variable indicating edge is beind edited 
+            self.__isEdgeBeingEdited = True 
+            # Handles if edge already exists or if edge is new
+            self.__handleEdge()  
         # If an edge is not being draw on screen
         else: 
+            # If edge is being edited, prevent new one from being born
             if(self.__isEdgeBeingEdited): return
             # Add Node ID to relevant label 
             self.__screen.updateFromLabelText(str(canvasNode.getID())) 
@@ -136,6 +141,7 @@ class TraversalController():
         self.__fromNode = None 
         self.__toNode = None 
         self.__currentEdge = None  
+        self.__isEdgeBeingEdited = False
 
     # Enables canvas events and sets boolean variable to true 
     def __createMovingEdge(self, canvasNode : CanvasNode):
@@ -158,15 +164,33 @@ class TraversalController():
         edge.setWeight(weight)
         # Clear variables used  
         self.__clearVariables()
-        # Set flag indicating edge is being edited to false
-        self.__isEdgeBeingEdited = False 
-    
+
+    # Deletes the newly drawn edge or existing edge
+    def deleteEdge(self): 
+        # Deletes edge from relevant data structure 
+        self.__deleteEdgeFromDict()
+        # Deletes drawn edge
+        self.__deleteEdge() 
+        # Restets variables  
+        self.__clearVariables()
+   
+    # Deletes egde from relevant data structure 
+    def __deleteEdgeFromDict(self): 
+        connectedNodes = (self.__fromNode, self.__toNode) 
+        # If egdes exists with tuple of nodes as the key
+        if(self.__model.getEdge(connectedNodes) != -1): 
+            self.__model.deleteEdge(connectedNodes) 
+        # Otherwise reverse key and delete edge at key
+        else: self.__model.deleteEdge(connectedNodes[::-1])
+
+    # Returns the Edge Canvas object
     def __getCanvasEdge(self) -> CanvasEdge: 
         connectedEdges = (self.__fromNode, self.__toNode)
         if(connectedEdges in self.__model.getEdges()): 
             return self.__model.getEdge(connectedEdges)
         else: return self.__model.getEdge(connectedEdges[::-1])
-       
+    
+    # Deletes current edge being drawn if user clicks the canvas 
     def __deleteEdgeOnClick(self, event : Event):
         canvas = self.__screen.getCanvas() 
         collisions = canvas.find_overlapping(event.x, event.y , event.x, event.y) 
