@@ -5,8 +5,8 @@ if(__name__ == "__main__"):
     exit()
 
 from canvas_objects import CanvasNode, CanvasEdge
-from .traversal_model import TraversalModel
-from tkinter import Event 
+from .traversal_model import TraversalModel 
+from tkinter import Event, BOTH 
 import math
 
 class TraversalController():
@@ -16,9 +16,10 @@ class TraversalController():
         
         # Attributes that handle drawing edges 
         self.__isEdgeBeingDrawn = False 
-        self.__fromNode = None 
-        self.__toNode = None 
-        self.__currentEdge = None 
+        self.__edgeStartNode = None 
+        self.__edgeEndNode = None 
+        self.__currentEdgeID = None
+        self.__currentEdgeObj = None 
         self.__isEdgeBeingEdited = False
 
     def addCanvasEvents(self): 
@@ -36,9 +37,9 @@ class TraversalController():
             # Change the add node buttons text to red 
             self.__screen.changeNodeButtonColour("red")
             return  
+        
         # if node can be drawn, change the buttons colour back to black
-        else: self.__screen.changeNodeButtonColour("black")
-
+        self.__screen.changeNodeButtonColour("black")
         # X-Y coords of where the node will spawn -> this is the same for evey node 
         x0, y0, x1, y1 = self.__model.getInitialCoords()   
         # Draws the circle 
@@ -47,6 +48,17 @@ class TraversalController():
         canvasNode = CanvasNode(circle, (x0, y0, x1, y1))  
         # Adds node to array containing nodes 
         self.__model.addNode(canvasNode)
+        
+        # Adds event handlers to new node 
+        self.__addNodeEvents(circle, canvasNode)
+
+        # Updates screen so node can be seen onscreen
+        self.__screen.getWindow().update() 
+    
+    def __addNodeEvents(self, circle : int, canvasNode : CanvasNode) -> None:
+        # Gets a reference to the canvas 
+        canvas = self.__screen.getCanvas() 
+        
         # Add event to change nodes colour when the mouse hovers over them
         canvas.tag_bind(circle, "<Enter>", lambda _: self.__changeColourOnHover(canvasNode))
         # Add event to change nodes colour when the mouse hovers over them
@@ -56,114 +68,291 @@ class TraversalController():
         # Add event listener to add an edge when a node is clicked 
         canvas.tag_bind(circle, "<Button-1>", lambda _: self.__createEdge(canvasNode))
 
-        # Updates screen so node can be seen onscreen
-        self.__screen.getWindow().update() 
-    
+
     # Creates a line that follows the mouse until another node is clicked 
-    def __createEdge(self, canvasNode : CanvasNode):     
-        # If edge is being drawn on screen
-        if(self.__isEdgeBeingDrawn): 
-            # Add Node ID to relevant label 
-            self.__screen.updateToLabelText(str(canvasNode.getID()))
-            # Disable canvas event listeners and sets boolean variable 
+    def __createEdge(self, canvasNode : CanvasNode):  
+
+        # If an edge is being edited, prevent a new one from being created
+        if(self.__isEdgeBeingEdited): return
+
+        # If an edge is already being drawn on screen
+        if(self.__isEdgeBeingDrawn):
+            # If an edge is already being drawn  
             self.__stopMovingEdge() 
-            # Sets node, edge ends at to CanvasNode
-            self.__toNode = canvasNode
-            # Sets variable indicating edge is beind edited 
+            # Sets variable indicating edge is being edited 
             self.__isEdgeBeingEdited = True 
-            # Handles if edge already exists or if edge is new
-            self.__handleEdge()  
-        # If an edge is not being draw on screen
+            # Sets node edge ends to current node 
+            self.__edgeEndNode = canvasNode 
+            # Checks edge can be created before creating new CanvadEdge Object 
+            # and adding the new object to relevant data structures  
+            self.__handleNewEdge()  
+         
+        # If an edge is not currently being draw on screen
         else: 
-            # If edge is being edited, prevent new one from being born
-            if(self.__isEdgeBeingEdited): return
-            # Add Node ID to relevant label 
-            self.__screen.updateFromLabelText(str(canvasNode.getID())) 
-            # Enables canvas event listeners and sets boolean variable 
-            self.__createMovingEdge(canvasNode) 
-            # Sets node, edge starts at to CanvasNode
-            self.__fromNode = canvasNode
+            self.__createMovingEdge(canvasNode)
+            # Store reference to node the new edge starts from  
+            self.__edgeStartNode = canvasNode
         # Updates window to display changes
         self.__screen.getWindow().update()  
     
-    # Handles if edges starts and end at the same node 
-    # or of an edge already exists between two nodes 
-    def __handleEdge(self):
+    # Case handling for potential duplicate or self edges 
+    def __handleNewEdge(self) -> None:
         # If edge starts and ends at the same node
-        if(self.__fromNode == self.__toNode):  
+        if(self.__edgeStartNode == self.__edgeEndNode):  
             self.__handleSelfEdge()
-            return
-        
+        else: 
+            self.__currentEdgeObj = self.__createNewEdge()
+            self.__screen.enableWeightOptions(self.__currentEdgeObj)
+    
+    def __createNewEdge(self) -> CanvasEdge: 
         # Get new or existing CanvasEdge object
         edge = self.__createCanvasEdge()
         # Updates current edge 
-        self.__currentEdge = edge.getCanvasID()
-        # Enable options that let users edit edges
-        self.__screen.enableWeightOptions()
-        # Update weight slider to show the edges weight
-        self.__screen.updateWeightOnScreen(edge.getWeight())  
-    
+        self.__currentEdgeID = edge.getCanvasID()
+        return edge
+
     # Creates and returns a new CanvasEdge object
     def __createCanvasEdge(self) -> CanvasEdge: 
-        connectedNodes = (self.__fromNode, self.__toNode) 
+        # Edges are stored in a dictionary with the key being a tuple of the two nodes being connected
+        connectedNodes = (self.__edgeStartNode, self.__edgeEndNode) 
         # If edge exists between the two nodes, 
         # return the already existing object 
         if(connectedNodes in self.__model.getEdges()): 
             self.__deleteEdge()  
             return self.__model.getEdge(connectedNodes) 
+        # Checks if reverse tuple of the connected nodes is in the dictionary 
         elif(connectedNodes[::-1] in self.__model.getEdges()):  
             self.__deleteEdge()
             return self.__model.getEdge(connectedNodes[::-1]) 
         # Creates new object of edge is new 
         else: 
             # Moves edge to centre of the destination node 
-            coords = self.__centreEdge(self.__toNode)
+            coords = self.__centreEdge() 
+            # Adjusts edge so arrow/s can be shown
+            # coords = self.__adjustEdgeCoords()
             # Create new object, weight is initially set to the default 
-            newEdge = CanvasEdge(self.__currentEdge, coords, self.__model.getDefaultWeight()) 
+            newEdge = CanvasEdge(self.__currentEdgeID, coords, self.__model.getDefaultWeight()) 
             # Add node to dictionary 
             self.__model.addEdge(connectedNodes, newEdge)   
             # Return new object 
             return newEdge
 
     # Handles when an egde starts and ends at the same node 
-    def __handleSelfEdge(self):
+    def __handleSelfEdge(self) -> None:
         # Delete edge
         self.__deleteEdge() 
-        # Clear text in labels
-        self.__screen.clearNodeLabelsText() 
-        # Disable buttons and resets slider 
-        self.__screen.disableWeightOptions()
         # Clear variables used when creating edges 
         self.__clearVariables()
         
     # Resets variables used when creating edges     
-    def __clearVariables(self): 
-        self.__fromNode = None 
-        self.__toNode = None 
-        self.__currentEdge = None  
+    def __clearVariables(self) -> None: 
+        self.__edgeStartNode = None 
+        self.__edgeEndNode = None 
+        self.__currentEdgeID = None  
+        self.__currentEdgeObj = None
         self.__isEdgeBeingEdited = False
 
     # Enables canvas events and sets boolean variable to true 
-    def __createMovingEdge(self, canvasNode : CanvasNode):
+    def __createMovingEdge(self, canvasNode : CanvasNode) -> None:
         # Adds canvas event to draw lines
-        self.__addCanvasEvent(canvasNode)
+        self.__addMovingEdgeEvent(canvasNode)
         # Sets variable to True
         self.__isEdgeBeingDrawn = True   
             
     # Disables canvas events and sets boolean variable to false 
-    def __stopMovingEdge(self):
+    def __stopMovingEdge(self) -> None:
         # Remove event that draws line
-        self.__deleteCanvasEvent()
+        self.__deleteMovingEdgeEvent()
         # Set edge being drawn to False
         self.__isEdgeBeingDrawn = False
         
     # Changes weight of current edge to passed value 
-    def saveEdge(self, weight : int): 
+    def saveEdge(self, newWeight : int) -> None: 
         # Update weight of current edge object
-        edge = self.__getCanvasEdge() 
-        edge.setWeight(weight)
+        self.__currentEdgeObj.setWeight(newWeight) 
+        # Adjust distance between nodes to match new weight
+        self.__adjustScreenDistance()
         # Clear variables used  
-        self.__clearVariables()
+        self.__clearVariables() 
+       
+    # Adjusts size of the edge to be more representative of its weight 
+    def __adjustScreenDistance(self) -> None:  
+        # Start and end coords of edge 
+        x2, y2, x3, y3 = self.__currentEdgeObj.getCoords()
+
+        # Maps the edges weight onto the range defining 
+        # the maxiumum and minimum on screen distance between nodes 
+        scaledDist = self.__calculateScaledDist()
+        
+        # Get on screen length of edge 
+        onScreenDist = self.__calculateDistance(x2, y2, x3, y3)
+
+        # If the edges length is to be decreased 
+        if(scaledDist < onScreenDist): 
+            self.__handleShrinkingEdge()
+        else:
+            self.__handleGrowingEdge()
+    
+    # Increases an edges length to match it's weight 
+    def __handleGrowingEdge(self): 
+        # Edge case of grows outside screen 
+        # - push as far as can in direction 
+        # - push as rest/far can in other direction  
+        # TODO (so I can come back easier)
+
+        # Reference to canvas
+        canvas = self.__screen.getCanvas()
+        # Start and end coords of edge 
+        x2, y2, x3, y3 = self.__currentEdgeObj.getCoords()
+        adjustedX, adjustedY = 0, 0
+
+        # Maps the edges weight onto the range defining 
+        # the maxiumum and minimum on screen distance between nodes 
+        scaledDist = self.__calculateScaledDist()
+        
+        # Get on screen length of edge 
+        onScreenDist = self.__calculateDistance(x2, y2, x3, y3)
+
+        if(x2 == x3):
+            adjustedX = x2 
+            # If egde goes from the top of the screen to the bottom
+            if(y2 < y3): adjustedY = y2 + scaledDist
+            # If egde goes from the bottom of the screen to the top
+            else: adjustedY = y2 - scaledDist 
+        elif(y2 == y3):
+            # Furthest Y coordinate remains unchanged
+            adjustedY = y3
+            # If edge goes from left to right
+            if(x2 < x3): adjustedX = x2 + scaledDist
+            # If the edge goes from right to left 
+            else: adjustedX = x2 - scaledDist   
+        else: 
+            adjustedX, adjustedY = self.__handleDiagonalLine()
+
+        # Update coords on screen
+        canvas.coords(self.__currentEdgeID, x2, y2, adjustedX, adjustedY) 
+        # Update coords in CanvasEdge Object 
+        self.__currentEdgeObj.updateCoords(canvas.coords(self.__currentEdgeID))
+        # Since the edge has been shrunk, one of the nodes need to reconnected to the end of the edge 
+        self.__reconnectNodeToEdge() 
+
+
+        # Update coords on screen
+        canvas.coords(self.__currentEdgeID, x2, y2, adjustedX, adjustedY) 
+        # Update coords in CanvasEdge Object 
+        self.__currentEdgeObj.updateCoords(canvas.coords(self.__currentEdgeID))
+        # Since the edge has been shrunk, one of the nodes need to reconnected to the end of the edge 
+        self.__reconnectNodeToEdge() 
+
+    # Shrinks and edge to match it's weight 
+    def __handleShrinkingEdge(self):
+        # Reference to canvas
+        canvas = self.__screen.getCanvas()
+        # Start and end coords of edge 
+        x2, y2, x3, y3 = self.__currentEdgeObj.getCoords()
+
+        # Maps the edges weight onto the range defining 
+        # the maxiumum and minimum on screen distance between nodes 
+        scaledDist = self.__calculateScaledDist()
+
+        # Straight line along the y-axis
+        if(x2 == x3):   
+            # Furthest X coordinate remains unchanged
+            adjustedX = x3 
+            # If egde goes from the top of the screen to the bottom
+            if(y2 < y3): adjustedY = y2 + scaledDist
+            # If egde goes from the bottom of the screen to the top
+            else: adjustedY = y2 - scaledDist
+        # Straight line along the x-axis
+        elif(y2 == y3): 
+            # Furthest Y coordinate remains unchanged
+            adjustedY = y3
+            # If edge goes from left to right
+            if(x2 < x3): adjustedX = x2 + scaledDist
+            # If the edge goes from right to left 
+            else: adjustedX = x2 - scaledDist        
+        else:  
+            adjustedX, adjustedY = self.__handleDiagonalLine()  
+         
+        # Update coords on screen
+        canvas.coords(self.__currentEdgeID, x2, y2, adjustedX, adjustedY) 
+        # Update coords in CanvasEdge Object 
+        self.__currentEdgeObj.updateCoords(canvas.coords(self.__currentEdgeID))
+        # Since the edge has been shrunk, one of the nodes need to reconnected to the end of the edge 
+        self.__reconnectNodeToEdge() 
+        
+    # Calculated new coords of a diagonal edge    
+    def __handleDiagonalLine(self) -> tuple:
+         # Start and end coords of edge 
+        x2, y2, x3, y3 = self.__currentEdgeObj.getCoords()
+        
+        # New X-Y Coords for the end of the edge 
+        adjustedX, adjustedY = 0, 0
+        
+        # Maps the edges weight onto the range defining 
+        # the maxiumum and minimum on screen distance between nodes 
+        scaledDist = self.__calculateScaledDist()
+        
+        # Get on screen length of edge 
+        onScreenDist = self.__calculateDistance(x2, y2, x3, y3)
+
+        # There are four cases for a given edges direction             
+        if(y2 > y3):  
+            # Calculate theta using y2 and y3
+            theta = self.__calculateTheta(abs(y2 - y3), onScreenDist) 
+            # Calculate Offsets needed to calculate new coords 
+            yOffset, xOffset = self.__calculateXYOffsets(theta, scaledDist) 
+            # Calculates new coords by adding or subtracting offsets 
+            if(x2 > x3):
+                adjustedX = x2 - xOffset 
+                adjustedY = y2 - yOffset
+            else:
+                adjustedX = x2 + xOffset 
+                adjustedY = y2 - yOffset
+        else: 
+            # Calculate theta using x2 and x3
+            theta = self.__calculateTheta(abs(x2 - x3), onScreenDist) 
+            # Calculared offsets to calculate new coords 
+            xOffset, yOffset = self.__calculateXYOffsets(theta, scaledDist)
+            # Calculates new coords by adding or subtracting offsets 
+            if(x2 > x3):
+                adjustedX = x2 - xOffset 
+                adjustedY = y2 + yOffset
+            else:
+                adjustedX = x2 + xOffset 
+                adjustedY = y2 + yOffset  
+        return (adjustedX, adjustedY)
+
+    def __reconnectNodeToEdge(self): 
+        # Reference to canvas
+        canvas = self.__screen.getCanvas() 
+        # Offset needed calculate nodes new coords
+        circleOffset = self.__model.getCircleSize() // 2 
+        # Only need the last coords of the edge 
+        _, _, x0, y0 = self.__currentEdgeObj.getCoords() 
+        # Updates on screen position of the node 
+        # Needs to rounded or floating point precision causes node to "vibrate"
+        canvas.coords(self.__edgeEndNode.getCanvasID(), 
+                      math.ceil(x0 - circleOffset), math.ceil(y0 - circleOffset), 
+                      math.ceil(x0 + circleOffset), math.ceil(y0 + circleOffset)) 
+        # Update coords in the CanvasNode Object
+        self.__edgeEndNode.updateCoords(canvas.coords(self.__edgeEndNode.getCanvasID()))
+
+    # Returns the value of the angle between the hypotenuse and adjacent side in radians 
+    def __calculateTheta(self, oppsiteLength : int, hypotenuseLength : int) -> float: 
+        return math.asin(abs(oppsiteLength) / hypotenuseLength)         
+
+    # Calculates the offsets needed to scale the edges length with it's weight
+    def __calculateXYOffsets(self, theta : float, hypotenuseLength : float) -> tuple:
+        return (math.sin(theta) * hypotenuseLength, math.cos(theta) * hypotenuseLength)
+        
+    # Maps an edges weight onto a range which defines the maximum 
+    # and minimum on screen distance between nodes
+    def __calculateScaledDist(self) -> int: 
+        return math.ceil(self.__model.getMinScreenDist() + \
+                ((self.__model.getMaxScreenDist() - self.__model.getMinScreenDist()) / 
+                 (self.__model.getMaxWeight() - self.__model.getMinWeight())) * \
+                (self.__currentEdgeObj.getWeight() - self.__model.getMinWeight()))
 
     # Deletes the newly drawn edge or existing edge
     def deleteEdge(self): 
@@ -176,7 +365,7 @@ class TraversalController():
    
     # Deletes egde from relevant data structure 
     def __deleteEdgeFromDict(self): 
-        connectedNodes = (self.__fromNode, self.__toNode) 
+        connectedNodes = (self.__edgeStartNode, self.__edgeEndNode) 
         # If egdes exists with tuple of nodes as the key
         if(self.__model.getEdge(connectedNodes) != -1): 
             self.__model.deleteEdge(connectedNodes) 
@@ -185,7 +374,7 @@ class TraversalController():
 
     # Returns the Edge Canvas object
     def __getCanvasEdge(self) -> CanvasEdge: 
-        connectedEdges = (self.__fromNode, self.__toNode)
+        connectedEdges = (self.__edgeStartNode, self.__edgeEndNode)
         if(connectedEdges in self.__model.getEdges()): 
             return self.__model.getEdge(connectedEdges)
         else: return self.__model.getEdge(connectedEdges[::-1])
@@ -194,21 +383,21 @@ class TraversalController():
     def __deleteEdgeOnClick(self, event : Event):
         canvas = self.__screen.getCanvas() 
         collisions = canvas.find_overlapping(event.x, event.y , event.x, event.y) 
-        if(len(collisions) == 1 and self.__currentEdge in collisions): 
+        if(len(collisions) == 1 and self.__currentEdgeID in collisions): 
             self.__deleteEdge()
             self.__stopMovingEdge() 
             self.__clearVariables() 
 
     # Deletes current edge from the screen 
     def __deleteEdge(self): 
-        self.__screen.getCanvas().delete(self.__currentEdge) 
+        self.__screen.getCanvas().delete(self.__currentEdgeID) 
             
     # Add event to draw a line representing an edge
-    def __addCanvasEvent(self, canvasNode : CanvasNode): 
+    def __addMovingEdgeEvent(self, canvasNode : CanvasNode): 
         self.__screen.getCanvas().bind("<Motion>", lambda event: self.__drawEdge(event, canvasNode))
 
     # Removes the event that draws lines representing edges 
-    def __deleteCanvasEvent(self):  
+    def __deleteMovingEdgeEvent(self):  
         canvas = self.__screen.getCanvas()
         if("<Motion>" in canvas.bind()):
             canvas.unbind("<Motion>")
@@ -225,37 +414,80 @@ class TraversalController():
         # If the mouse is still in the node, the edge is not drawn yet
         if(canvasNode.getCanvasID() in collisions): return  
         # If there is no current edge 
-        if(self.__currentEdge == None): 
+        if(self.__currentEdgeID == None): 
             # Create a new edge and assign it to a variable 
-            self.__currentEdge = canvas.create_line(x0 + circleOffset, y0 + circleOffset, 
-                                                    event.x, event.y, width = "3")  
+            self.__currentEdgeID = canvas.create_line(x0 + circleOffset, y0 + circleOffset, 
+                                                    event.x, event.y, width = "3", arrow=BOTH)  
             # Lowers the priority of the edge, so it appears below nodes 
-            canvas.tag_lower(self.__currentEdge) 
+            canvas.tag_lower(self.__currentEdgeID) 
         # If there is an edge being drawn on screen
         else:   
             # Gets current coordinates of the line
-            lineCoords = canvas.coords(self.__currentEdge)
+            lineCoords = canvas.coords(self.__currentEdgeID)
             # Change XY coordinates to where the mouse is
             lineCoords[2] = event.x 
             lineCoords[3] = event.y 
             # Updates the lines coordinates 
-            canvas.coords(self.__currentEdge, lineCoords)
+            canvas.coords(self.__currentEdgeID, lineCoords)
         
     # Draws an edge to the centre of the circle
-    def __centreEdge(self, destinationNode : CanvasNode) -> tuple: 
+    def __centreEdge(self) -> tuple: 
         circleOffset = self.__model.getCircleSize() // 2 
+        # Reference to canvas 
         canvas = self.__screen.getCanvas()  
         # Get Coords of the destination node 
-        x1, y1, _, _ = destinationNode.getCoords() 
+        x1, y1, _, _ = self.__edgeEndNode.getCoords() 
         # Gets current coords of the edges
-        coords = canvas.coords(self.__currentEdge) 
+        coords = canvas.coords(self.__currentEdgeID) 
         # Update coords of the edge to be in the middle of the passed node
         coords[2] = x1 + circleOffset 
         coords[3] = y1 + circleOffset 
         # Send updated coords to the canvas
-        canvas.coords(self.__currentEdge, coords)  
+        canvas.coords(self.__currentEdgeID, coords)  
         # Return the updated coords of the edge 
         return coords 
+    
+    # Adjusts position of the edge 
+    # Allows the arrow/s to not be hidden in the centre of each node
+    def __adjustEdgeCoords(self) -> tuple:
+
+        canvas = self.__screen.getCanvas()    
+        circleRadius = self.__model.getCircleSize() // 2 
+
+        # x,y coords of both nodes
+        x0, y0, _, _ = self.__edgeStartNode.getCoords()
+        x1, y1, _, _ = self.__edgeEndNode.getCoords() 
+
+        # calculates centre coords of each node 
+        x0 += circleRadius 
+        y0 += circleRadius 
+        
+        x1 += circleRadius 
+        y1 += circleRadius  
+
+        # Gets current coords of the edge
+        coords = canvas.coords(self.__currentEdgeID)   
+
+        # Calculate direction of the edge in relation to the circle
+        dx = coords[0] - x1
+        dy = coords[1] - y1 
+
+        # Length of the line 
+        length = math.sqrt((dx**2 + dy**2)) 
+
+        # Normalise vectors 
+        dx /= length 
+        dy /= length 
+
+        # X coord of the circumference, the arrow touches
+        px = x1 + circleRadius * dx 
+        # Y coord of the circumference, the arrow touches
+        py = y1 + circleRadius * dy
+
+        # Readjust line 
+        canvas.coords(self.__currentEdgeID, coords[0], coords[1], px, py)
+        # Return updated coords of the line 
+        return canvas.coords(self.__currentEdgeID)
 
     # Checks if a new node can be added to the screen.  
     # Nodes can be added to the screen if there are no 
@@ -277,10 +509,10 @@ class TraversalController():
             len(self.__model.getNodes()) == self.__model.getMaxNumNodes() else True
         
     # Moves the node to follow the users mouse 
-    def __moveNode(self, event : Event, canvasNode : CanvasNode) -> None:  
+    def __moveNode(self, event : Event, canvasNode : CanvasNode) -> None:   
         # Disables canvas event that draws edges if it binded 
-        self.__deleteCanvasEvent()
-        # Sets False so another edge cna be drawn later
+        self.__deleteMovingEdgeEvent()
+        # Sets False so another edge can be drawn later
         self.__isEdgeBeingDrawn = False
 
         # Reference to the canvas 
@@ -299,15 +531,19 @@ class TraversalController():
 
         # Updates coords in the CanvasNode object
         canvasNode.updateCoords((xCoord, yCoord, xCoord + circleSize, yCoord + circleSize))
-        # Applies forces to each node 
-        self.__calculateForces(canvasNode)
+        
+        
+        # Applies forces to each node -> disabled for now 
+        # self.__calculateForces(canvasNode)
 
         # Updates coords in the CanvasNode object
         canvasNode.updateCoords((xCoord, yCoord, xCoord + circleSize, yCoord + circleSize))
         self.__redrawNodes()
         self.__redrawEdges()
+        
         # Moves center of the circle to the coordinates specified 
         #canvas.moveto(canvasNode.getCanvasID(), xCoord, yCoord) 
+        
         # Updates screen so node can be seen onscreen
         self.__screen.getWindow().update()
 
@@ -444,8 +680,3 @@ class TraversalController():
 
     
 # Listen to Paranoid by Black Sabbath
-
-
-
-
-

@@ -50,6 +50,11 @@ class TraversalModel():
         # Resolution of the weight slider
         self.__weightSliderResolution = 1
 
+        # Smallest distance nodes can be apart on screen 
+        self.__minScreenDist = 50
+        # Smallest distance nodes can be apart on screen 
+        self.__maxScreenDist = 150
+
     # Adds controller         
     def addController(self, controller): 
         self.__controller = controller 
@@ -58,6 +63,10 @@ class TraversalModel():
     def getMinDelay(self): return self.__minDelay
     def getMaxDelay(self): return self.__maxDelay  
     def getResolution(self): return self.__resolution   
+
+    # Getters for distances between nodes on screen 
+    def getMinScreenDist(self) -> int: return self.__minScreenDist
+    def getMaxScreenDist(self) -> int: return self.__maxScreenDist
 
     # Getters for node data
     def getInitialCoords(self): return self.__initialNodeCoords    
@@ -95,6 +104,4 @@ class TraversalModel():
     def getDefaultWeight(self) -> int: return self.__defaultWeight
     def getWeightSliderResolution(self) -> int: return self.__weightSliderResolution 
 
-    
- 
 # Listen to Jigsaws Falling Into Place by Radiohead

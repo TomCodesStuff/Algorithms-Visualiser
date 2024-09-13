@@ -9,6 +9,7 @@ import tkinter as tk
 from tkinter import ttk 
 from .traversal_controller import TraversalController
 from .traversal_model import TraversalModel
+from canvas_objects import CanvasNode, CanvasEdge
 
 class TraversalScreen(sc.Screen, sc.ScreenTemplate): 
     def initScreen(self) -> None:
@@ -76,42 +77,27 @@ class TraversalScreen(sc.Screen, sc.ScreenTemplate):
     # Creates options to add edges or edit existing ones
     def __createAddEdgeOption(self) -> None: 
         # Frame containing widgets for adding an option
-        self.__edgeNodesFrame = tk.Frame(self.getOptionsWidgetFrame()) 
+        self.__edgeNodesFrame = tk.Frame(self.getOptionsWidgetFrame(), background="white") 
         # Display frame on screen
         self.__edgeNodesFrame.pack(pady=(10, 0))  
 
         # Calls functions to create add edge options 
-        self.__createNodeEdgeLabels() 
         self.__createEdgeWeightOption() 
-        #self.__createEdgeDirectionOptions() 
+        self.__createEdgeDirectionOptions() 
         self.__createEdgeConfirmationButtons()
 
-    # Create options that display nodes an edge connects
-    def __createNodeEdgeLabels(self) -> None:
-        self.__createLabel(self.__edgeNodesFrame, text="From").grid(row=0, column=0) 
-        
-        # Label that will contain ID of node the edge starts at
-        self.__nodeFromLabel = self.__createLabel(self.__edgeNodesFrame, width=6)
-        self.__nodeFromLabel.grid(row=0, column=1)
-        # Underline underneath label
-        tk.Frame(background="black").place(in_=self.__nodeFromLabel, x=0, rely=1.0, height=2, relwidth=1.0)
-
-        self.__createLabel(self.__edgeNodesFrame, text="To").grid(row=0, column=2)
-        # Label that will contain ID of node the edge ends at
-        self.__nodeToLabel = self.__createLabel(self.__edgeNodesFrame, width=6)
-        self.__nodeToLabel.grid(row=0, column=3) 
-        # Underline underneath label
-        tk.Frame(background="black").place(in_=self.__nodeToLabel, x=0, rely=1.0, height=2, relwidth=1.0)
-
-    # Create option to let user input an edges weight/cost
+        # Hide the options until they are needed 
+        self.__hideEdgeOptions()
+    
+    # Create option to let users change an edges weight/cost
     def __createEdgeWeightOption(self) -> None:
         # Frame to store entry widget to let users to choose an edges weight
-        self.__edgeWeightFrame = tk.Frame(self.getOptionsWidgetFrame(), background="white") 
+        self.__edgeWeightFrame = tk.Frame(self.__edgeNodesFrame, background="white") 
         self.__edgeWeightFrame.pack(pady=(10,0))
         self.__weightSlider = tk.Scale(self.__edgeWeightFrame, from_ = self.__model.getMinWeight(), 
                                        to_=self.__model.getMaxWeight(), resolution=self.__model.getWeightSliderResolution(), 
                                        length = self.getOptionsWidgetFrame().winfo_width(), orient="horizontal", showvalue=False, 
-                                       bg = "white", highlightbackground="white", state="disabled", command=self.__updateWeight)
+                                       bg = "white", highlightbackground="white", command=self.__updateWeight)
         
         self.__updateWeight("No Edge Selected")
         self.__weightSlider.pack()
@@ -123,7 +109,7 @@ class TraversalScreen(sc.Screen, sc.ScreenTemplate):
     # Create option to decide if edge is directed/undirected
     def __createEdgeDirectionOptions(self) -> None:
         # Add Radio buttons for directed and undirected edges 
-        self.__radioButtonFrame = tk.Frame(self.getOptionsWidgetFrame(), background="white")
+        self.__radioButtonFrame = tk.Frame(self.__edgeNodesFrame, background="white")
         self.__radioButtonFrame.pack(pady=(10, 0))
         # Stores the value of the currently selected radio button
         self.__edgeType = tk.IntVar() 
@@ -134,7 +120,7 @@ class TraversalScreen(sc.Screen, sc.ScreenTemplate):
 
     # Create buttons to save or delete an edge    
     def __createEdgeConfirmationButtons(self): 
-        self.__edgeConfirmationFrame = tk.Frame(self.getOptionsWidgetFrame(), background="white")
+        self.__edgeConfirmationFrame = tk.Frame(self.__edgeNodesFrame, background="white")
         self.__edgeConfirmationFrame.pack(pady=(10, 0)) 
         self.__createSaveEdgeButton()
         self.__createDeleteEdgeButton()
@@ -142,13 +128,13 @@ class TraversalScreen(sc.Screen, sc.ScreenTemplate):
     # Create button to save edge 
     def __createSaveEdgeButton(self) -> None:
         self.__saveEdgeButton = tk.Button(self.__edgeConfirmationFrame, text = "Save.", width=6, relief = "solid", 
-                                          font=(self.getFont(), self.getFontSize()), command=self.__addEdge, state="disabled")
+                                          font=(self.getFont(), self.getFontSize()), command=self.__saveEdge)
         self.__saveEdgeButton.grid(row=0, column=0, padx=(0, 5)) 
     
     # Create button to delete edge 
     def __createDeleteEdgeButton(self) -> None:
         self.__deleteEdgeButton = tk.Button(self.__edgeConfirmationFrame, text="Delete.", width=6, relief="solid",
-                                            font=(self.getFont(), self.getFontSize()), command=self.__deleteEdge, state="disabled")
+                                            font=(self.getFont(), self.getFontSize()), command=self.__deleteEdge)
         self.__deleteEdgeButton.grid(row=0, column=1, padx=(10, 0))
 
     # Wrapper function to create a Radio Button
@@ -164,64 +150,64 @@ class TraversalScreen(sc.Screen, sc.ScreenTemplate):
         if(width): label.config(width=width)
         return label
     
-    def __addEdge(self):     
+    def __hideEdgeOptions(self): 
+        self.__edgeNodesFrame.pack_forget() 
+    
+    def __showEdgeOptions(self) -> None: 
+        self.__edgeNodesFrame.pack()
+
+    def __saveEdge(self) -> None:     
         # Updates egdes weight 
         self.__controller.saveEdge(self.__weightSlider.get())
         # Add function to change weight of object if needed 
         self.disableWeightOptions()   
-        # Clear text in labels 
-        self.clearNodeLabelsText()
 
-    def __deleteEdge(self):  
+    def __deleteEdge(self) -> None:  
         # Deletes newly drawn weight or prexising weight 
         self.__controller.deleteEdge()
         # Add function to delete edge  
         self.disableWeightOptions()
-        # Clear text in labels  
-        self.clearNodeLabelsText()
-        
-    # Update text in label that displays node, edge starts from
-    def updateFromLabelText(self, nodeID : str) -> None:  
-        self.__nodeFromLabel.config(text=nodeID)
-    
-    # Update text in label that displays node, edge ends at
-    def updateToLabelText(self, nodeID : str): 
-        self.__nodeToLabel.config(text=nodeID)
+  
 
     # Updates weight displayed in the slider bar 
-    def updateWeightOnScreen(self, edgeWeight : int): 
+    def updateWeightOnScreen(self, edgeWeight : int) -> None: 
         self.__weightSlider.set(edgeWeight)
         # If edges weight is the minimum weight
         if(edgeWeight == self.__model.getMinWeight()):  
             # Need to manually change text above the slider 
             self.__updateWeight(str(self.__model.getMinWeight()))
 
-    # Clear text in labels that display the node IDs
-    def clearNodeLabelsText(self): 
-        self.__nodeFromLabel.config(text="")
-        self.__nodeToLabel.config(text="")  
     
     # Resets position and disables weight slider 
-    def resetWeightSlider(self): 
+    def resetWeightSlider(self) -> None: 
         # Resets text
         self.__updateWeight("No Edge Selected") 
         # Disables slider 
         self.__weightSlider.config(state="disabled")
     
     # Enables egde options so users can toggle them
-    def enableWeightOptions(self): 
-        # Sets relevant widget to active 
-        self.__weightSlider.config(state="active")
+    def enableWeightOptions(self, canvasEdge : CanvasEdge) -> None: 
+        # Update weight slider 
+        self.__updateWeight(canvasEdge.getWeight())  
+        # Enables buttons and slider (so they work lol)
         self.__saveEdgeButton.config(state="active")
-        self.__deleteEdgeButton.config(state="active")
+        self.__deleteEdgeButton.config(state="active")  
+        self.__weightSlider.config(state="active")
+        # Moves thumb of slider to correct value -> scale must be active first 
+        self.__weightSlider.set(canvasEdge.getWeight())
+
+        # Show edge options 
+        self.__showEdgeOptions()
     
     # Disables edge options and resets weight slider 
-    def disableWeightOptions(self):  
+    def disableWeightOptions(self) -> None:  
         # Disables buttons
         self.__saveEdgeButton.config(state="disabled")
         self.__deleteEdgeButton.config(state="disabled") 
         # Disable and reset weight slider 
         self.resetWeightSlider()
+        # Makes edge Options invisible 
+        self.__hideEdgeOptions()
 
     # Creates buttons that lets user execute algorithms or stop them
     def __createStopSolveButtons(self) -> None:
