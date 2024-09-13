@@ -15,6 +15,8 @@ class TraversalController():
         self.__model = model  
         
         # Attributes that handle drawing edges 
+        
+        # Attributes that handle drawing edges 
         self.__isEdgeBeingDrawn = False 
         self.__edgeStartNode = None 
         self.__edgeEndNode = None 
@@ -378,6 +380,8 @@ class TraversalController():
         if(connectedEdges in self.__model.getEdges()): 
             return self.__model.getEdge(connectedEdges)
         else: return self.__model.getEdge(connectedEdges[::-1])
+    
+    # Deletes current edge being drawn if user clicks the canvas 
     
     # Deletes current edge being drawn if user clicks the canvas 
     def __deleteEdgeOnClick(self, event : Event):

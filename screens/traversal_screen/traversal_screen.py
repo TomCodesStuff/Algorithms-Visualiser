@@ -103,6 +103,7 @@ class TraversalScreen(sc.Screen, sc.ScreenTemplate):
         self.__weightSlider.pack()
 
     # Updates text in label abive weight slider 
+    # Updates text in label abive weight slider 
     def __updateWeight(self, value : str) -> None:
         self.__weightSlider.config(label = f"Weight: {value}")    
 
