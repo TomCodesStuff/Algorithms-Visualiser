@@ -179,33 +179,11 @@ class TraversalController():
        
     # Adjusts size of the edge to be more representative of its weight 
     def __adjustScreenDistance(self) -> None:  
-        # Start and end coords of edge 
-        x2, y2, x3, y3 = self.__currentEdgeObj.getCoords()
-
-        # Maps the edges weight onto the range defining 
-        # the maxiumum and minimum on screen distance between nodes 
-        scaledDist = self.__calculateScaledDist()
-        
-        # Get on screen length of edge 
-        onScreenDist = self.__calculateDistance(x2, y2, x3, y3)
-
-        # If the edges length is to be decreased 
-        if(scaledDist < onScreenDist): 
-            self.__handleShrinkingEdge()
-        else:
-            self.__handleGrowingEdge()
-    
-    # Increases an edges length to match it's weight 
-    def __handleGrowingEdge(self): 
-        # Edge case of grows outside screen 
-        # - push as far as can in direction 
-        # - push as rest/far can in other direction  
-        # TODO (so I can come back easier)
-
         # Reference to canvas
         canvas = self.__screen.getCanvas()
         # Start and end coords of edge 
         x2, y2, x3, y3 = self.__currentEdgeObj.getCoords()
+        # New ending X-Y coords of the edge 
         adjustedX, adjustedY = 0, 0
 
         # Maps the edges weight onto the range defining 
@@ -215,6 +193,40 @@ class TraversalController():
         # Get on screen length of edge 
         onScreenDist = self.__calculateDistance(x2, y2, x3, y3)
 
+        # If the length does not need changing
+        if(onScreenDist == scaledDist): return
+
+        # If the edge is a diagonal line 
+        if(x2 != x3 and y2 != y3):
+            adjustedX, adjustedY = self.__handleDiagonalLine()   
+        elif(scaledDist < onScreenDist): 
+            adjustedX, adjustedY = self.__handleGrowingStraightLine() 
+        else: adjustedX, adjustedY = self.__handleShrinkingStraightLine()
+
+        
+        # Update coords on screen
+        canvas.coords(self.__currentEdgeID, x2, y2, adjustedX, adjustedY) 
+        # Update coords in CanvasEdge Object 
+        self.__currentEdgeObj.updateCoords(canvas.coords(self.__currentEdgeID))
+        # Since the edge has been shrunk, one of the nodes need to reconnected to the end of the edge 
+        self.__reconnectNodeToEdge() 
+
+
+    # Increases an edges length to match it's weight 
+    def __handleGrowingStraightLine(self): 
+        # Edge case of grows outside screen 
+        # - push as far as can in direction 
+        # - push as rest/far can in other direction  
+        # TODO (so I can come back easier)
+
+        # Start and end coords of edge 
+        x2, y2, x3, y3 = self.__currentEdgeObj.getCoords()
+        adjustedX, adjustedY = 0, 0
+
+        # Maps the edges weight onto the range defining 
+        # the maxiumum and minimum on screen distance between nodes 
+        scaledDist = self.__calculateScaledDist()
+        
         if(x2 == x3):
             adjustedX = x2 
             # If egde goes from the top of the screen to the bottom
@@ -228,28 +240,11 @@ class TraversalController():
             if(x2 < x3): adjustedX = x2 + scaledDist
             # If the edge goes from right to left 
             else: adjustedX = x2 - scaledDist   
-        else: 
-            adjustedX, adjustedY = self.__handleDiagonalLine()
-
-        # Update coords on screen
-        canvas.coords(self.__currentEdgeID, x2, y2, adjustedX, adjustedY) 
-        # Update coords in CanvasEdge Object 
-        self.__currentEdgeObj.updateCoords(canvas.coords(self.__currentEdgeID))
-        # Since the edge has been shrunk, one of the nodes need to reconnected to the end of the edge 
-        self.__reconnectNodeToEdge() 
-
-
-        # Update coords on screen
-        canvas.coords(self.__currentEdgeID, x2, y2, adjustedX, adjustedY) 
-        # Update coords in CanvasEdge Object 
-        self.__currentEdgeObj.updateCoords(canvas.coords(self.__currentEdgeID))
-        # Since the edge has been shrunk, one of the nodes need to reconnected to the end of the edge 
-        self.__reconnectNodeToEdge() 
+        
+        return adjustedX, adjustedY
 
     # Shrinks and edge to match it's weight 
-    def __handleShrinkingEdge(self):
-        # Reference to canvas
-        canvas = self.__screen.getCanvas()
+    def __handleShrinkingStraightLine(self):
         # Start and end coords of edge 
         x2, y2, x3, y3 = self.__currentEdgeObj.getCoords()
 
@@ -272,16 +267,9 @@ class TraversalController():
             # If edge goes from left to right
             if(x2 < x3): adjustedX = x2 + scaledDist
             # If the edge goes from right to left 
-            else: adjustedX = x2 - scaledDist        
-        else:  
-            adjustedX, adjustedY = self.__handleDiagonalLine()  
-         
-        # Update coords on screen
-        canvas.coords(self.__currentEdgeID, x2, y2, adjustedX, adjustedY) 
-        # Update coords in CanvasEdge Object 
-        self.__currentEdgeObj.updateCoords(canvas.coords(self.__currentEdgeID))
-        # Since the edge has been shrunk, one of the nodes need to reconnected to the end of the edge 
-        self.__reconnectNodeToEdge() 
+            else: adjustedX = x2 - scaledDist    
+
+        return adjustedX, adjustedY    
         
     # Calculated new coords of a diagonal edge    
     def __handleDiagonalLine(self) -> tuple:
