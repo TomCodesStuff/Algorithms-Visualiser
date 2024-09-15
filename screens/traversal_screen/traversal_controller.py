@@ -201,23 +201,104 @@ class TraversalController():
             adjustedX, adjustedY = self.__handleDiagonalLine()   
         elif(scaledDist < onScreenDist): 
             adjustedX, adjustedY = self.__handleGrowingStraightLine() 
+
         else: adjustedX, adjustedY = self.__handleShrinkingStraightLine()
 
-        
+        # Edge case of grows outside screen 
+        # - push as far as can in direction -> then just move node/s 
+        # - push as rest/far can in other direction  
+        # TODO (so I can come back easier)
+
         # Update coords on screen
         canvas.coords(self.__currentEdgeID, x2, y2, adjustedX, adjustedY) 
         # Update coords in CanvasEdge Object 
         self.__currentEdgeObj.updateCoords(canvas.coords(self.__currentEdgeID))
         # Since the edge has been shrunk, one of the nodes need to reconnected to the end of the edge 
-        self.__reconnectNodeToEdge() 
+        self.__reconnectNodeToEdge()   
+        self.__handleOutOfBounds()
 
+    # Handles when a node is pushed off screen when an edges length is increased
+    # (This is a bit jank but I don't care) 
+    # (Can cause the edges length to shrink a little but I really don't care)
+    def __handleOutOfBounds(self):
+        # Reference to canvas
+        canvas = self.__screen.getCanvas()
+        # Size of nodes
+        circleSize = self.__model.getCircleSize()  
+        # Offset added to calculate coords of a nodes centre
+        circleCentreOffset = circleSize // 2
+
+        # Coords of node potentially offscreen
+        x0, y0, x1, y1 = self.__edgeEndNode.getCoords()  
+        # Offsets will be used to calculate how far the 
+        # node still on screen needs to move to preserve edge length
+        xOffset, yOffset = 0, 0
+
+        # If node is offscreen to the left
+        if(x0 < 0):  
+            # Calculate offset to be added to x coords of node still on screen
+            xOffset = self.__model.getCanvasUpperBoundOffset() - x0  
+            # Calculate new x coords of node that is offscreen
+            x0 = self.__model.getCanvasUpperBoundOffset()
+            x1 = x0 + circleSize
+        # If the node is offscreen to the right
+        if(x1 > canvas.winfo_width()):
+            # Calculate offset to be added to x coords of node still on screen
+            xOffset = canvas.winfo_width() - self.__model.getCanvasUpperBoundOffset() - x1
+            # Calculate new x coords of node that is offscreen
+            x1 = canvas.winfo_width() - self.__model.getCanvasUpperBoundOffset()  
+            x0 = x1 - circleSize
+        # If the node is above the viewable screen
+        if(y0 < 0): 
+            # Calculate offset to be added to y coords of node still on screen
+            yOffset = self.__model.getCanvasUpperBoundOffset() - y0
+            # Calculate new y coords of node that is offscreen
+            y0 = self.__model.getCanvasUpperBoundOffset() 
+            y1 = y0 + circleSize
+        # If the node is below the viewable screen 
+        if(y1 > canvas.winfo_height()):
+            # Calculate offset to be added to y coords of node still on screen
+            yOffset = canvas.winfo_height() - self.__model.getCanvasUpperBoundOffset() - y1
+             # Calculate new y coords of node that is offscreen
+            y1 = canvas.winfo_height() - self.__model.getCanvasUpperBoundOffset() 
+            y1 = y0 + circleSize
+        
+        # Precision with floating points can cause nodes to shrink noticeably 
+        # Make sure size of nodes is still preserved 
+        if(y1 - y0 != self.__model.getCircleSize()): 
+            y1 += (circleSize - (y1 - y0))
+
+        # Update coords of node so it's back on screen 
+        canvas.coords(self.__edgeEndNode.getCanvasID(), x0, y0, x1, y1) 
+        # Update coords in node Object 
+        self.__edgeEndNode.updateCoords((x0, y0, x1, y1))
+
+        # Get coords of node that was not pushed off screen
+        x2, y2, x3, y3 = self.__edgeStartNode.getCoords()  
+        # Add offsets to the nodes coords so the length of the edge is kept the same  
+        x2 += xOffset 
+        x3 += xOffset 
+        y2 += yOffset 
+        y3 += yOffset
+        
+        # Update coords of node so it's back on screen 
+        canvas.coords(self.__edgeStartNode.getCanvasID(), math.floor(x2), math.floor(y2), 
+                      math.floor(x3), math.floor(y3)) 
+        # Update coords in node Object 
+        self.__edgeStartNode.updateCoords((x2, y2, x3, y3))
+
+        # Get updated starting coords of nodes (also used to test that objects are keeping accurate coords)
+        x0, y0, _, _ = self.__edgeEndNode.getCoords()
+        x2, y2, _, _ = self.__edgeStartNode.getCoords()  
+
+        # Updates edge so it is reconnected to the nodes 
+        canvas.coords(self.__currentEdgeID, x0 + circleCentreOffset, y0 + circleCentreOffset, 
+                      x2 + circleCentreOffset, y2 + circleCentreOffset) 
+        self.__currentEdgeObj.updateCoords((x0 + circleCentreOffset, y0 + circleCentreOffset,
+                                             x2 + circleCentreOffset, y2 + circleCentreOffset))
 
     # Increases an edges length to match it's weight 
     def __handleGrowingStraightLine(self): 
-        # Edge case of grows outside screen 
-        # - push as far as can in direction 
-        # - push as rest/far can in other direction  
-        # TODO (so I can come back easier)
 
         # Start and end coords of edge 
         x2, y2, x3, y3 = self.__currentEdgeObj.getCoords()
