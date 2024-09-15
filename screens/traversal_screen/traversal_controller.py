@@ -199,9 +199,10 @@ class TraversalController():
         # If the edge is a diagonal line 
         if(x2 != x3 and y2 != y3):
             adjustedX, adjustedY = self.__handleDiagonalLine()   
+        # If the edge is increasing in size  
         elif(scaledDist < onScreenDist): 
-            adjustedX, adjustedY = self.__handleGrowingStraightLine() 
-
+            adjustedX, adjustedY = self.__handleGrowingStraightLine()  
+        # If the edge has decreased in size 
         else: adjustedX, adjustedY = self.__handleShrinkingStraightLine()
 
 
@@ -209,9 +210,13 @@ class TraversalController():
         canvas.coords(self.__currentEdgeID, x2, y2, adjustedX, adjustedY) 
         # Update coords in CanvasEdge Object 
         self.__currentEdgeObj.updateCoords(canvas.coords(self.__currentEdgeID))
-        # Since the edge has been shrunk, one of the nodes need to reconnected to the end of the edge 
+        # Since the edge's length has been changed one of the nodes need to reconnected to the end of the edge 
         self.__reconnectNodeToEdge()   
-        self.__handleOutOfBounds()
+
+        # If an edges length has increased
+        if(scaledDist > onScreenDist):    
+            # Handle edge case caused by a node being pushed past the canvas' boundaries    
+            self.__handleOutOfBounds()
 
     # Handles when a node is pushed off screen when an edges length is increased
     # (This is a bit jank but I don't care) 
