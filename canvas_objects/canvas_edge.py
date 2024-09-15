@@ -5,10 +5,17 @@ if(__name__ == "__main__"):
 
 class CanvasEdge(): 
     def __init__(self, canvasID : int, coords : tuple, weight : int) -> None: 
+        # ID used to identify edge on the canvas
         self.__canvasID = canvasID
+        # On screen coords of the edge
         self.__coords = coords
+        # Weight/cost
         self.__weight = weight
-        self.__isDirected = False 
+        self.__isDirected = False  
+        # The node that the edges XY coords start at 
+        self.__startNode = None  
+        # The node that the edges XY coords end at
+        self.__endNode = None 
     
     # Getter for canvas ID 
     def getCanvasID(self): 
@@ -24,6 +31,14 @@ class CanvasEdge():
     def getCoords(self) -> tuple: 
         return self.__coords
     def updateCoords(self, coords : tuple) -> None:
-        self.__coords = coords
+        self.__coords = coords 
+    
+    # Getter/Setters for adding the nodes the edge connects  
+    # Takes in CanvasNode Objects
+    def addNodes(self, startNode, endNode): 
+        self.__startNode = startNode 
+        self.__endNode = endNode 
+    
+    def getNodes(self) -> tuple: return (self.__startNode, self.__endNode)
 
 # Listen to Live Forever by Oasis 

@@ -22,6 +22,8 @@ class CanvasNode():
         self.__colour = "Blue"
         # Colour of the node when it is hovered over 
         self.__highlightColour = "Red"
+        # A Set containing references to edges that connects nodes to eachother 
+        self.__edges = set()
     
     # Updates the coordinates of the node to be accurate to the coordinates on screen
     def updateCoords(self, coords : tuple) -> None: 
@@ -34,7 +36,8 @@ class CanvasNode():
     def getCoords(self) -> tuple: return self.__coords
     def getID(self) -> int: return self.__ID    
     def getMainColour(self) -> str: return self.__colour 
-    def getHighlightColour(self) -> str: return self.__highlightColour 
+    def getHighlightColour(self) -> str: return self.__highlightColour  
+    def getConnectionsSet(self) -> set: return self.__edges
 
     # Adds a connection between this node and another node
     def addConnection(self, nodeID : int, weight : int) -> None: 
@@ -44,6 +47,9 @@ class CanvasNode():
     # Returns -1 if the connection doesn't exist
     def getConnection(self, nodeID: int) -> int:
         if(nodeID not in self.__connectedNodes): return -1 
-        return self.__connectedNodes[nodeID]
+        return self.__connectedNodes[nodeID] 
+    
+    # Adds a CanvasEdge Object to the set 
+    def addConnectionToSet(self, edge) -> None: self.__edges.add(edge)
     
 # Listen to Paralyzer by Finger Eleven     

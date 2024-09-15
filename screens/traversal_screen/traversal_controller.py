@@ -110,7 +110,12 @@ class TraversalController():
         # Get new or existing CanvasEdge object
         edge = self.__createCanvasEdge()
         # Updates current edge 
-        self.__currentEdgeID = edge.getCanvasID()
+        self.__currentEdgeID = edge.getCanvasID() 
+        # Add references to nodes in CanvasEdge object
+        edge.addNodes(self.__edgeStartNode, self.__edgeEndNode) 
+        # Add reference to edge in CanvasNode objects 
+        self.__edgeStartNode.addConnectionToSet(edge)
+        self.__edgeEndNode.addConnectionToSet(edge)
         return edge
 
     # Creates and returns a new CanvasEdge object
@@ -216,7 +221,47 @@ class TraversalController():
         # If an edges length has increased
         if(scaledDist > onScreenDist):    
             # Handle edge case caused by a node being pushed past the canvas' boundaries    
-            self.__handleOutOfBounds()
+            self.__handleOutOfBounds() 
+        
+        # When a node has been moved current edges need to be 
+        # moved so that they are connected to the node again 
+        # Both nodes could possibly be moved 
+        self.__reconnectEdges(self.__edgeStartNode)
+        self.__reconnectEdges(self.__edgeEndNode)
+
+    # TODO
+    def __reconnectEdges(self, node : CanvasNode) -> None:  
+        # Reference to canvas
+        canvas = self.__screen.getCanvas()  
+        # Starting coords of node
+        x0, y0, _, _ = node.getCoords() 
+        circleCentreOffset = self.__model.getCircleSize() // 2 
+        # Coords each edge needs to reconnect to node
+        newEdgeCoordX, newEdgeCoordY = x0 + circleCentreOffset, y0 + circleCentreOffset     
+        # XY coords of edge 
+        x2, y2, x3, y3 = 0, 0, 0, 0 
+        
+        # For each egde that connects the node to other nodes
+        for edge in node.getConnectionsSet():   
+            # Get XY coords of the current edge 
+            x2, y2, x3, y3 = edge.getCoords() 
+            # Get node connected at the beginning of the egde
+            edgeStartNode, _ = edge.getNodes()   
+            # If start of the edge needs to be reconnected
+            if(edgeStartNode == node):  
+                # Update starting XY coords of the node
+                x2 = newEdgeCoordX 
+                y2 = newEdgeCoordY  
+            # If the end of edge needs to be reconnected
+            else:
+                # Update ending XY coords of node 
+                x3 = newEdgeCoordX 
+                y3 = newEdgeCoordY 
+            
+            # Update position of edge on screen
+            canvas.coords(edge.getCanvasID(), x2, y2, x3, y3)  
+            # Update coords in CanvasEdge Object
+            edge.updateCoords(canvas.coords(edge.getCanvasID()))
 
     # Handles when a node is pushed off screen when an edges length is increased
     # (This is a bit jank but I don't care) 
