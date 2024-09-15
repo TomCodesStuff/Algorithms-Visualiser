@@ -204,10 +204,6 @@ class TraversalController():
 
         else: adjustedX, adjustedY = self.__handleShrinkingStraightLine()
 
-        # Edge case of grows outside screen 
-        # - push as far as can in direction -> then just move node/s 
-        # - push as rest/far can in other direction  
-        # TODO (so I can come back easier)
 
         # Update coords on screen
         canvas.coords(self.__currentEdgeID, x2, y2, adjustedX, adjustedY) 
@@ -294,8 +290,7 @@ class TraversalController():
         # Updates edge so it is reconnected to the nodes 
         canvas.coords(self.__currentEdgeID, x0 + circleCentreOffset, y0 + circleCentreOffset, 
                       x2 + circleCentreOffset, y2 + circleCentreOffset) 
-        self.__currentEdgeObj.updateCoords((x0 + circleCentreOffset, y0 + circleCentreOffset,
-                                             x2 + circleCentreOffset, y2 + circleCentreOffset))
+        self.__currentEdgeObj.updateCoords(canvas.coords(self.__currentEdgeID))
 
     # Increases an edges length to match it's weight 
     def __handleGrowingStraightLine(self): 
