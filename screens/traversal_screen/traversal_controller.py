@@ -69,6 +69,23 @@ class TraversalController():
         canvas.tag_bind(circle, "<B1-Motion>", lambda event: self.__moveNode(event, canvasNode))   
         # Add event listener to add an edge when a node is clicked 
         canvas.tag_bind(circle, "<Button-1>", lambda _: self.__createEdge(canvasNode))
+    
+    def __addEdgeEvents(self, edge : int, canvasEdge : CanvasEdge) -> None:
+        # Reference to the canvas 
+        canvas = self.__screen.getCanvas()    
+        canvas.tag_bind(edge, "<Button-1>", lambda _: self.__editEdgeOnClick(canvasEdge))
+    
+    def __editEdgeOnClick(self, canvasEdge : CanvasEdge) -> None: 
+        if(self.__isEdgeBeingDrawn or self.__isEdgeBeingEdited): return 
+
+        # Assign values to variables needed to edit edges 
+        self.__isEdgeBeingEdited = True 
+        self.__currentEdgeID = canvasEdge.getCanvasID()  
+        self.__currentEdgeObj = canvasEdge
+        self.__edgeStartNode, self.__edgeEndNode = canvasEdge.getNodes() 
+        # Show option on screen to an edge 
+        self.__screen.enableWeightOptions(self.__currentEdgeObj)
+
 
 
     # Creates a line that follows the mouse until another node is clicked 
@@ -111,11 +128,6 @@ class TraversalController():
         edge = self.__createCanvasEdge()
         # Updates current edge 
         self.__currentEdgeID = edge.getCanvasID() 
-        # Add references to nodes in CanvasEdge object
-        edge.addNodes(self.__edgeStartNode, self.__edgeEndNode) 
-        # Add reference to edge in CanvasNode objects 
-        self.__edgeStartNode.addConnectionToSet(edge)
-        self.__edgeEndNode.addConnectionToSet(edge)
         return edge
 
     # Creates and returns a new CanvasEdge object
@@ -138,9 +150,16 @@ class TraversalController():
             # Adjusts edge so arrow/s can be shown
             # coords = self.__adjustEdgeCoords()
             # Create new object, weight is initially set to the default 
-            newEdge = CanvasEdge(self.__currentEdgeID, coords, self.__model.getDefaultWeight()) 
+            newEdge = CanvasEdge(self.__currentEdgeID, coords, self.__model.getDefaultWeight())  
             # Add node to dictionary 
             self.__model.addEdge(connectedNodes, newEdge)   
+            # Add references to nodes in CanvasEdge object
+            newEdge.addNodes(self.__edgeStartNode, self.__edgeEndNode) 
+            # Add reference to edge in CanvasNode objects 
+            self.__edgeStartNode.addConnectionToSet(newEdge)
+            self.__edgeEndNode.addConnectionToSet(newEdge)
+            # Adds events to the edge 
+            self.__addEdgeEvents(self.__currentEdgeID, newEdge)
             # Return new object 
             return newEdge
 
@@ -498,7 +517,10 @@ class TraversalController():
     # Deletes current edge being drawn if user clicks the canvas 
     
     # Deletes current edge being drawn if user clicks the canvas 
-    def __deleteEdgeOnClick(self, event : Event):
+    def __deleteEdgeOnClick(self, event : Event): 
+        # This event can trigger when an edge is being edited 
+        # Deleting the edge when it shouldn't be 
+        if(self.__isEdgeBeingEdited): return
         canvas = self.__screen.getCanvas() 
         collisions = canvas.find_overlapping(event.x, event.y , event.x, event.y) 
         if(len(collisions) == 1 and self.__currentEdgeID in collisions): 
