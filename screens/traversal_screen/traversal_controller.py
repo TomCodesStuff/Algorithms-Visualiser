@@ -15,8 +15,6 @@ class TraversalController():
         self.__model = model  
         
         # Attributes that handle drawing edges 
-        
-        # Attributes that handle drawing edges 
         self.__isEdgeBeingDrawn = False 
         self.__edgeStartNode = None 
         self.__edgeEndNode = None 
@@ -74,6 +72,7 @@ class TraversalController():
         # Reference to the canvas 
         canvas = self.__screen.getCanvas()    
         canvas.tag_bind(edge, "<Button-1>", lambda _: self.__editEdgeOnClick(canvasEdge))
+        canvas.tag_bind(edge, "<Double-Button-1>", lambda _: self.__deleteEdgeOnDoubleClick(canvasEdge))
     
     def __editEdgeOnClick(self, canvasEdge : CanvasEdge) -> None: 
         if(self.__isEdgeBeingDrawn or self.__isEdgeBeingEdited): return 
@@ -84,13 +83,21 @@ class TraversalController():
         self.__currentEdgeObj = canvasEdge
         self.__edgeStartNode, self.__edgeEndNode = canvasEdge.getNodes() 
         # Show option on screen to an edge 
-        self.__screen.enableWeightOptions(self.__currentEdgeObj)
-
-
+        self.__screen.enableWeightOptions(self.__currentEdgeObj) 
+    
+    # Delete an edge when a user double clicks on it
+    def __deleteEdgeOnDoubleClick(self, canvasEdge : CanvasEdge):  
+        # Assign values to variables to previously written functions can work
+        self.__currentEdgeID = canvasEdge.getCanvasID() 
+        self.__currentEdgeObj = canvasEdge 
+        self.__edgeStartNode, self.__edgeEndNode = canvasEdge.getNodes() 
+        # Hide options to edit edge if they are currently visible
+        self.__screen.disableWeightOptions()
+        # Delete egde 
+        self.deleteEdge()
 
     # Creates a line that follows the mouse until another node is clicked 
     def __createEdge(self, canvasNode : CanvasNode):  
-
         # If an edge is being edited, prevent a new one from being created
         if(self.__isEdgeBeingEdited): return
 
@@ -489,13 +496,18 @@ class TraversalController():
                  (self.__model.getMaxWeight() - self.__model.getMinWeight())) * \
                 (self.__currentEdgeObj.getWeight() - self.__model.getMinWeight()))
 
+    # TODO 
     # Deletes the newly drawn edge or existing edge
     def deleteEdge(self): 
         # Deletes edge from relevant data structure 
-        self.__deleteEdgeFromDict()
+        self.__deleteEdgeFromDict() 
         # Deletes drawn edge
         self.__deleteEdge() 
-        # Restets variables  
+        # Delete reference of CanvasEdge Object in the CanvasNode objects
+        self.__edgeStartNode.deleteConnectionFromSet(self.__currentEdgeObj)
+        self.__edgeEndNode.deleteConnectionFromSet(self.__currentEdgeObj)
+
+        # Resets variables  
         self.__clearVariables()
    
     # Deletes egde from relevant data structure 

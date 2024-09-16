@@ -50,6 +50,12 @@ class CanvasNode():
         return self.__connectedNodes[nodeID] 
     
     # Adds a CanvasEdge Object to the set 
-    def addConnectionToSet(self, edge) -> None: self.__edges.add(edge)
+    def addConnectionToSet(self, edge) -> None: self.__edges.add(edge) 
+
+    # Delete a CanvasEdge from the set 
+    # (Otherwise errors happen when an edge is deleted)
+    def deleteConnectionFromSet(self, egde) -> None:  
+        self.__edges.remove(egde)
+        pass
     
 # Listen to Paralyzer by Finger Eleven     
