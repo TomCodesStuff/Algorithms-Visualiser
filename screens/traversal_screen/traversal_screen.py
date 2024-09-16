@@ -160,13 +160,13 @@ class TraversalScreen(sc.Screen, sc.ScreenTemplate):
     def __saveEdge(self) -> None:     
         # Updates egdes weight 
         self.__controller.saveEdge(self.__weightSlider.get())
-        # Add function to change weight of object if needed 
+        # Hides options to edit edge from view
         self.disableWeightOptions()   
 
     def __deleteEdge(self) -> None:  
-        # Deletes newly drawn weight or prexising weight 
+        # Deletes newly drawn weight or pre-existing weight 
         self.__controller.deleteEdge()
-        # Add function to delete edge  
+        # Hides options to edit edge from view 
         self.disableWeightOptions()
   
 

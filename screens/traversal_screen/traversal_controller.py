@@ -15,8 +15,6 @@ class TraversalController():
         self.__model = model  
         
         # Attributes that handle drawing edges 
-        
-        # Attributes that handle drawing edges 
         self.__isEdgeBeingDrawn = False 
         self.__edgeStartNode = None 
         self.__edgeEndNode = None 
@@ -69,11 +67,37 @@ class TraversalController():
         canvas.tag_bind(circle, "<B1-Motion>", lambda event: self.__moveNode(event, canvasNode))   
         # Add event listener to add an edge when a node is clicked 
         canvas.tag_bind(circle, "<Button-1>", lambda _: self.__createEdge(canvasNode))
+    
+    def __addEdgeEvents(self, edge : int, canvasEdge : CanvasEdge) -> None:
+        # Reference to the canvas 
+        canvas = self.__screen.getCanvas()    
+        canvas.tag_bind(edge, "<Button-1>", lambda _: self.__editEdgeOnClick(canvasEdge))
+        canvas.tag_bind(edge, "<Double-Button-1>", lambda _: self.__deleteEdgeOnDoubleClick(canvasEdge))
+    
+    def __editEdgeOnClick(self, canvasEdge : CanvasEdge) -> None: 
+        if(self.__isEdgeBeingDrawn or self.__isEdgeBeingEdited): return 
 
+        # Assign values to variables needed to edit edges 
+        self.__isEdgeBeingEdited = True 
+        self.__currentEdgeID = canvasEdge.getCanvasID()  
+        self.__currentEdgeObj = canvasEdge
+        self.__edgeStartNode, self.__edgeEndNode = canvasEdge.getNodes() 
+        # Show option on screen to an edge 
+        self.__screen.enableWeightOptions(self.__currentEdgeObj) 
+    
+    # Delete an edge when a user double clicks on it
+    def __deleteEdgeOnDoubleClick(self, canvasEdge : CanvasEdge):  
+        # Assign values to variables to previously written functions can work
+        self.__currentEdgeID = canvasEdge.getCanvasID() 
+        self.__currentEdgeObj = canvasEdge 
+        self.__edgeStartNode, self.__edgeEndNode = canvasEdge.getNodes() 
+        # Hide options to edit edge if they are currently visible
+        self.__screen.disableWeightOptions()
+        # Delete egde 
+        self.deleteEdge()
 
     # Creates a line that follows the mouse until another node is clicked 
     def __createEdge(self, canvasNode : CanvasNode):  
-
         # If an edge is being edited, prevent a new one from being created
         if(self.__isEdgeBeingEdited): return
 
@@ -111,11 +135,6 @@ class TraversalController():
         edge = self.__createCanvasEdge()
         # Updates current edge 
         self.__currentEdgeID = edge.getCanvasID() 
-        # Add references to nodes in CanvasEdge object
-        edge.addNodes(self.__edgeStartNode, self.__edgeEndNode) 
-        # Add reference to edge in CanvasNode objects 
-        self.__edgeStartNode.addConnectionToSet(edge)
-        self.__edgeEndNode.addConnectionToSet(edge)
         return edge
 
     # Creates and returns a new CanvasEdge object
@@ -138,9 +157,16 @@ class TraversalController():
             # Adjusts edge so arrow/s can be shown
             # coords = self.__adjustEdgeCoords()
             # Create new object, weight is initially set to the default 
-            newEdge = CanvasEdge(self.__currentEdgeID, coords, self.__model.getDefaultWeight()) 
+            newEdge = CanvasEdge(self.__currentEdgeID, coords, self.__model.getDefaultWeight())  
             # Add node to dictionary 
             self.__model.addEdge(connectedNodes, newEdge)   
+            # Add references to nodes in CanvasEdge object
+            newEdge.addNodes(self.__edgeStartNode, self.__edgeEndNode) 
+            # Add reference to edge in CanvasNode objects 
+            self.__edgeStartNode.addConnectionToSet(newEdge)
+            self.__edgeEndNode.addConnectionToSet(newEdge)
+            # Adds events to the edge 
+            self.__addEdgeEvents(self.__currentEdgeID, newEdge)
             # Return new object 
             return newEdge
 
@@ -470,13 +496,18 @@ class TraversalController():
                  (self.__model.getMaxWeight() - self.__model.getMinWeight())) * \
                 (self.__currentEdgeObj.getWeight() - self.__model.getMinWeight()))
 
+    # TODO 
     # Deletes the newly drawn edge or existing edge
     def deleteEdge(self): 
         # Deletes edge from relevant data structure 
-        self.__deleteEdgeFromDict()
+        self.__deleteEdgeFromDict() 
         # Deletes drawn edge
         self.__deleteEdge() 
-        # Restets variables  
+        # Delete reference of CanvasEdge Object in the CanvasNode objects
+        self.__edgeStartNode.deleteConnectionFromSet(self.__currentEdgeObj)
+        self.__edgeEndNode.deleteConnectionFromSet(self.__currentEdgeObj)
+
+        # Resets variables  
         self.__clearVariables()
    
     # Deletes egde from relevant data structure 
@@ -498,7 +529,10 @@ class TraversalController():
     # Deletes current edge being drawn if user clicks the canvas 
     
     # Deletes current edge being drawn if user clicks the canvas 
-    def __deleteEdgeOnClick(self, event : Event):
+    def __deleteEdgeOnClick(self, event : Event): 
+        # This event can trigger when an edge is being edited 
+        # Deleting the edge when it shouldn't be 
+        if(self.__isEdgeBeingEdited): return
         canvas = self.__screen.getCanvas() 
         collisions = canvas.find_overlapping(event.x, event.y , event.x, event.y) 
         if(len(collisions) == 1 and self.__currentEdgeID in collisions): 
