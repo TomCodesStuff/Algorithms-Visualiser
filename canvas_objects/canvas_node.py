@@ -23,7 +23,7 @@ class CanvasNode():
         # Colour of the node when it is hovered over 
         self.__highlightColour = "Red"
         # A Set containing references to edges that connects nodes to eachother 
-        self.__edges = set()
+        self.__edges = []
     
     # Updates the coordinates of the node to be accurate to the coordinates on screen
     def updateCoords(self, coords : tuple) -> None: 
@@ -49,13 +49,15 @@ class CanvasNode():
         if(nodeID not in self.__connectedNodes): return -1 
         return self.__connectedNodes[nodeID] 
     
-    # Adds a CanvasEdge Object to the set 
-    def addConnectionToSet(self, edge) -> None: self.__edges.add(edge) 
+    # Adds a CanvasEdge Object to the list 
+    def addConnectionToSet(self, edge) -> None: self.__edges.append(edge) 
 
-    # Delete a CanvasEdge from the set 
+    # Delete a CanvasEdge from the list 
     # (Otherwise errors happen when an edge is deleted)
     def deleteConnectionFromSet(self, egde) -> None:  
-        self.__edges.remove(egde)
-        pass
+        self.__edges.remove(egde)   
+
+    # Return all edges connected the node 
+    def getEdges(self) -> list: return self.__edges
     
 # Listen to Paralyzer by Finger Eleven     

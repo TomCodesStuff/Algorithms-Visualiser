@@ -67,12 +67,41 @@ class TraversalController():
         canvas.tag_bind(circle, "<B1-Motion>", lambda event: self.__moveNode(event, canvasNode))   
         # Add event listener to add an edge when a node is clicked 
         canvas.tag_bind(circle, "<Button-1>", lambda _: self.__createEdge(canvasNode))
-    
+        # Add event to delete a node when it is double clicked 
+        canvas.tag_bind(circle, "<Double-Button-1>", lambda _: self.__deleteNodeOnDoubleClick(canvasNode))
+
     def __addEdgeEvents(self, edge : int, canvasEdge : CanvasEdge) -> None:
         # Reference to the canvas 
         canvas = self.__screen.getCanvas()    
         canvas.tag_bind(edge, "<Button-1>", lambda _: self.__editEdgeOnClick(canvasEdge))
-        canvas.tag_bind(edge, "<Double-Button-1>", lambda _: self.__deleteEdgeOnDoubleClick(canvasEdge))
+        canvas.tag_bind(edge, "<Double-Button-1>", lambda _: self.__deleteEdgeOnDoubleClick(canvasEdge)) 
+    
+    def __deleteNodeOnDoubleClick(self, canvasNode : CanvasNode) -> None:
+        # Nodes can't be deleted if an edge is being edited 
+        if(self.__isEdgeBeingEdited): return
+        # The event to draw an edge can still trigger so the edge needs to be deleted
+        self.__deleteEdgeFromCanvas()
+        self.__stopMovingEdge() 
+        self.__clearVariables() 
+
+        # Iterate through all edges 
+        while(canvasNode.getEdges() != []): 
+            # Get first edge in the list
+            edge = canvasNode.getEdges()[0]
+
+            # Assign values to variables so edge can be deleted
+            self.__currentEdgeID = edge.getCanvasID() 
+            self.__currentEdgeObj = edge 
+            self.__edgeStartNode, self.__edgeEndNode = edge.getNodes()
+            # Delete Edge  
+            self.deleteEdge() 
+        
+        # Delete node from the canvas
+        self.__deleteNodeFromCanvas() 
+    
+    # Delete node from the canvas
+    def __deleteNodeFromCanvas(self, canvasNode : CanvasNode):
+        self.__screen.getCanvas().delete(canvasNode.getCanvasID())  
     
     def __editEdgeOnClick(self, canvasEdge : CanvasEdge) -> None: 
         if(self.__isEdgeBeingDrawn or self.__isEdgeBeingEdited): return 
@@ -144,11 +173,11 @@ class TraversalController():
         # If edge exists between the two nodes, 
         # return the already existing object 
         if(connectedNodes in self.__model.getEdges()): 
-            self.__deleteEdge()  
+            self.__deleteEdgeFromCanvas()  
             return self.__model.getEdge(connectedNodes) 
         # Checks if reverse tuple of the connected nodes is in the dictionary 
         elif(connectedNodes[::-1] in self.__model.getEdges()):  
-            self.__deleteEdge()
+            self.__deleteEdgeFromCanvas()
             return self.__model.getEdge(connectedNodes[::-1]) 
         # Creates new object of edge is new 
         else: 
@@ -173,7 +202,7 @@ class TraversalController():
     # Handles when an egde starts and ends at the same node 
     def __handleSelfEdge(self) -> None:
         # Delete edge
-        self.__deleteEdge() 
+        self.__deleteEdgeFromCanvas() 
         # Clear variables used when creating edges 
         self.__clearVariables()
         
@@ -255,7 +284,7 @@ class TraversalController():
         self.__reconnectEdges(self.__edgeStartNode)
         self.__reconnectEdges(self.__edgeEndNode)
 
-    # TODO
+    # Reconnect edges that are now in the wrong position 
     def __reconnectEdges(self, node : CanvasNode) -> None:  
         # Reference to canvas
         canvas = self.__screen.getCanvas()  
@@ -502,7 +531,7 @@ class TraversalController():
         # Deletes edge from relevant data structure 
         self.__deleteEdgeFromDict() 
         # Deletes drawn edge
-        self.__deleteEdge() 
+        self.__deleteEdgeFromCanvas() 
         # Delete reference of CanvasEdge Object in the CanvasNode objects
         self.__edgeStartNode.deleteConnectionFromSet(self.__currentEdgeObj)
         self.__edgeEndNode.deleteConnectionFromSet(self.__currentEdgeObj)
@@ -536,12 +565,12 @@ class TraversalController():
         canvas = self.__screen.getCanvas() 
         collisions = canvas.find_overlapping(event.x, event.y , event.x, event.y) 
         if(len(collisions) == 1 and self.__currentEdgeID in collisions): 
-            self.__deleteEdge()
+            self.__deleteEdgeFromCanvas()
             self.__stopMovingEdge() 
             self.__clearVariables() 
 
     # Deletes current edge from the screen 
-    def __deleteEdge(self): 
+    def __deleteEdgeFromCanvas(self): 
         self.__screen.getCanvas().delete(self.__currentEdgeID) 
             
     # Add event to draw a line representing an edge
