@@ -86,6 +86,7 @@ class TraversalModel():
     def getNodes(self) -> list[CanvasNode]: return self.__nodes
     def getNode(self, idx: int) -> CanvasNode: return self.__nodes[idx]
     def addNode(self, canvasNode : CanvasNode) -> None: self.__nodes.append(canvasNode)  
+    def deleteNode(self, canvasNode : CanvasNode) -> None: self.__nodes.remove(canvasNode)
     
     # Getters and setters for edges dictionary 
     def getEdges(self) -> dict: return self.__edges 

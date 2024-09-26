@@ -21,40 +21,58 @@ class TraversalController():
         self.__currentEdgeID = None
         self.__currentEdgeObj = None 
         self.__isEdgeBeingEdited = False
+        self.__isNodeBeingDeleted = False
 
     def addCanvasEvents(self): 
         canvas = self.__screen.getCanvas() 
         # Add event to delete current edge being drawn when the canvas is clicked
         canvas.bind("<Button-1>", lambda event: self.__deleteEdgeOnClick(event))
+        canvas.bind("<Double-Button-1>", lambda event: self.__spawnNodeOnDoubleClick(event))
 
     # Draws a circle (node) on the canvas 
     def spawnNode(self):   
-        # Gets a reference to the canvas 
-        canvas = self.__screen.getCanvas()   
-
         # If no more nodes can currently be spawned
-        if(not self.__canNodeBeSpawned()):   
+        if(not self.__canNodeBeSpawned(self.__model.getInitialCoords())):   
             # Change the add node buttons text to red 
             self.__screen.changeNodeButtonColour("red")
             return  
         
         # if node can be drawn, change the buttons colour back to black
         self.__screen.changeNodeButtonColour("black")
-        # X-Y coords of where the node will spawn -> this is the same for evey node 
-        x0, y0, x1, y1 = self.__model.getInitialCoords()   
-        # Draws the circle 
-        circle = canvas.create_oval(x0, y0, x1, y1, outline = "black", fill="blue")     
-        # Create corresponding object for the circle 
-        canvasNode = CanvasNode(circle, (x0, y0, x1, y1))  
-        # Adds node to array containing nodes 
-        self.__model.addNode(canvasNode)
         
-        # Adds event handlers to new node 
-        self.__addNodeEvents(circle, canvasNode)
+        # Default X-Y coords of where the node will spawn 
+        x0, y0, x1, y1 = self.__model.getInitialCoords()   
+        # Draws a new circle on the canvas at the specified coords
+        # Returns the ID of the new circle
+        circle = self.__drawNode((x0, y0, x1, y1)) 
+        # Creates an object for the new node
+        self.__createCanvasNodeObject(circle, (x0, y0, x1, y1))
 
         # Updates screen so node can be seen onscreen
         self.__screen.getWindow().update() 
     
+    # Draws a circle on the canvas at the specified coords 
+    # Returns the ID of the drawn circle 
+    def __drawNode(self, coords : tuple): 
+        # Gets a reference to the canvas 
+        canvas = self.__screen.getCanvas()   
+        # X-Y coords of where the node will be drawn
+        x0, y0, x1, y1 = coords   
+        # Draws the circle 
+        circle = canvas.create_oval(x0, y0, x1, y1, outline = "black", fill="blue")     
+        # Return Canvas ID of new circle
+        return circle
+
+    # Creates a CanvasNode object for the passed 
+    def __createCanvasNodeObject(self, circleID : int, coords : tuple): 
+         # Create corresponding object for a node drawn on the canvas
+        canvasNode = CanvasNode(circleID, coords)  
+        # Adds node to array containing nodes 
+        self.__model.addNode(canvasNode)
+        # Adds event handlers to new node 
+        self.__addNodeEvents(circleID, canvasNode)
+
+        
     def __addNodeEvents(self, circle : int, canvasNode : CanvasNode) -> None:
         # Gets a reference to the canvas 
         canvas = self.__screen.getCanvas() 
@@ -78,7 +96,10 @@ class TraversalController():
     
     def __deleteNodeOnDoubleClick(self, canvasNode : CanvasNode) -> None:
         # Nodes can't be deleted if an edge is being edited 
-        if(self.__isEdgeBeingEdited): return
+        if(self.__isEdgeBeingEdited): return 
+        # Set variables indicating node is being deleted to True  
+        # (This is used to stop another canvas event triggering)
+        self.__isNodeBeingDeleted = True
         # The event to draw an edge can still trigger so the edge needs to be deleted
         self.__deleteEdgeFromCanvas()
         self.__stopMovingEdge() 
@@ -90,14 +111,14 @@ class TraversalController():
             edge = canvasNode.getEdges()[0]
 
             # Assign values to variables so edge can be deleted
-            self.__currentEdgeID = edge.getCanvasID() 
-            self.__currentEdgeObj = edge 
-            self.__edgeStartNode, self.__edgeEndNode = edge.getNodes()
+            self.__initVariables(edge)
             # Delete Edge  
             self.deleteEdge() 
         
         # Delete node from the canvas
-        self.__deleteNodeFromCanvas() 
+        self.__deleteNodeFromCanvas(canvasNode) 
+        # Delete node object from array stored in model 
+        self.__model.deleteNode(canvasNode)
     
     # Delete node from the canvas
     def __deleteNodeFromCanvas(self, canvasNode : CanvasNode):
@@ -108,22 +129,24 @@ class TraversalController():
 
         # Assign values to variables needed to edit edges 
         self.__isEdgeBeingEdited = True 
-        self.__currentEdgeID = canvasEdge.getCanvasID()  
-        self.__currentEdgeObj = canvasEdge
-        self.__edgeStartNode, self.__edgeEndNode = canvasEdge.getNodes() 
+        self.__initVariables(canvasEdge)
         # Show option on screen to an edge 
         self.__screen.enableWeightOptions(self.__currentEdgeObj) 
     
     # Delete an edge when a user double clicks on it
     def __deleteEdgeOnDoubleClick(self, canvasEdge : CanvasEdge):  
-        # Assign values to variables to previously written functions can work
-        self.__currentEdgeID = canvasEdge.getCanvasID() 
-        self.__currentEdgeObj = canvasEdge 
-        self.__edgeStartNode, self.__edgeEndNode = canvasEdge.getNodes() 
+        self.__initVariables(canvasEdge)
         # Hide options to edit edge if they are currently visible
         self.__screen.disableWeightOptions()
         # Delete egde 
         self.deleteEdge()
+
+    # Assign values to variables so functions to edit/delete edges can work
+    def __initVariables(self, canvasEdge : CanvasEdge): 
+        self.__currentEdgeID = canvasEdge.getCanvasID() 
+        self.__currentEdgeObj = canvasEdge 
+        self.__edgeStartNode, self.__edgeEndNode = canvasEdge.getNodes() 
+
 
     # Creates a line that follows the mouse until another node is clicked 
     def __createEdge(self, canvasNode : CanvasNode):  
@@ -525,7 +548,6 @@ class TraversalController():
                  (self.__model.getMaxWeight() - self.__model.getMinWeight())) * \
                 (self.__currentEdgeObj.getWeight() - self.__model.getMinWeight()))
 
-    # TODO 
     # Deletes the newly drawn edge or existing edge
     def deleteEdge(self): 
         # Deletes edge from relevant data structure 
@@ -555,8 +577,26 @@ class TraversalController():
             return self.__model.getEdge(connectedEdges)
         else: return self.__model.getEdge(connectedEdges[::-1])
     
-    # Deletes current edge being drawn if user clicks the canvas 
-    
+    # TODO
+    def __spawnNodeOnDoubleClick(self, event : Event): 
+        canvas = self.__screen.getCanvas()   
+        circleSize = self.__model.getCircleSize() 
+        # X-Y coords of new node is where the users clicks 
+        x0, y0, x1, y1 = event.x, event.y, event.x + circleSize, event.y + circleSize
+
+        # This event can trigger when a node is being deleted (both are double click)
+        # As clicking a circle on the canvas also triggers canvas events 
+        if(self.__isNodeBeingDeleted): 
+            self.__isNodeBeingDeleted = False 
+            return 
+        
+
+
+        # Check if node can spawned where the user clicked
+        if(self.__canNodeBeSpawned((x0, y0, x1, y1))):  
+            circle = self.__drawNode((x0, y0, x1, y1)) 
+            self.__createCanvasNodeObject(circle, (x0, y0, x1, y1))
+      
     # Deletes current edge being drawn if user clicks the canvas 
     def __deleteEdgeOnClick(self, event : Event): 
         # This event can trigger when an edge is being edited 
@@ -674,9 +714,9 @@ class TraversalController():
     # Nodes can be added to the screen if there are no 
     # other nodes in a given radius or if the maximum number
     # of nodes has not been exceeded 
-    def __canNodeBeSpawned(self): 
+    def __canNodeBeSpawned(self, coords : tuple): 
         # Coordinates the node will be drawn at 
-        x0, y0, x1, y1 = self.__model.getInitialCoords()  
+        x0, y0, x1, y1 = coords
         spaceBetweenNodes = self.__model.getSpaceBetweenNodes() * 2  
         # Get's ID of any nodes within a set radius 
         conflictingNodes = list(self.__screen.getCanvas()
@@ -685,7 +725,7 @@ class TraversalController():
                                     y0 - spaceBetweenNodes, 
                                     x1 + spaceBetweenNodes,
                                     y1 + spaceBetweenNodes)) 
-        # Returnd True if the node can be drawn, else False 
+        # Returns True if the node can be drawn, else False 
         return False if conflictingNodes or \
             len(self.__model.getNodes()) == self.__model.getMaxNumNodes() else True
         
