@@ -577,12 +577,12 @@ class TraversalController():
             return self.__model.getEdge(connectedEdges)
         else: return self.__model.getEdge(connectedEdges[::-1])
     
-    # TODO
-    def __spawnNodeOnDoubleClick(self, event : Event): 
-        canvas = self.__screen.getCanvas()   
-        circleSize = self.__model.getCircleSize() 
+    # Spawns 
+    def __spawnNodeOnDoubleClick(self, event : Event):  
+        circleOffset = self.__model.getCircleSize()  // 2
         # X-Y coords of new node is where the users clicks 
-        x0, y0, x1, y1 = event.x, event.y, event.x + circleSize, event.y + circleSize
+        x0, y0, x1, y1 = event.x - circleOffset, event.y - circleOffset,\
+            event.x + circleOffset, event.y + circleOffset
 
         # This event can trigger when a node is being deleted (both are double click)
         # As clicking a circle on the canvas also triggers canvas events 
