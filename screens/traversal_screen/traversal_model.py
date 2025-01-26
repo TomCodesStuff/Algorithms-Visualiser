@@ -52,7 +52,7 @@ class TraversalModel():
 
         # Smallest distance nodes can be apart on screen 
         self.__minScreenDist = 50
-        # Smallest distance nodes can be apart on screen 
+        # Largest distance nodes can be apart on screen 
         self.__maxScreenDist = 150
 
     # Adds controller         

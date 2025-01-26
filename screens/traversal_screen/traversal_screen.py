@@ -224,8 +224,5 @@ class TraversalScreen(sc.Screen, sc.ScreenTemplate):
                                              font = (self.getFont(), self.getFontSize()), state = "disabled")
         self.__pauseResumeButton.grid(row = 0, column = 1)   
     
-    # Changes colour of the given circle to the colour specified
-    def changeCircleColour(self, circle : int, colour : str) -> None: 
-        self.getCanvas().itemconfig(circle, fill = colour)
 
 # Listen to Can't Stop by The Red Hot Chili Peppers 

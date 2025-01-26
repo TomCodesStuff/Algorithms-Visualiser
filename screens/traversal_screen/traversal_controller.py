@@ -6,13 +6,15 @@ if(__name__ == "__main__"):
 
 from canvas_objects import CanvasNode, CanvasEdge
 from .traversal_model import TraversalModel 
+from .node_handler import NodeHandler
 from tkinter import Event, BOTH 
 import math
 
 class TraversalController():
     def __init__(self, screen, model : TraversalModel): 
         self.__screen = screen 
-        self.__model = model  
+        self.__model = model   
+        self.__nodeHandler = NodeHandler(self.__screen.getCanvas(), model)
         
         # Attributes that handle drawing edges 
         self.__isEdgeBeingDrawn = False 
@@ -21,108 +23,28 @@ class TraversalController():
         self.__currentEdgeID = None
         self.__currentEdgeObj = None 
         self.__isEdgeBeingEdited = False
-        self.__isNodeBeingDeleted = False
-
-    def addCanvasEvents(self): 
-        canvas = self.__screen.getCanvas() 
-        # Add event to delete current edge being drawn when the canvas is clicked
-        canvas.bind("<Button-1>", lambda event: self.__deleteEdgeOnClick(event))
-        canvas.bind("<Double-Button-1>", lambda event: self.__spawnNodeOnDoubleClick(event))
+        self.__isNodeBeingDeleted = False 
+    
 
     # Draws a circle (node) on the canvas 
-    def spawnNode(self):   
-        # If no more nodes can currently be spawned
-        if(not self.__canNodeBeSpawned(self.__model.getInitialCoords())):   
-            # Change the add node buttons text to red 
-            self.__screen.changeNodeButtonColour("red")
-            return  
-        
-        # if node can be drawn, change the buttons colour back to black
-        self.__screen.changeNodeButtonColour("black")
-        
-        # Default X-Y coords of where the node will spawn 
-        x0, y0, x1, y1 = self.__model.getInitialCoords()   
-        # Draws a new circle on the canvas at the specified coords
-        # Returns the ID of the new circle
-        circle = self.__drawNode((x0, y0, x1, y1)) 
-        # Creates an object for the new node
-        self.__createCanvasNodeObject(circle, (x0, y0, x1, y1))
-
-        # Updates screen so node can be seen onscreen
+    def spawnNode(self, coords = None):
+        if(coords == None): coords = self.__model.getInitialCoords()    
+        if(self.__nodeHandler.spawnNode(coords) > 0):
+            # Change the "Add Node" button's text to black 
+            self.__screen.changeNodeButtonColour("black") 
+        else:
+            # Change the "Add Node" button's text to red 
+            self.__screen.changeNodeButtonColour("red")  
+        # Refresh screen to show changes  
         self.__screen.getWindow().update() 
-    
-    # Draws a circle on the canvas at the specified coords 
-    # Returns the ID of the drawn circle 
-    def __drawNode(self, coords : tuple): 
-        # Gets a reference to the canvas 
-        canvas = self.__screen.getCanvas()   
-        # X-Y coords of where the node will be drawn
-        x0, y0, x1, y1 = coords   
-        # Draws the circle 
-        circle = canvas.create_oval(x0, y0, x1, y1, outline = "black", fill="blue")     
-        # Return Canvas ID of new circle
-        return circle
 
-    # Creates a CanvasNode object for the passed 
-    def __createCanvasNodeObject(self, circleID : int, coords : tuple): 
-         # Create corresponding object for a node drawn on the canvas
-        canvasNode = CanvasNode(circleID, coords)  
-        # Adds node to array containing nodes 
-        self.__model.addNode(canvasNode)
-        # Adds event handlers to new node 
-        self.__addNodeEvents(circleID, canvasNode)
-
-        
-    def __addNodeEvents(self, circle : int, canvasNode : CanvasNode) -> None:
-        # Gets a reference to the canvas 
-        canvas = self.__screen.getCanvas() 
-        
-        # Add event to change nodes colour when the mouse hovers over them
-        canvas.tag_bind(circle, "<Enter>", lambda _: self.__changeColourOnHover(canvasNode))
-        # Add event to change nodes colour when the mouse hovers over them
-        canvas.tag_bind(circle, "<Leave>", lambda _: self.__changeColourOnLeave(canvasNode)) 
-        # Add event listener to move node when it's dragged by the mouse 
-        canvas.tag_bind(circle, "<B1-Motion>", lambda event: self.__moveNode(event, canvasNode))   
-        # Add event listener to add an edge when a node is clicked 
-        canvas.tag_bind(circle, "<Button-1>", lambda _: self.__createEdge(canvasNode))
-        # Add event to delete a node when it is double clicked 
-        canvas.tag_bind(circle, "<Double-Button-1>", lambda _: self.__deleteNodeOnDoubleClick(canvasNode))
 
     def __addEdgeEvents(self, edge : int, canvasEdge : CanvasEdge) -> None:
         # Reference to the canvas 
         canvas = self.__screen.getCanvas()    
         canvas.tag_bind(edge, "<Button-1>", lambda _: self.__editEdgeOnClick(canvasEdge))
         canvas.tag_bind(edge, "<Double-Button-1>", lambda _: self.__deleteEdgeOnDoubleClick(canvasEdge)) 
-    
-    def __deleteNodeOnDoubleClick(self, canvasNode : CanvasNode) -> None:
-        # Nodes can't be deleted if an edge is being edited 
-        if(self.__isEdgeBeingEdited): return 
-        # Set variables indicating node is being deleted to True  
-        # (This is used to stop another canvas event triggering)
-        self.__isNodeBeingDeleted = True
-        # The event to draw an edge can still trigger so the edge needs to be deleted
-        self.__deleteEdgeFromCanvas()
-        self.__stopMovingEdge() 
-        self.__clearVariables() 
 
-        # Iterate through all edges 
-        while(canvasNode.getEdges() != []): 
-            # Get first edge in the list
-            edge = canvasNode.getEdges()[0]
-
-            # Assign values to variables so edge can be deleted
-            self.__initVariables(edge)
-            # Delete Edge  
-            self.deleteEdge() 
-        
-        # Delete node from the canvas
-        self.__deleteNodeFromCanvas(canvasNode) 
-        # Delete node object from array stored in model 
-        self.__model.deleteNode(canvasNode)
-    
-    # Delete node from the canvas
-    def __deleteNodeFromCanvas(self, canvasNode : CanvasNode):
-        self.__screen.getCanvas().delete(canvasNode.getCanvasID())  
     
     def __editEdgeOnClick(self, canvasEdge : CanvasEdge) -> None: 
         if(self.__isEdgeBeingDrawn or self.__isEdgeBeingEdited): return 
@@ -150,6 +72,8 @@ class TraversalController():
 
     # Creates a line that follows the mouse until another node is clicked 
     def __createEdge(self, canvasNode : CanvasNode):  
+        print("This feature is disabled for now")
+        return 
         # If an edge is being edited, prevent a new one from being created
         if(self.__isEdgeBeingEdited): return
 
@@ -253,6 +177,8 @@ class TraversalController():
         
     # Changes weight of current edge to passed value 
     def saveEdge(self, newWeight : int) -> None: 
+        print("This is disabled for now")
+        return 
         # Update weight of current edge object
         self.__currentEdgeObj.setWeight(newWeight) 
         # Adjust distance between nodes to match new weight
@@ -576,27 +502,8 @@ class TraversalController():
         if(connectedEdges in self.__model.getEdges()): 
             return self.__model.getEdge(connectedEdges)
         else: return self.__model.getEdge(connectedEdges[::-1])
-    
-    # Spawns 
-    def __spawnNodeOnDoubleClick(self, event : Event):  
-        circleOffset = self.__model.getCircleSize()  // 2
-        # X-Y coords of new node is where the users clicks 
-        x0, y0, x1, y1 = event.x - circleOffset, event.y - circleOffset,\
-            event.x + circleOffset, event.y + circleOffset
-
-        # This event can trigger when a node is being deleted (both are double click)
-        # As clicking a circle on the canvas also triggers canvas events 
-        if(self.__isNodeBeingDeleted): 
-            self.__isNodeBeingDeleted = False 
-            return 
-        
 
 
-        # Check if node can spawned where the user clicked
-        if(self.__canNodeBeSpawned((x0, y0, x1, y1))):  
-            circle = self.__drawNode((x0, y0, x1, y1)) 
-            self.__createCanvasNodeObject(circle, (x0, y0, x1, y1))
-      
     # Deletes current edge being drawn if user clicks the canvas 
     def __deleteEdgeOnClick(self, event : Event): 
         # This event can trigger when an edge is being edited 
@@ -710,24 +617,6 @@ class TraversalController():
         # Return updated coords of the line 
         return canvas.coords(self.__currentEdgeID)
 
-    # Checks if a new node can be added to the screen.  
-    # Nodes can be added to the screen if there are no 
-    # other nodes in a given radius or if the maximum number
-    # of nodes has not been exceeded 
-    def __canNodeBeSpawned(self, coords : tuple): 
-        # Coordinates the node will be drawn at 
-        x0, y0, x1, y1 = coords
-        spaceBetweenNodes = self.__model.getSpaceBetweenNodes() * 2  
-        # Get's ID of any nodes within a set radius 
-        conflictingNodes = list(self.__screen.getCanvas()
-                                .find_overlapping(
-                                    x0 - spaceBetweenNodes, 
-                                    y0 - spaceBetweenNodes, 
-                                    x1 + spaceBetweenNodes,
-                                    y1 + spaceBetweenNodes)) 
-        # Returns True if the node can be drawn, else False 
-        return False if conflictingNodes or \
-            len(self.__model.getNodes()) == self.__model.getMaxNumNodes() else True
         
     # Moves the node to follow the users mouse 
     def __moveNode(self, event : Event, canvasNode : CanvasNode) -> None:   
@@ -755,7 +644,7 @@ class TraversalController():
         
         
         # Applies forces to each node -> disabled for now 
-        # self.__calculateForces(canvasNode)
+        self.__calculateForces(canvasNode)
 
         # Updates coords in the CanvasNode object
         canvasNode.updateCoords((xCoord, yCoord, xCoord + circleSize, yCoord + circleSize))
@@ -825,22 +714,14 @@ class TraversalController():
             # Update coords in canvasEdge object 
             canvasEdge.updateCoords(coords)
 
-    # Changes the nodes colour the mouse is hovering to red
-    def __changeColourOnHover(self, canvasNode : CanvasNode) -> None: 
-        self.__screen.changeCircleColour(canvasNode.getCanvasID(), 
-                                         canvasNode.getHighlightColour())
-    
-    # Changes the mouse stops hovering over a node it's colour is set to blue 
-    def __changeColourOnLeave(self, canvasNode : CanvasNode) -> None:
-        self.__screen.changeCircleColour(canvasNode.getCanvasID(), 
-                                         canvasNode.getMainColour())
 
     # Calculates the forces that will be applied to each node 
     def __calculateForces(self, canvasNode : CanvasNode): 
         n = len(self.__model.getNodes())
         circleSize = self.__model.getCircleSize()
         circleOffset = circleSize// 2 
-        # Step one apply Coulombs laws to each node  
+        
+        # Iterate through each node 
         for i in range(n): 
             for j in range(i + 1, n):   
                 # XY coordinates of the nodes
@@ -897,7 +778,25 @@ class TraversalController():
     
     # Calculates distance between two nodes using the pythagoras theorem 
     def __calculateDistance(self, x0 : int, y0 : int, x1 : int, y1 : int) -> float: 
-        return math.sqrt(math.pow(x1 - x0, 2) + math.pow(y1 - y0, 2))
+        return math.sqrt(math.pow(x1 - x0, 2) + math.pow(y1 - y0, 2)) 
+    
+
+    # Spawns node when user double clicks the canvas 
+    def __spawnNodeOnDoubleClick(self, event : Event):  
+        circleOffset = self.__model.getCircleSize()  // 2
+        # X-Y coords of new node is where the users clicks 
+        x0, y0, x1, y1 = event.x - circleOffset, event.y - circleOffset,\
+            event.x + circleOffset, event.y + circleOffset
+
+        self.spawnNode((x0, y0, x1, y1))
+        
+
+    # Add events to the canvas so users can interact with it 
+    def addCanvasEvents(self): 
+        canvas = self.__screen.getCanvas() 
+        # Add event to delete current edge being drawn when the canvas is clicked
+        # canvas.bind("<Button-1>", lambda event: self.__deleteEdgeOnClick(event))
+        canvas.bind("<Double-Button-1>", lambda event: self.__spawnNodeOnDoubleClick(event))
 
     
 # Listen to Paranoid by Black Sabbath
