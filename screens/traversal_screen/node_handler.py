@@ -3,12 +3,15 @@ from .traversal_model import TraversalModel
 from tkinter import Canvas
 
 class NodeHandler():
-    def __init__(self, canvas : Canvas, model : TraversalModel):
+    def __init__(self, canvas : Canvas, controller, model : TraversalModel):
         # Store reference to canvas (makes things a lot easier)  
         self.__canvas = canvas
         # Store reference to model (to access data needed for nodes)
-        self.__model = model 
+        self.__model = model  
+        # Stores reference to the controller (literally needed for one function only)
+        self.__controller = controller
 
+        
         self.__isEdgeBeingEdited = False 
         self.__isNodeBeingDeleted = False 
 
@@ -73,16 +76,18 @@ class NodeHandler():
     def __deleteNodeFromCanvas(self, canvasNode : CanvasNode):
         self.__canvas.delete(canvasNode.getCanvasID())  
 
-
+    
     # Deletes a node when the user double clicks on it 
     def __deleteNodeOnDoubleClick(self, canvasNode : CanvasNode) -> None:
         # A node can't be deleted if an edge connected to it is being edited 
-        if(self.__isEdgeBeingEdited): return 
+        if(self.__controller.isEdgeBeingEdited()): return 
+        
         # Set variables indicating node is being deleted to True  
         # (This is used to stop another canvas event triggering)
         self.__isNodeBeingDeleted = True
 
         # The event to draw an edge can still trigger so it needs to be cancelled
+        # TODO Make function in controller to handle this 
         #self.__deleteEdgeFromCanvas()
         #self.__stopMovingEdge() 
         #self.__clearVariables() 
@@ -92,7 +97,8 @@ class NodeHandler():
         while(canvasNode.getEdges() != []): 
             # Get first edge in the list
             edge = canvasNode.getEdges()[0]
-
+            
+            # TODO 
             # Assign values to variables so edge can be deleted
             #self.__initVariables(edge)
             # Delete Edge  
@@ -113,8 +119,9 @@ class NodeHandler():
         
         # Add event listener to move node when it's dragged by the mouse 
         #canvas.tag_bind(circle, "<B1-Motion>", lambda event: self.__moveNode(event, canvasNode))   
+        
         # Add event listener to add an edge when a node is clicked 
-        # canvas.tag_bind(circle, "<Button-1>", lambda _: self.__createEdge(canvasNode))
+        #self.__canvas.tag_bind(circle, "<Button-1>", lambda _: self.__controller.handleEdgeEvent(canvasNode))
         # Add event to delete a node when it is double clicked 
         self.__canvas.tag_bind(circle, "<Double-Button-1>", lambda _: self.__deleteNodeOnDoubleClick(canvasNode)) 
     
