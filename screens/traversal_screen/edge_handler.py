@@ -1,53 +1,70 @@
 from canvas_objects import CanvasNode, CanvasEdge
 from .traversal_model import TraversalModel
-from tkinter import Canvas
+from tkinter import Canvas, Event
+
 
 class EdgeHandler():
     def __init__(self, canvas : Canvas, controller, model : TraversalModel ) -> None:
+        # References to needed objects 
         self.__canvas = canvas
         self.__controller = controller 
         self.__model = model 
         
+        # Booleans to handle cases when multiple events trigger at once
         self.__isEdgeBeingDrawn = False 
-        self.__isEdgeBeingEdited = False 
+        self.__isEdgeBeingEdited = False  
+        self.__isEdgeBeingDeleted = False
         
+        # Store references to nodes edge connects 
         self.__nodeEdgeStart = None 
         self.__nodeEdgeEnd = None 
+
+        # Canvas ID if edge user is interacting with
         self.__currentEdgeID = None 
+        # Stores reference to corresponding edge object 
         self.__currentEdgeObj = None
 
     
+    # Getters 
     def isEdgeBeingEdited(self) -> bool: return self.__isEdgeBeingEdited
-    def isEdgeBeingDrawn(self) -> bool: return self.__isEdgeBeingDrawn 
+    def isEdgeBeingDrawn(self) -> bool: return self.__isEdgeBeingDrawn   
+    def isEdgeBeingDeleted(self) -> bool: return self.__isEdgeBeingDeleted
+
+    # Setters 
     def setEdgeBeingEdited(self, state : bool) -> None: 
         self.__isEdgeBeingEdited = state
     def setEdgeBeingDrawn(self, state : bool) -> None: 
-        self.__isEdgeBeingDrawn = state
+        self.__isEdgeBeingDrawn = state 
+    def setEdgeBeingDeleted(self, state : bool) -> None: 
+        self.__isEdgeBeingDeleted = state 
 
+    # Setters 
     def setConnectionStartNode(self, canvasNode : CanvasNode) -> None: 
         self.__nodeEdgeStart = canvasNode 
     def setConnectionEndNode(self, canvasNode : CanvasNode) -> None: 
         self.__nodeEdgeEnd = canvasNode
     
-    def getEdgeBeingEdited(self) -> CanvasEdge: 
-        return self.__currentEdgeObj
+    # Getters 
+    def getEdgeBeingEdited(self) -> CanvasEdge: return self.__currentEdgeObj
+    def getCurrentEdgeID(self) -> int: return self.__currentEdgeID 
+    def getCurrentEdgeObj(self) -> CanvasEdge: return self.__currentEdgeObj
+    def getEdgeStartNode(self) -> CanvasNode: return self.__nodeEdgeStart
+    def getEdgeEndNode(self) -> CanvasNode: return self.__nodeEdgeEnd
     
-    def getCurrentEdgeID(self) -> int: 
-        return self.__currentEdgeID 
-    
+    # Setter 
     def setCurrentEdgeID(self, currentEdgeID: int) -> None: 
         self.__currentEdgeID = currentEdgeID
 
 
     # Assign values to variables so functions to edit/delete edges can work
-    def __initVariables(self, canvasEdge : CanvasEdge): 
+    def initVariables(self, canvasEdge : CanvasEdge): 
         self.__currentEdgeID = canvasEdge.getCanvasID() 
         self.__currentEdgeObj = canvasEdge 
         self.__nodeEdgeStart, self.__nodeEdgeEnd = canvasEdge.getNodes() 
 
 
     # Resets variables used when creating edges     
-    def __clearVariables(self) -> None: 
+    def clearVariables(self) -> None: 
         self.__nodeEdgeStart = None 
         self.__nodeEdgeEnd = None 
         self.__currentEdgeID = None  
@@ -60,13 +77,12 @@ class EdgeHandler():
         # Delete edge from canvas
         self.__canvas.delete(self.__currentEdgeID) 
             
-    
     # Handles when an egde starts and ends at the same node 
     def __handleSelfEdge(self) -> None:
         # Delete edge
         self.__deleteEdgeFromCanvas() 
         # Clear variables used when creating edges 
-        self.__clearVariables()
+        self.clearVariables()
 
 
     def __editEdgeOnClick(self, canvasEdge : CanvasEdge) -> None: 
@@ -74,7 +90,7 @@ class EdgeHandler():
 
         # Assign values to variables needed to edit edges 
         self.setEdgeBeingEdited(True)
-        self.__initVariables(canvasEdge)
+        self.initVariables(canvasEdge)
         
         # Show option on screen to an edge 
         self.__controller.enableEdgeWeightOptions()
@@ -99,20 +115,37 @@ class EdgeHandler():
         # Delete reference of CanvasEdge Object in the CanvasNode objects
         self.__nodeEdgeStart.deleteConnectionFromSet(self.__currentEdgeObj)
         self.__nodeEdgeEnd.deleteConnectionFromSet(self.__currentEdgeObj)
-
         # Resets variables  
-        self.__clearVariables()
+        self.clearVariables()  
+    
+
+    # Deletes edge current being drawn (follwing users mouse)
+    def deleteEdgeBeingDrawn(self) -> None: 
+        self.__deleteEdgeFromCanvas()
+        self.__controller.stopMovingEdge()
+        self.clearVariables() 
 
 
+     # Deletes current edge being drawn if user clicks the canvas 
+    def deleteEdgeOnClick(self, event : Event): 
+        # This event can trigger when an edge is being edited 
+        # Deleting the edge when it shouldn't be 
+        if(self.__isEdgeBeingEdited): return
+        collisions = self.__canvas.find_overlapping(event.x, event.y , event.x, event.y) 
+        if(len(collisions) == 1 and self.__currentEdgeID in collisions): 
+            self.__deleteEdgeFromCanvas()
+            self.__controller.stopMovingEdge() 
+            self.clearVariables() 
+    
     # Delete an edge when a user double clicks on it
-    def __deleteEdgeOnDoubleClick(self, canvasEdge : CanvasEdge):  
-        self.__initVariables(canvasEdge)
-        
+    def __deleteEdgeOnDoubleClick(self, canvasEdge : CanvasEdge):    
+        self.setEdgeBeingDeleted(True)
+        self.initVariables(canvasEdge)
         # Hide options to edit edge if they are currently visible
         self.__controller.disableEdgeWeightOptions()
         # Delete edge 
-        self.deleteEdge()
-
+        self.deleteEdge() 
+    
 
     # Add event handlers to edges for interactability 
     def __addEdgeEvents(self, edge : int, canvasEdge : CanvasEdge) -> None:  
@@ -134,14 +167,12 @@ class EdgeHandler():
             self.__deleteEdgeFromCanvas()
             return self.__model.getEdge(connectedNodes[::-1]) 
         
-        # TODO LINK TO CONTROLLER HERE
-        # Moves edge to centre of the destination node 
-        coords = self.__centreEdge() 
-        # Adjusts edge so arrow/s can be shown
-        coords = self.__adjustEdgeCoords()
+
+        # Adjust edge coords it's in the correct place 
+        adjustedCoords = self.__controller.adjustEdgeCoords()
         
         # Create new object, weight is initially set to the default 
-        newEdge = CanvasEdge(self.__currentEdgeID, coords, self.__model.getDefaultWeight())  
+        newEdge = CanvasEdge(self.__currentEdgeID, adjustedCoords, self.__model.getDefaultWeight())  
         # Add node to dictionary 
         self.__model.addEdge(connectedNodes, newEdge)   
         # Add references to nodes in CanvasEdge object
@@ -163,6 +194,7 @@ class EdgeHandler():
         self.__currentEdgeID = edge.getCanvasID() 
         return edge
 
+
     # Case handling for potential duplicate or self edges 
     def __handleNewEdge(self) -> None:
         # If edge starts and ends at the same node
@@ -175,10 +207,8 @@ class EdgeHandler():
     
     # Handles when a edge connects two nodes together 
     def handleNodeConnection(self, canvasNode : CanvasNode) -> None:
-        
         # Stop Edge following mouse event 
         self.__controller.stopMovingEdge() 
-        
         # Sets variable indicating edge is being edited 
         self.setEdgeBeingEdited(True)
         # Sets node edge ends to current node 
@@ -190,5 +220,3 @@ class EdgeHandler():
     def spawnEdge(self, canvasNode : CanvasNode): 
         # Store reference to node the new edge starts from  
         self.setConnectionStartNode(canvasNode) 
-
-    

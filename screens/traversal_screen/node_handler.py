@@ -1,30 +1,30 @@
 from canvas_objects import CanvasNode
-from .traversal_model import TraversalModel
+from .traversal_model import TraversalModel 
+from .edge_handler import EdgeHandler
 from tkinter import Canvas
 
 class NodeHandler():
-    def __init__(self, canvas : Canvas, controller, model : TraversalModel):
+    def __init__(self, canvas : Canvas, controller, model : TraversalModel, edgeHandler : EdgeHandler):
         # Store reference to canvas (makes things a lot easier)  
         self.__canvas = canvas
         # Store reference to model (to access data needed for nodes)
         self.__model = model  
         # Stores reference to the controller (literally needed for one function only)
         self.__controller = controller
-
-        
-        self.__isEdgeBeingEdited = False 
+        # Reference to edge handler (just needed cause events are a pain)
+        self.__edgeHandler = edgeHandler
+        # Flag to ensure events don't trigger when node being deleted
         self.__isNodeBeingDeleted = False 
+    
 
-        # 
-        '''
-        # The event to draw an edge can still trigger so the edge needs to be deleted
-        self.__deleteEdgeFromCanvas()
-        self.__stopMovingEdge() 
-        self.__clearVariables() 
-        '''
+    # Getter
+    def isNodeBeingDeleted(self) -> bool: return self.__isNodeBeingDeleted 
+    # Setter 
+    def setNodeBeingDeleted(self, state : bool) -> None:  
+        self.__isNodeBeingDeleted = state 
 
 
-     # Checks if a new node can be added to the screen.  
+    # Checks if a new node can be added to the screen.  
     def __canNodeBeSpawned(self, coords : tuple): 
         # Coordinates the node will be drawn at 
         x0, y0, x1, y1 = coords
@@ -80,29 +80,23 @@ class NodeHandler():
     # Deletes a node when the user double clicks on it 
     def __deleteNodeOnDoubleClick(self, canvasNode : CanvasNode) -> None:
         # A node can't be deleted if an edge connected to it is being edited 
-        if(self.__controller.isEdgeBeingEdited()): return 
+        if(self.__edgeHandler.isEdgeBeingEdited()): return 
         
         # Set variables indicating node is being deleted to True  
-        # (This is used to stop another canvas event triggering)
-        self.__isNodeBeingDeleted = True
+        # (This is used to stop another canvas event triggering) 
+        self.__isNodeBeingDeleted = True 
 
-        # The event to draw an edge can still trigger so it needs to be cancelled
-        # TODO Make function in controller to handle this 
-        #self.__deleteEdgeFromCanvas()
-        #self.__stopMovingEdge() 
-        #self.__clearVariables() 
+        # The event to draw an edge can still trigger 
+        # so it needs to be deleted
+        self.__edgeHandler.deleteEdgeBeingDrawn()
 
 
         # Iterate through all edges 
         while(canvasNode.getEdges() != []): 
-            # Get first edge in the list
-            edge = canvasNode.getEdges()[0]
-            
-            # TODO 
             # Assign values to variables so edge can be deleted
-            #self.__initVariables(edge)
+            self.__initVariables(canvasNode.getEdges()[0])
             # Delete Edge  
-            #self.deleteEdge() 
+            self.__edgeHandler.deleteEdge()
         
         # Delete node from the canvas
         self.__deleteNodeFromCanvas(canvasNode) 
@@ -121,11 +115,11 @@ class NodeHandler():
         #canvas.tag_bind(circle, "<B1-Motion>", lambda event: self.__moveNode(event, canvasNode))   
         
         # Add event listener to add an edge when a node is clicked 
-        #self.__canvas.tag_bind(circle, "<Button-1>", lambda _: self.__controller.handleEdgeEvent(canvasNode))
+        self.__canvas.tag_bind(circle, "<Button-1>", lambda _: self.__controller.handleNodeClickEvent(canvasNode))
         # Add event to delete a node when it is double clicked 
         self.__canvas.tag_bind(circle, "<Double-Button-1>", lambda _: self.__deleteNodeOnDoubleClick(canvasNode)) 
     
-
+    
     # Draws a circle (node) on the canvas  
     def spawnNode(self, coords : tuple) -> int:   
         # This function can be called at the same time a node is being deleted
