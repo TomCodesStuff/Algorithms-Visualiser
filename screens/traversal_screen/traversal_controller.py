@@ -522,7 +522,7 @@ class TraversalController():
         self.__screen.changeCircleColour(canvasNode.getCanvasID(), "Red")
 
         # Handles if the mouse moves of off the canvas 
-        xCoord, yCoord = self.__adjustCoords(event.x, event.y)
+        xCoord, yCoord = event.x, event.y
 
         # Updates coords in the CanvasNode object
         canvasNode.updateCoords((xCoord, yCoord, xCoord + circleSize, yCoord + circleSize))
@@ -542,31 +542,6 @@ class TraversalController():
         # Updates screen so node can be seen onscreen
         self.__screen.getWindow().update()
 
-    # Changes the coordinates of a circle when when the user drags it across the screen
-    def __adjustCoords(self, x : int, y : int) -> tuple:  
-        
-        canvas = self.__screen.getCanvas()
-        circleSize = self.__model.getCircleSize()
-        circleOffset = circleSize // 2 
-        self.stopMovingEdge()
-        
-        # Checks if mouse has gone out of bounds to the left 
-        # Stops the node from moving off the canvas
-        xCoord = max(x - circleOffset, self.__model.getCanvasLowerBoundOffset()) 
-        # Checks if mouse has gone out of bounds to the right 
-        # Stops the node from moving off the canvas
-        xCoord = min(xCoord, canvas.winfo_width() - self.__model.getCanvasUpperBoundOffset() - circleSize) 
-
-        # Checks if mouse has gone out of bounds by going above the canvas
-        # Stops the node from moving off the canvas 
-        yCoord = max(y - circleOffset, self.__model.getCanvasLowerBoundOffset()) 
-        # Checks if mouse has gone out of bounds by going below the canvas
-        # Stops the node from moving off the canvas 
-        yCoord = min(yCoord, canvas.winfo_height() - self.__model.getCanvasUpperBoundOffset() - circleSize)  
-
-        # The above could be done in one line but just because it can doesn't mean it should 
-        # Doing it in one line would make the calculations very hard to read  
-        return(xCoord, yCoord)
 
     # Updates position of nodes on the canvas
     def __redrawNodes(self): 
