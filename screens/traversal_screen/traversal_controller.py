@@ -17,7 +17,8 @@ class TraversalController():
         self.__model = model   
         self.__edgeHandler = EdgeHandler(self.__screen.getCanvas(), self, model)
         self.__nodeHandler = NodeHandler(self.__screen.getCanvas(), self, 
-                                         model, self.__edgeHandler)
+                                         model, self.__edgeHandler) 
+        self.__updateCanvas()
 
         
         
@@ -69,10 +70,10 @@ class TraversalController():
         self.__edgeHandler.setEdgeBeingDrawn(True)
 
 
-    # Disables canvas event that cuases edge to follow mouse 
+    # Disables canvas event that causes edge to follow mouse 
     def stopMovingEdge(self) -> None:
         # Remove event that draws line
-        self.__deleteMovingEdgeEvent()
+        self.deleteMovingEdgeEvent()
         # Set edge being drawn to False
         self.__edgeHandler.setEdgeBeingDrawn(False)
 
@@ -399,7 +400,7 @@ class TraversalController():
         self.__screen.getCanvas().bind("<Motion>", lambda event: self.__drawEdge(event, canvasNode))
 
     # Removes the event that draws lines representing edges 
-    def __deleteMovingEdgeEvent(self):  
+    def deleteMovingEdgeEvent(self):  
         canvas = self.__screen.getCanvas()
         if("<Motion>" in canvas.bind()):
             canvas.unbind("<Motion>")
@@ -505,7 +506,7 @@ class TraversalController():
     # Moves the node to follow the users mouse 
     def __moveNode(self, event : Event, canvasNode : CanvasNode) -> None:   
         # Disables canvas event that draws edges if it binded 
-        self.__deleteMovingEdgeEvent()
+        self.deleteMovingEdgeEvent()
         # Sets False so another edge can be drawn later
         self.__isEdgeBeingDrawn = False
 
@@ -689,6 +690,18 @@ class TraversalController():
         # Add event to delete current edge being drawn when the canvas is clicked
         canvas.bind("<Button-1>", lambda event: self.__edgeHandler.deleteEdgeOnClick(event))
         canvas.bind("<Double-Button-1>", lambda event: self.__spawnNodeOnDoubleClick(event))
+    
+
+    # Updates canvas to display nodes and edges interacting  
+    # Need way to stop this being called when screen moves 
+    def __updateCanvas(self) -> None: 
+        
+        self.__redrawNodes()
+        # Update canvas 
+        self.__screen.getWindow().update()
+        # Schedule function to run after 50ms
+        self.__screen.getWindow().scheduleFunctionExecution(self.__updateCanvas, 2)
+
 
     
 # Listen to Paranoid by Black Sabbath

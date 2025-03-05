@@ -167,7 +167,6 @@ class EdgeHandler():
             self.__deleteEdgeFromCanvas()
             return self.__model.getEdge(connectedNodes[::-1]) 
         
-
         # Adjust edge coords it's in the correct place 
         adjustedCoords = self.__controller.adjustEdgeCoords()
         
@@ -220,3 +219,5 @@ class EdgeHandler():
     def spawnEdge(self, canvasNode : CanvasNode): 
         # Store reference to node the new edge starts from  
         self.setConnectionStartNode(canvasNode) 
+
+# Listen to Why does it always rain on my by Travis 

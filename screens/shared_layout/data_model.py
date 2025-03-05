@@ -7,7 +7,7 @@ class SharedDataModel():
     # Constructor
     def __init__(self):
         self.__controller = None
-        self.__array =  []
+        self.__array = []
         self.__barColours = []
         self.__target = None
         self.__targetSetting = 0

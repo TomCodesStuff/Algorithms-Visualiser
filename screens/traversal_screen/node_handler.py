@@ -1,10 +1,10 @@
 from canvas_objects import CanvasNode
 from .traversal_model import TraversalModel 
 from .edge_handler import EdgeHandler
-from tkinter import Canvas
+from tkinter import Canvas, Event
 
 class NodeHandler():
-    def __init__(self, canvas : Canvas, controller, model : TraversalModel, edgeHandler : EdgeHandler):
+    def __init__(self, canvas : Canvas, controller, model : TraversalModel, edgeHandler : EdgeHandler) -> None:
         # Store reference to canvas (makes things a lot easier)  
         self.__canvas = canvas
         # Store reference to model (to access data needed for nodes)
@@ -73,8 +73,34 @@ class NodeHandler():
       
 
     # Deletes the node from the canvas
-    def __deleteNodeFromCanvas(self, canvasNode : CanvasNode):
+    def __deleteNodeFromCanvas(self, canvasNode : CanvasNode) -> None:
         self.__canvas.delete(canvasNode.getCanvasID())  
+
+    
+    # Move node to cursors position on the canvas  
+    def __moveNode(self, event : Event, canvasNode : CanvasNode) -> None:  
+        # Disables canvas event that draws edges if it binded 
+        self.__controller.deleteMovingEdgeEvent()
+        # Sets boolean to False so another edge can be drawn later
+        self.__edgeHandler.setEdgeBeingDrawn(False) 
+        # Radius of nodes 
+        circleSize = self.__model.getCircleSize()
+        # I don't know why but this stops the circles only being partially 
+        # drawn when being moved around (works on windows only)
+        self.__canvas.configure(cursor='arrow')
+
+        # TODO ADD CONTROLLER METHOD 
+        # Sets the circles colour to Red, makes sure the colour remains 
+        # red even if the mouse is moved off the circle 
+        #self.__screen.changeCircleColour(canvasNode.getCanvasID(), "Red")
+
+        # Handles if the mouse moves of off the canvas 
+        #xCoord, yCoord = self.__adjustCoords(event.x, event.y)
+
+        # TODO make node be in middle of mouse 
+        # Updates coords in the CanvasNode object
+        canvasNode.updateCoords((event.x, event.y, event.x + circleSize, event.y + circleSize))
+        pass
 
     
     # Deletes a node when the user double clicks on it 
@@ -90,11 +116,10 @@ class NodeHandler():
         # so it needs to be deleted
         self.__edgeHandler.deleteEdgeBeingDrawn()
 
-
         # Iterate through all edges 
         while(canvasNode.getEdges() != []): 
             # Assign values to variables so edge can be deleted
-            self.__initVariables(canvasNode.getEdges()[0])
+            self.__edgeHandler.initVariables(canvasNode.getEdges()[0])
             # Delete Edge  
             self.__edgeHandler.deleteEdge()
         
@@ -112,7 +137,7 @@ class NodeHandler():
         self.__canvas.tag_bind(circle, "<Leave>", lambda _: self.__changeColourOnLeave(canvasNode)) 
         
         # Add event listener to move node when it's dragged by the mouse 
-        #canvas.tag_bind(circle, "<B1-Motion>", lambda event: self.__moveNode(event, canvasNode))   
+        self.__canvas.tag_bind(circle, "<B1-Motion>", lambda event: self.__moveNode(event, canvasNode))   
         
         # Add event listener to add an edge when a node is clicked 
         self.__canvas.tag_bind(circle, "<Button-1>", lambda _: self.__controller.handleNodeClickEvent(canvasNode))
@@ -142,3 +167,5 @@ class NodeHandler():
         self.__addNodeEvents(circleID, canvasNode) 
         # Return to indicate success
         return 1
+
+# Listen to Hertz by Amyl and the Sniffers 

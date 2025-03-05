@@ -9,7 +9,7 @@ import tkinter as tk
 from tkinter import ttk 
 from .traversal_controller import TraversalController
 from .traversal_model import TraversalModel
-from canvas_objects import CanvasNode, CanvasEdge
+from canvas_objects import CanvasEdge
 
 class TraversalScreen(sc.Screen, sc.ScreenTemplate): 
     def initScreen(self) -> None:
@@ -24,7 +24,9 @@ class TraversalScreen(sc.Screen, sc.ScreenTemplate):
         # Add event handlers to the canvas
         self.__controller.addCanvasEvents() 
         # Create the options users can interact with 
-        self.__createOptions()  
+        self.__createOptions()    
+        # Override default behaviour of home button 
+        self.__overrideHomeButtonCommand()
         
     # Creates the widgets that allows users to toggle the visualisers settings
     def __createOptions(self) -> None: 
@@ -102,8 +104,7 @@ class TraversalScreen(sc.Screen, sc.ScreenTemplate):
         self.__updateWeight("No Edge Selected")
         self.__weightSlider.pack()
 
-    # Updates text in label abive weight slider 
-    # Updates text in label abive weight slider 
+    # Updates text in label above weight slider 
     def __updateWeight(self, value : str) -> None:
         self.__weightSlider.config(label = f"Weight: {value}")    
 
@@ -222,7 +223,19 @@ class TraversalScreen(sc.Screen, sc.ScreenTemplate):
         # Allows user to stop algorithm whilst it's running - button is initially disabled
         self.__pauseResumeButton = tk.Button(algorithmToggleFrame, text = "Pause.", width = 7, relief = "solid", 
                                              font = (self.getFont(), self.getFontSize()), state = "disabled")
-        self.__pauseResumeButton.grid(row = 0, column = 1)   
+        self.__pauseResumeButton.grid(row = 0, column = 1)    
+    
+
+    # Cancels any functions schedules to run 
+    def __loadHomeScreen(self) -> None:   
+        # Cancel any pending functions
+        self.getWindow().cancelScheduledFunctions() 
+        # Load the homescreen
+        self.loadHomeScreen()
+        
+    # Override default function of the home screen button
+    def  __overrideHomeButtonCommand(self) -> None: 
+        self.getHomeButton().config(command=self.__loadHomeScreen) 
     
 
 # Listen to Can't Stop by The Red Hot Chili Peppers 
