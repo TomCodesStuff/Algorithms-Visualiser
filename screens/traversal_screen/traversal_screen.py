@@ -228,7 +228,7 @@ class TraversalScreen(sc.Screen, sc.ScreenTemplate):
 
     # Cancels any functions schedules to run 
     def __loadHomeScreen(self) -> None:   
-        # Cancel any pending functions
+        # Cancel any pending functions -> most likely refereshing canvas 
         self.getWindow().cancelScheduledFunctions() 
         # Load the homescreen
         self.loadHomeScreen()

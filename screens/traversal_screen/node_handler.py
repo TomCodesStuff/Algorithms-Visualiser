@@ -128,9 +128,8 @@ class NodeHandler():
 
         # Updates coords in the CanvasNode object
         canvasNode.updateCoords((xCoord, yCoord, xCoord + circleSize, yCoord + circleSize))
-        pass
+        
 
-    
     # Deletes a node when the user double clicks on it 
     def __deleteNodeOnDoubleClick(self, canvasNode : CanvasNode) -> None:
         # A node can't be deleted if an edge connected to it is being edited 

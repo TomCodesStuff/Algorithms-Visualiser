@@ -7,7 +7,8 @@ if(__name__ == "__main__"):
 from canvas_objects import CanvasNode, CanvasEdge
 from .traversal_model import TraversalModel 
 from .node_handler import NodeHandler
-from .edge_handler import EdgeHandler
+from .edge_handler import EdgeHandler 
+from .physics_handler import PhysicsHandler
 from tkinter import Event, BOTH 
 import math
 
@@ -670,7 +671,10 @@ class TraversalController():
     # Updates canvas to display nodes and edges interacting  
     # Need way to stop this being called when screen moves 
     def __updateCanvas(self) -> None: 
-        
+        physics_handler = PhysicsHandler(self.__model) 
+        physics_handler.calculateNodeRepulsion()
+
+        # Redrawn nodes so that they 
         self.__redrawNodes()
         # Update canvas 
         self.__screen.getWindow().update()
@@ -678,5 +682,4 @@ class TraversalController():
         self.__screen.getWindow().scheduleFunctionExecution(self.__updateCanvas, 2)
 
 
-    
 # Listen to Paranoid by Black Sabbath
