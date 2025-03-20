@@ -109,11 +109,13 @@ class SharedLayout(sc.ScreenTemplate):
         algorithmToggleFrame.pack(side = "bottom", pady = (0,5))
         # Allows user to see the algorithm in action
         self.__solveStopButton = tk.Button(algorithmToggleFrame, text = "Solve.", width = 7, relief = "solid", 
-                                           font = (self.getFont(), self.getFontSize()), command = lambda: self.__initAlgorithm())
+                                           font = (self.getFont(), self.getFontSize()), 
+                                           command = lambda: self.__initAlgorithm())
         self.__solveStopButton.grid(row = 0, column = 0, padx = (0,5)) 
         # Allows user to stop algorithm whilst it's running - button is initially disabled
         self.__pauseResumeButton = tk.Button(algorithmToggleFrame, text = "Pause.", width = 7, relief = "solid", 
-                                             font = (self.getFont(), self.getFontSize()), state = "disabled", command = lambda : self.__pauseAlgorithm())
+                                             font = (self.getFont(), self.getFontSize()), 
+                                             state = "disabled", command = lambda : self.__pauseAlgorithm())
         self.__pauseResumeButton.grid(row = 0, column = 1)  
 
     # When the slider has changed value a label is added with the relevant speed 
@@ -153,7 +155,8 @@ class SharedLayout(sc.ScreenTemplate):
     # Guarantees target is not in array
     def targetOut(self) -> int: 
         # Chooses a number between the range of arrays smallest value - 20 and arrays largest value + 20
-        target = random.randint(min(self.__dataModel.getArray()) - self.__model.getBuffer(), max(self.__dataModel.getArray()) + self.__model.getBuffer())
+        target = random.randint(min(self.__dataModel.getArray()) - self.__model.getBuffer(), 
+                                max(self.__dataModel.getArray()) + self.__model.getBuffer())
         # If generated number in array recall function
         if target in self.__dataModel.getArray(): self.targetOut()
         # If generated number not in array then just return value
@@ -174,8 +177,9 @@ class SharedLayout(sc.ScreenTemplate):
             self.__controller.generateTarget(self.__dataModel.getTargetSetting()) 
             # Call algorithm -> so this program actually has a use
             self.__algorithmThread = threading.Thread(target=callAlgorithm, 
-                                                      args=(self.__dataModel, self.__getAlgorithmChoice(), self.__getAlgorithmType(), 
-                                                                                  self.__widgetsAlgorithmStops))
+                                                      args=(self.__dataModel, self.__getAlgorithmChoice(), 
+                                                            self.__getAlgorithmType(), 
+                                                            self.__widgetsAlgorithmStops))
             # Start Thread
             self.__algorithmThread.start()
     

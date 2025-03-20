@@ -11,10 +11,13 @@ from canvas_objects import CanvasNode
 
 # Handles all physics-based calculations 
 class PhysicsHandler():
-    def __init__(self, model : TraversalModel) -> None: 
-        self.__model = model  
+    def __init__(self, model : TraversalModel, canvasBounds : tuple, canvasCentre : tuple) -> None: 
+        self.__model = model   
+        self.__canvasBounds = canvasBounds
+        self.__centreX, self.__centreY = canvasCentre
+        self.__gravityConstant = 2
 
-    
+        
     # Calculates distance between passed coords (pythagoras) 
     def __calculateDistance(self, x0 : int, y0 : int, x1 : int, y1 : int) -> float: 
         return math.sqrt(math.pow(x1 - x0, 2) + math.pow(y1 - y0, 2)) 
@@ -40,7 +43,7 @@ class PhysicsHandler():
         circleSize = self.__model.getCircleSize()
         circleOffset = circleSize // 2 
         
-        # Iterate through each node 
+        # Iterate through each pair of nodes 
         for i in range(n): 
             for j in range(i + 1, n):   
                 # X-Y coordinates of the nodes
@@ -64,9 +67,44 @@ class PhysicsHandler():
                 
                 # Update the coords of each node 
                 self.__updateNodeCoords(self.__model.getNode(i), -forceX, -forceY)
-                self.__updateNodeCoords(self.__model.getNode(j), forceX, forceY)
-                
+                self.__updateNodeCoords(self.__model.getNode(j), forceX, forceY)  
+    
+    
+    # Returns -1, 0, 1 depending if a is less than , equal to or greater than b 
+    def __directionToCentre(self, a, b): 
+        return (a > b) - (a < b)
+    
+
+    # Checks to see if any part of the node is outside the drawbable area
+    def __checkLowerBounds(self, x0, y0): 
+        lowerboundX, lowerBoundY, _, _ = self.__canvasBounds
+        circleSize = self.__model.getCircleSize()
+        return True if lowerboundX + circleSize >= x0 or\
+            lowerBoundY + circleSize >= y0 else False
+
+
+    def __checkUpperBounds(self, x1, y1): 
+        _, _, upperBoundX, upperBoundY = self.__canvasBounds
+        circleSize = self.__model.getCircleSize()
+        return True if upperBoundX - circleSize <= x1 or\
+            upperBoundY - circleSize <= y1 else False
+
+    
+    def __calculateGravityOffset(self, x0, y0): 
+        x0Offset = self.__gravityConstant * self.__directionToCentre(self.__centreX, x0)
+        y0Offset = self.__gravityConstant * self.__directionToCentre(self.__centreY, y0) 
+        return (x0Offset, y0Offset)
+
+
 
     # Calculates force that drags nodes towards centre of the canvas 
     # Acts as way to stop nodes going offscreen 
-    def applyGravity(self): pass 
+    def applyGravity(self): 
+        for node in self.__model.getNodes(): 
+            x0, y0, x1, y1 = node.getCoords() 
+            # If Node is out of bounds, try to move it back on screen
+            if(self.__checkLowerBounds(x0, y0) or self.__checkUpperBounds(x1, y1)): 
+                gravityX, gravityY = self.__calculateGravityOffset(x0, y0)
+                self.__updateNodeCoords(node, gravityX, gravityY)
+
+            

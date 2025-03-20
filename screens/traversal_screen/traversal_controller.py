@@ -14,25 +14,49 @@ import math
 
 class TraversalController():
     def __init__(self, screen, model : TraversalModel): 
+        # Screen and Model Object References 
         self.__screen = screen 
-        self.__model = model   
-        self.__edgeHandler = EdgeHandler(self.__screen.getCanvas(), self, model)
+        self.__model = model    
+
+        # Handles creation and deletion of edges 
+        self.__edgeHandler = EdgeHandler(self.__screen.getCanvas(), self, model) 
+        # Handles creation and deletion of nodes 
         self.__nodeHandler = NodeHandler(self.__screen.getCanvas(), self, 
-                                         model, self.__edgeHandler) 
+                                         model, self.__edgeHandler)   
+        # Handles 'physics based' calculations 
+        self.__physicsHandler = PhysicsHandler(self.__model, self.__getCanvasBounds(), 
+                                               self.__getCanvasCentreCoords())  
+        # Refreshes canvas preiodically   
         self.__updateCanvas()
 
-        
-        
+
+    # Calculates centre coords of the canvas 
+    def __getCanvasBounds(self) -> tuple:
+        canvas = self.__screen.getCanvas() 
+        return (0, 0, canvas.winfo_width(), canvas.winfo_height())
+    
+
+    # Calculates coords of the centre of the canvas  
+    def __getCanvasCentreCoords(self) -> tuple: 
+        canvas = self.__screen.getCanvas() 
+        return (canvas.winfo_width() // 2, 
+                canvas.winfo_height() // 2)
+ 
+
+    # Returns True if an edge is being edited by a user 
     def isEdgeBeingEdited(self) -> bool: 
         return self.__edgeHandler.isEdgeBeingEdited()
 
 
+    # Updates Screen to display options
     def enableEdgeWeightOptions(self) -> None:
         self.__screen.enableWeightOptions(self.__edgeHandler.getEdgeBeingEdited()) 
     
 
+    # Updates Screen to hide options
     def disableEdgeWeightOptions(self) -> None:
         self.__screen.disableWeightOptions()
+
 
     # Draws a circle (node) on the canvas 
     def spawnNode(self, coords = None):
@@ -671,15 +695,15 @@ class TraversalController():
     # Updates canvas to display nodes and edges interacting  
     # Need way to stop this being called when screen moves 
     def __updateCanvas(self) -> None: 
-        physics_handler = PhysicsHandler(self.__model) 
-        physics_handler.calculateNodeRepulsion()
+        self.__physicsHandler.applyGravity()
+        self.__physicsHandler.calculateNodeRepulsion()
 
         # Redrawn nodes so that they 
         self.__redrawNodes()
         # Update canvas 
         self.__screen.getWindow().update()
         # Schedule function to run after 50ms
-        self.__screen.getWindow().scheduleFunctionExecution(self.__updateCanvas, 2)
+        self.__screen.getWindow().scheduleFunctionExecution(self.__updateCanvas, 50)
 
 
 # Listen to Paranoid by Black Sabbath
