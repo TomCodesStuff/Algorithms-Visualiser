@@ -3,27 +3,34 @@ if(__name__ == "__main__"):
     print("This is file shouldn't be run on it's own. \nIt should be imported only.")
     exit()
 
+import math 
+
 class CanvasNode():
     # Static variable shared between each instance 
     nodeID = 1
 
-    def __init__(self, canvasID : int, coords : tuple) -> None: 
+    def __init__(self, canvasID : int, coords : tuple, nodeSize : int) -> None: 
         # ID of the node on the canvas
         self.__canvasID = canvasID 
         # Node ID
-        self.__ID = CanvasNode.nodeID
+        self.__ID = CanvasNode.nodeID 
+        # Size of the node 
+        self.__nodeSize = nodeSize
         CanvasNode.nodeID += 1 
-        # X-Y Coorindates of the node on screen
+        # X-Y Coordindates of the node on screen
         self.__coords = coords
-        # Edges between this and other nodes 
-        # and the weight of each edge
+        # Dictionary mapping nodes connected by edges 
+        # Keys are the node objects with the values being the weight of the connection
         self.__connectedNodes = {} 
         # Main colour of the node
         self.__colour = "Blue"
         # Colour of the node when it is hovered over 
         self.__highlightColour = "Red"
-        # A Set containing references to edges that connects nodes to eachother 
+        # A List containing references to edges that connects nodes to eachother 
         self.__edges = []
+        # Values that adjust the nodes position on screen, determined by forces applied on the Node 
+        self.__forceX = 0
+        self.__forceY = 0
     
     # Updates the coordinates of the node to be accurate to the coordinates on screen
     def updateCoords(self, coords : tuple) -> None: 
@@ -59,5 +66,31 @@ class CanvasNode():
 
     # Return all edges connected the node 
     def getEdges(self) -> list: return self.__edges
+
+    # Adjust Force applied in X-axis
+    def adjustForceX(self, forceX : int) -> None:
+        self.__forceX += forceX 
+
+    # Adjust Force applied in Y-axis
+    def adjustForceY(self, forceY : int) -> None:
+        self.__forceY += forceY 
     
+    # Resets values that apply forces to a node
+    def resetForces(self) -> None:
+        self.__forceX = 0
+        self.__forceY = 0
+    
+    def applyForces(self) -> None:  
+        # Get top-left coordinates of the node 
+        x0, y0, _, _ = self.__coords 
+        
+        # New Coords need to be rounded to nearest number
+        # Due to issue with floating point coords causing nodes to move left/right forever
+        newX0 =  math.ceil(x0 + self.__forceX)
+        newy0 = math.ceil(y0 + self.__forceY)  
+
+        # Update coords 
+        self.__coords = (newX0, newy0, newX0 + self.__nodeSize, newy0 + self.__nodeSize)
+
+
 # Listen to Paralyzer by Finger Eleven     

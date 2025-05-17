@@ -17,9 +17,9 @@ class NodeHandler():
         self.__isNodeBeingDeleted = False 
     
 
-    # Getter
+    # Getter to check if a node is being deleted 
     def isNodeBeingDeleted(self) -> bool: return self.__isNodeBeingDeleted 
-    # Setter 
+    # Setter used to flag when a node is being deleted
     def setNodeBeingDeleted(self, state : bool) -> None:  
         self.__isNodeBeingDeleted = state 
 
@@ -56,7 +56,7 @@ class NodeHandler():
     # Creates a CanvasNode object for the passed node 
     def __createCanvasNodeObject(self, circleID : int, coords : tuple) -> CanvasNode: 
          # Create corresponding object for a node drawn on the canvas
-        canvasNode = CanvasNode(circleID, coords)  
+        canvasNode = CanvasNode(circleID, coords, self.__model.getCircleSize())  
         # Adds node to array containing nodes 
         self.__model.addNode(canvasNode)
         return canvasNode

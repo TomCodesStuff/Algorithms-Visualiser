@@ -53,7 +53,10 @@ class TraversalModel():
         # Smallest distance nodes can be apart on screen 
         self.__minScreenDist = 50
         # Largest distance nodes can be apart on screen 
-        self.__maxScreenDist = 150
+        self.__maxScreenDist = 150 
+
+        # Time delay when updating the canvas   
+        self.__updateDelay = 50
 
     # Adds controller         
     def addController(self, controller): 
@@ -104,5 +107,8 @@ class TraversalModel():
     def getMaxWeight(self) -> int: return self.__maxWeight 
     def getDefaultWeight(self) -> int: return self.__defaultWeight
     def getWeightSliderResolution(self) -> int: return self.__weightSliderResolution 
+
+    # Getter for delay used when updating the canvas
+    def getUpdateDelay(self) -> int: return self.__updateDelay
 
 # Listen to Jigsaws Falling Into Place by Radiohead
