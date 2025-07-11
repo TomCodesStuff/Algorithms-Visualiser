@@ -695,15 +695,18 @@ class TraversalController():
     # Updates canvas to display nodes and edges interacting  
     # Need way to stop this being called when screen moves 
     def __updateCanvas(self) -> None: 
-        #self.__physicsHandler.applyGravity()
+        
+        self.__physicsHandler.applyGravity()
         self.__physicsHandler.calculateNodeRepulsion()
         self.__physicsHandler.applyForces()
+        
         # Redrawn nodes so that there positions updated on screen 
         self.__redrawNodes()
         # Update canvas 
         self.__screen.getWindow().update()
         # Schedule function to run after 50ms
-        self.__screen.getWindow().scheduleFunctionExecution(self.__updateCanvas, 50)
+        self.__screen.getWindow().scheduleFunctionExecution(self.__updateCanvas,
+                                                            self.__model.getUpdateDelay())
 
 
 # Listen to Paranoid by Black Sabbath

@@ -19,7 +19,7 @@ class TraversalModel():
         # Initial node coordinates an size 
         self.__initialX = 5
         self.__intialY = 5
-        self.__circleSize = 25
+        self.__circleSize = 15
         self.__initialNodeCoords = (self.__initialX, self.__intialY, 
                                     self.__initialX + self.__circleSize, 
                                     self.__intialY + self.__circleSize)
