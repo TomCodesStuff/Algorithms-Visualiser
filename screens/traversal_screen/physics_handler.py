@@ -68,7 +68,7 @@ class PhysicsHandler():
     def __getDirection(self, a, b): 
         return (a > b) - (a < b)
     
-
+    # TODO Delete this 
     def __calculateGravityIntensity(self, coord : int, centreCoord : int) -> int:  
         return max((abs(coord - centreCoord) // 100) - 0.75, 0)
 
