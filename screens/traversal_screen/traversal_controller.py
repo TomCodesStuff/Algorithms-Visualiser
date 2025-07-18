@@ -30,10 +30,13 @@ class TraversalController():
         self.__updateCanvas()
 
 
-    # Calculates centre coords of the canvas 
+    # Stores coords of the lower and upper bounds of the canvas 
     def __getCanvasBounds(self) -> tuple:
         canvas = self.__screen.getCanvas() 
-        return (0, 0, canvas.winfo_width(), canvas.winfo_height())
+        return (self.__model.getCanvasLowerBoundOffset(), 
+                self.__model.getCanvasLowerBoundOffset(), 
+                canvas.winfo_width() - self.__model.getCanvasUpperBoundOffset(), 
+                canvas.winfo_height() - self.__model.getCanvasUpperBoundOffset())
     
 
     # Calculates coords of the centre of the canvas  

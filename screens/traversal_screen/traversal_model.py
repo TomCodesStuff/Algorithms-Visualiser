@@ -30,7 +30,7 @@ class TraversalModel():
         # Minimum space between nodes 
         self.__nodesSpacingOffset = 20  
         # Number of nodes that can be on screen at once
-        self.__maxNumNodes = 50
+        self.__maxNumNodes = 20
         
         # Values for physics calculations 
         self.__forceConstant = (1e-8) * 9e9 
@@ -107,6 +107,7 @@ class TraversalModel():
     def getMaxWeight(self) -> int: return self.__maxWeight 
     def getDefaultWeight(self) -> int: return self.__defaultWeight
     def getWeightSliderResolution(self) -> int: return self.__weightSliderResolution 
+
 
     # Getter for delay used when updating the canvas
     def getUpdateDelay(self) -> int: return self.__updateDelay
