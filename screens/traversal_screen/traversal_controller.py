@@ -30,7 +30,7 @@ class TraversalController():
         self.__updateCanvas()
 
 
-    # Stores coords of the lower and upper bounds of the canvas 
+    # Returns coords of the lower and upper bounds of the canvas 
     def __getCanvasBounds(self) -> tuple:
         canvas = self.__screen.getCanvas() 
         return (self.__model.getCanvasLowerBoundOffset(), 
@@ -39,7 +39,7 @@ class TraversalController():
                 canvas.winfo_height() - self.__model.getCanvasUpperBoundOffset())
     
 
-    # Calculates coords of the centre of the canvas  
+    # Calculates and returns coords of the centre of the canvas  
     def __getCanvasCentreCoords(self) -> tuple: 
         canvas = self.__screen.getCanvas() 
         return (canvas.winfo_width() // 2, 
@@ -110,8 +110,6 @@ class TraversalController():
     def saveEdge(self, newWeight : int) -> None: 
         # Update weight of current edge object
         self.__edgeHandler.getCurrentEdgeObj().setWeight(newWeight) 
-        # Adjust distance between nodes to match new weight
-        self.__adjustScreenDistance()
         # Clear variables used  
         self.__edgeHandler.clearVariables() 
     
@@ -524,51 +522,13 @@ class TraversalController():
         # Return updated coords of the line 
         return canvas.coords(self.__edgeHandler.getCurrentEdgeID())
 
+
+    # TODO -> MOVE TO EDGE Handler 
     def adjustEdgeCoords(self) -> tuple: 
         # Move edge to end in the middle of the destination node
         self.__centreEdge()
         # Ensures the arrows for each edge can be seen 
         return self.__adjustEdgePos()
-
-        
-    # Moves the node to follow the users mouse 
-    def __moveNode(self, event : Event, canvasNode : CanvasNode) -> None:   
-        # Disables canvas event that draws edges if it binded 
-        self.deleteMovingEdgeEvent()
-        # Sets False so another edge can be drawn later
-        self.__isEdgeBeingDrawn = False
-
-        # Reference to the canvas 
-        canvas = self.__screen.getCanvas()
-        # Radius of the nodes
-        circleSize = self.__model.getCircleSize()  
-        # I don't know why but this stops the circles only being partially 
-        # drawn when being moved around (works on windows only)
-        canvas.configure(cursor='arrow')
-        # Sets the circles colour to Red, makes sure the colour remains 
-        # red even if the mouse is moved off the circle 
-        self.__screen.changeCircleColour(canvasNode.getCanvasID(), "Red")
-
-        # Handles if the mouse moves of off the canvas 
-        xCoord, yCoord = event.x, event.y
-
-        # Updates coords in the CanvasNode object
-        canvasNode.updateCoords((xCoord, yCoord, xCoord + circleSize, yCoord + circleSize))
-        
-        
-        # Applies forces to each node -> disabled for now 
-        self.__calculateForces(canvasNode)
-
-        # Updates coords in the CanvasNode object
-        canvasNode.updateCoords((xCoord, yCoord, xCoord + circleSize, yCoord + circleSize))
-        self.__redrawNodes()
-        self.__redrawEdges()
-        
-        # Moves center of the circle to the coordinates specified 
-        #canvas.moveto(canvasNode.getCanvasID(), xCoord, yCoord) 
-        
-        # Updates screen so node can be seen onscreen
-        self.__screen.getWindow().update()
 
 
     # Updates position of nodes on the canvas
@@ -578,6 +538,7 @@ class TraversalController():
             x0, y0, _, _ = node.getCoords()
             canvas.moveto(node.getCanvasID(), x0, y0)
     
+
     # Update positions of edges on the canvas 
     def __redrawEdges(self):
         canvas = self.__screen.getCanvas() 
@@ -603,66 +564,6 @@ class TraversalController():
             canvasEdge.updateCoords(coords)
 
 
-    # Calculates the forces that will be applied to each node 
-    def __calculateForces(self, canvasNode : CanvasNode): 
-        n = len(self.__model.getNodes())
-        circleSize = self.__model.getCircleSize()
-        circleOffset = circleSize// 2 
-        
-        # Iterate through each node 
-        for i in range(n): 
-            for j in range(i + 1, n):   
-                # XY coordinates of the nodes
-                x0, y0, _, _ = self.__model.getNode(i).getCoords()
-                x1, y1, _, _, = self.__model.getNode(j).getCoords()   
-                # XY coords of the centre of each circle
-                centreX0, centreY0 = x0 + circleOffset, y0 + circleOffset
-                centreX1, centreY1 = x1 + circleOffset, y1 + circleOffset
- 
-                # Calculated pythagorean distance between the circles
-                dist = self.__calculateDistance(centreX0, centreY0, centreX1, centreY1)  
-                # If the circles are far apart the result force would be neglible 
-                if(dist > self.__model.getMaximumForceDistance()): continue
-                
-                # Resultant force as a scalar 
-                force = self.__model.getForceConstant() / max(dist, 1) 
-
-                # Convert scalar force to vector form
-                forceX = ((centreX1 - centreX0) / dist) * force
-                forceY = ((centreY1 - centreY0) / dist) * force 
-
-                # Update coords of each node 
-                self.__updatedCoords(x0, y0, -forceX, -forceY, self.__model.getNode(i))
-                self.__updatedCoords(x1, y1, forceX, forceY, self.__model.getNode(j))
-           
-    # Updates the X-Y coordinates using the resultant forces
-    def __updatedCoords(self, x : int, y : int, forceX : int, forceY : int, canavsNode : CanvasNode):  
-        circleSize = self.__model.getCircleSize()
-        canvas = self.__screen.getCanvas()
-        x0 = x + forceX 
-        y0 = y + forceY
-
-        # If the resulting force along the x-axis causes the node 
-        # to go out of bounds to the left or the right of the canvas 
-        # The x-axis resultant force is reversed 
-        if(x0 <= self.__model.getCanvasLowerBoundOffset() 
-           or x0 >= canvas.winfo_width() - self.__model.getCanvasUpperBoundOffset() - circleSize): 
-            x0 = x - forceX
-        
-        # If the resulting force along the y-axis causes the node 
-        # to go out of bounds above or below the canvas 
-        # The y-axis resultant force is reversed 
-        if(y0 <= self.__model.getCanvasLowerBoundOffset() or y0 >= 
-           canvas.winfo_height() - self.__model.getCanvasUpperBoundOffset() - circleSize): 
-            y0 = y - forceY
-
-        # Rounds the new coordinates up to the nearest whole number
-        x0 = math.ceil(x0)
-        y0 = math.ceil(y0)
-
-        # Updates the coordinates of the relevant node 
-        canavsNode.updateCoords((x0, y0, x0 + circleSize, y0 + circleSize)) 
-    
     # Calculates distance between two nodes using the pythagoras theorem 
     def __calculateDistance(self, x0 : int, y0 : int, x1 : int, y1 : int) -> float: 
         return math.sqrt(math.pow(x1 - x0, 2) + math.pow(y1 - y0, 2)) 
@@ -680,7 +581,7 @@ class TraversalController():
         if(self.__edgeHandler.isEdgeBeingDrawn() or 
            self.__edgeHandler.isEdgeBeingDrawn()): return
         
-        circleOffset = self.__model.getCircleSize()  // 2
+        circleOffset = self.__model.getCircleSize() // 2
         # X-Y coords of new node is where the users clicks 
         x0, y0, x1, y1 = event.x - circleOffset, event.y - circleOffset,\
             event.x + circleOffset, event.y + circleOffset

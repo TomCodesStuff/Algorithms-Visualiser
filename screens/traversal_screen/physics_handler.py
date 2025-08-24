@@ -1,5 +1,5 @@
 # If this isn't at the top the program breaks :/
-# If the file is run as is message this returned and program exits
+# If the file is run as is this message is printed and the program exits
 if(__name__ == "__main__"):
     print("This is file shouldn't be run on it's own. \nIt should be imported only.")
     exit()
@@ -88,7 +88,7 @@ class PhysicsHandler():
             self.__checkUpperBounds(x1, y1, upperX, upperY) 
 
 
-    def __getDirectionFromCentre(self, coords: tuple) -> tuple:  
+    def __calculateGravityForce(self, coords: tuple) -> tuple:  
         circleSize = self.__model.getCircleSize() 
         x0, y0, _, _ = coords    
         # Returns the X-Y directions relative to the centre of the canvas 
@@ -101,9 +101,9 @@ class PhysicsHandler():
     def applyGravity(self):  
         for node in self.__model.getNodes():  
             if(self.__isNodeOffscreen(node.getCoords())): 
-                directionX, directionY = self.__getDirectionFromCentre(node.getCoords())
+                directionX, directionY = self.__calculateGravityForce(node.getCoords())
                 self.__updateNodeForces(node, directionX, directionY)
-            continue
+            
     
 
     # Apply all calculated forces 
@@ -113,5 +113,4 @@ class PhysicsHandler():
             node.resetForces()
 
             
-
-# Yesterday all my problems seemed so far away 
+# Listen to Yesterday by The Beatles  

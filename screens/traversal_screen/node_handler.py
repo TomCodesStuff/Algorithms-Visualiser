@@ -55,7 +55,7 @@ class NodeHandler():
 
     # Creates a CanvasNode object for the passed node 
     def __createCanvasNodeObject(self, circleID : int, coords : tuple) -> CanvasNode: 
-         # Create corresponding object for a node drawn on the canvas
+        # Create corresponding object for a node drawn on the canvas
         canvasNode = CanvasNode(circleID, coords, self.__model.getCircleSize())  
         # Adds node to array containing nodes 
         self.__model.addNode(canvasNode)
