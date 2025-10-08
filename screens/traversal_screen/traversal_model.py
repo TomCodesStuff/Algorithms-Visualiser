@@ -33,8 +33,9 @@ class TraversalModel():
         self.__maxNumNodes = 20
         
         # Values for physics calculations 
-        self.__forceConstant = (1e-8) * 9e9 
-        self.__maximumForceDistance = 75 
+        #self.__forceConstant = 1e-9 * 9e9  
+        self.__forceConstant = 10
+        self.__maximumForceDistance = 50 
         
         # Array to contain references to CanvasNode objectd
         self.__nodes = []

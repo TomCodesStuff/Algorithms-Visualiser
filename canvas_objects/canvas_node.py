@@ -84,13 +84,20 @@ class CanvasNode():
         # Get top-left coordinates of the node 
         x0, y0, _, _ = self.__coords 
         
-        # New Coords need to be rounded to nearest number
-        # Due to issue with floating point coords causing nodes to move left/right forever
-        newX0 =  math.ceil(x0 + self.__forceX)
-        newy0 = math.ceil(y0 + self.__forceY)  
+        # Calculate new x0 and y0 
+        newX0 =  x0 + self.__forceX
+        newY0 = y0 + self.__forceY
+
+        # Coords need to be rounded to nearest number
+        # Due to issues with floating point coords causing nodes to move left/right forever
+        if self.__forceX < 0: newX0 = math.floor(newX0)
+        else: newX0 = math.ceil(newX0)
+
+        if self.__forceY < 0: newY0 = math.floor(newY0)
+        else: newY0 = math.ceil(newY0)
 
         # Update coords 
-        self.__coords = (newX0, newy0, newX0 + self.__nodeSize, newy0 + self.__nodeSize)
+        self.__coords = (newX0, newY0, newX0 + self.__nodeSize, newY0 + self.__nodeSize)
 
 
 # Listen to Paralyzer by Finger Eleven     
