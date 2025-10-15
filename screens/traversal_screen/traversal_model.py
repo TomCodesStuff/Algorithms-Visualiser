@@ -36,7 +36,9 @@ class TraversalModel():
         self.__forceConstant = 10
         self.__maxRepulsionDist = 50 
         self.__fadeDist = self.__maxRepulsionDist * 0.75
-        self.__gravityIncrease = 0.1
+        self.__gravityConstant = 0.001
+        self.__maximumGravityDist = 250
+
         
         # Array to contain references to CanvasNode objectd
         self.__nodes = []
@@ -55,7 +57,7 @@ class TraversalModel():
         # Smallest distance nodes can be apart on screen 
         self.__minScreenDist = 50
         # Largest distance nodes can be apart on screen 
-        self.__maxScreenDist = 150 
+        self.__maxScreenDist = 50 
 
         # Time delay when updating the canvas   
         self.__updateDelay = 50
@@ -86,9 +88,10 @@ class TraversalModel():
     # Getters for data used in physics calculations
     def getForceConstant(self) -> float: return self.__forceConstant  
     def getMaxRepulsionDist(self) -> int: return self.__maxRepulsionDist   
-    def getFadeDist(self) -> float:return self.__fadeDist
-    def getGravityIncrease(self) -> float: return self.__gravityIncrease
-    
+    def getFadeDist(self) -> float: return self.__fadeDist
+    def getMaximumGravityDist(self) -> int: return self.__maximumGravityDist
+    def getGravityConstant(self) -> int: return self.__gravityConstant
+
     # Getters and setters for nodes array
     def getNodes(self) -> list[CanvasNode]: return self.__nodes
     def getNode(self, idx: int) -> CanvasNode: return self.__nodes[idx]

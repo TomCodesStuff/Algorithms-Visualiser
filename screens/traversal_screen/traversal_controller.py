@@ -601,7 +601,7 @@ class TraversalController():
     def __updateCanvas(self) -> None: 
         
         
-        #self.__physicsHandler.applyGravity()
+        self.__physicsHandler.applyGravity()
         self.__physicsHandler.calculateNodeRepulsion()
         self.__physicsHandler.applyForces()
         

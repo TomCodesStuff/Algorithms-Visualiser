@@ -64,7 +64,7 @@ class PhysicsHandler():
                 # Convert scalar coords into standardised vector form 
                 dx, dy = (centreX1 - centreX0) / max(dist, 0.1), (centreY1 - centreY0) / max(dist, 0.1)
                 # Calculate X-Y forces to be applied to each node
-                forceX, forceY = dx * force * fade, dy * force * fade
+                forceX, forceY = dx * force, dy * force
                 
                 # Update each nodes forces
                 self.__updateNodeForces(self.__model.getNode(i), -forceX, -forceY) 
@@ -97,15 +97,10 @@ class PhysicsHandler():
 
 
     def __calculateGravityForce(self, node: CanvasNode) -> tuple:  
-        
-        
-        
         circleSize = self.__model.getCircleSize() 
         x0, y0, _, _ = node.getCoords()
         centreDirectionX = self.__getAxisDirection(self.__canvasCentreX,  x0 + circleSize)
         centreDirectionY = self.__getAxisDirection(self.__canvasCentreX,  y0 + circleSize)
-
-
         # Returns the X-Y directions relative to the centre of the canvas 
         return (centreDirectionX * node.getGravityPull(), 
                 centreDirectionY * node.getGravityPull())
@@ -119,20 +114,18 @@ class PhysicsHandler():
             x0, y0, _, _ = node.getCoords() 
             circleCentreX = x0 + circleOffset
             circleCentreY = y0 + circleOffset
-            print(circleCentreX, circleCentreY, self.__canvasCentreX, self.__canvasCentreY)
+            
             dist = self.__calculateDistance(circleCentreX, circleCentreY, 
                                             self.__canvasCentreX, self.__canvasCentreY)
             
-            if dist <= 150: continue
+            if dist <= self.__model.getMaximumGravityDist(): continue
             
-            dx = self.__canvasCentreX - circleCentreX
-            dy = self.__canvasCentreY - circleCentreY
+            hi = dist - self.__model.getMaximumGravityDist()
+            dx = (self.__canvasCentreX - circleCentreX) / max(dist, 0.1) 
+            dy = (self.__canvasCentreY - circleCentreY) / max(dist, 0.1)
 
-            dirX = dx / max(1, dist)
-            dirY = dy / max(1, dist)
-
-            forceX = dirX * min(0.01, 0.0001 * dist) 
-            forceY = dirY * min(0.01, 0.0001 * dist) 
+            forceX = dx * self.__model.getGravityConstant() 
+            forceY = dy * self.__model.getGravityConstant() 
          
             self.__updateNodeForces(node, forceX, forceY)
             
