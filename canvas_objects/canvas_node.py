@@ -31,7 +31,10 @@ class CanvasNode():
         # Values that adjust the nodes position on screen, determined by forces applied on the Node 
         self.__forceX = 0
         self.__forceY = 0
-    
+        # Value used to determine strength of gravity
+        self.__gravityPull = 0
+
+
     # Updates the coordinates of the node to be accurate to the coordinates on screen
     def updateCoords(self, coords : tuple) -> None: 
         self.__coords = coords
@@ -97,7 +100,16 @@ class CanvasNode():
         else: newY0 = math.ceil(newY0)
 
         # Update coords 
-        self.__coords = (newX0, newY0, newX0 + self.__nodeSize, newY0 + self.__nodeSize)
+        self.__coords = (newX0, newY0, newX0 + self.__nodeSize, newY0 + self.__nodeSize)  
+    
+    # Setters for Gravity pull 
+    def increaseGravityPull(self, value : float) -> None:
+        self.__gravityPull += value 
+    def resetGravityPull(self) -> None: 
+        self.__gravityPull = 0.5  
 
+    # Getter for gravity pull
+    def getGravityPull(self) -> float: 
+        return self.__gravityPull
 
 # Listen to Paralyzer by Finger Eleven     

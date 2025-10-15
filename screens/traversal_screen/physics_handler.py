@@ -36,6 +36,9 @@ class PhysicsHandler():
         n = len(self.__model.getNodes())
         circleSize = self.__model.getCircleSize()
         circleOffset = circleSize // 2 
+        maxRepulsionDist = self.__model.getMaxRepulsionDist() 
+        repulsionFadeDist = self.__model.getFadeDist()
+
         # Iterate through each pair of nodes 
         for i in range(n): 
             for j in range(i + 1, n):   
@@ -48,18 +51,23 @@ class PhysicsHandler():
  
                 # Calculated pythagorean distance between the circles
                 dist = self.__calculateDistance(centreX0, centreY0, centreX1, centreY1)  
-                # If the circles are too far apart the result force would be neglible 
-                if(dist > self.__model.getMaximumForceDistance()): continue
                 
+                # If the circles are too far apart the result force would be neglible 
+                if(dist > maxRepulsionDist): continue
+                
+                # Linear fade allows for less jitter when nodes get closer to maximum repulsion distance 
+                # Repulsion fade distance = 0.75 * maximum repulsion distance  
+                fade = 1 - ((dist - repulsionFadeDist) / (repulsionFadeDist - maxRepulsionDist))
+
                 # Resultant force as a scalar 
                 force = self.__model.getForceConstant() / max(dist, 1) 
-
-                # Convert scalar force to vector form
-                forceX = ((centreX1 - centreX0) / dist) * force
-                forceY = ((centreY1 - centreY0) / dist) * force   
+                # Convert scalar coords into standardised vector form 
+                dx, dy = (centreX1 - centreX0) / max(dist, 0.1), (centreY1 - centreY0) / max(dist, 0.1)
+                # Calculate X-Y forces to be applied to each node
+                forceX, forceY = dx * force * fade, dy * force * fade
                 
-                # Update the forces of each node so they can be applied later 
-                self.__updateNodeForces(self.__model.getNode(i), -forceX, -forceY)
+                # Update each nodes forces
+                self.__updateNodeForces(self.__model.getNode(i), -forceX, -forceY) 
                 self.__updateNodeForces(self.__model.getNode(j), forceX, forceY)  
     
     
@@ -88,22 +96,47 @@ class PhysicsHandler():
             self.__checkUpperBounds(x1, y1, upperX, upperY) 
 
 
-    def __calculateGravityForce(self, coords: tuple) -> tuple:  
+    def __calculateGravityForce(self, node: CanvasNode) -> tuple:  
+        
+        
+        
         circleSize = self.__model.getCircleSize() 
-        x0, y0, _, _ = coords    
+        x0, y0, _, _ = node.getCoords()
+        centreDirectionX = self.__getAxisDirection(self.__canvasCentreX,  x0 + circleSize)
+        centreDirectionY = self.__getAxisDirection(self.__canvasCentreX,  y0 + circleSize)
+
+
         # Returns the X-Y directions relative to the centre of the canvas 
-        return (self.__getAxisDirection(self.__canvasCentreX,  x0 + circleSize), 
-                self.__getAxisDirection(self.__canvasCentreY, y0 + circleSize))
+        return (centreDirectionX * node.getGravityPull(), 
+                centreDirectionY * node.getGravityPull())
     
     
     # Calculates force that drags nodes towards centre of the canvas 
     # Acts as way to stop nodes going offscreen 
     def applyGravity(self):  
-        for node in self.__model.getNodes():  
-            if(self.__isNodeOffscreen(node.getCoords())): 
-                directionX, directionY = self.__calculateGravityForce(node.getCoords())
-                self.__updateNodeForces(node, directionX, directionY)
+        circleOffset = self.__model.getCircleSize() // 2
+        for node in self.__model.getNodes(): 
+            x0, y0, _, _ = node.getCoords() 
+            circleCentreX = x0 + circleOffset
+            circleCentreY = y0 + circleOffset
+            print(circleCentreX, circleCentreY, self.__canvasCentreX, self.__canvasCentreY)
+            dist = self.__calculateDistance(circleCentreX, circleCentreY, 
+                                            self.__canvasCentreX, self.__canvasCentreY)
             
+            if dist <= 150: continue
+            
+            dx = self.__canvasCentreX - circleCentreX
+            dy = self.__canvasCentreY - circleCentreY
+
+            dirX = dx / max(1, dist)
+            dirY = dy / max(1, dist)
+
+            forceX = dirX * min(0.01, 0.0001 * dist) 
+            forceY = dirY * min(0.01, 0.0001 * dist) 
+         
+            self.__updateNodeForces(node, forceX, forceY)
+            
+
     
 
     # Apply all calculated forces 

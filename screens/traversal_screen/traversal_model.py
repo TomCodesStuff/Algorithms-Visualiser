@@ -33,9 +33,10 @@ class TraversalModel():
         self.__maxNumNodes = 20
         
         # Values for physics calculations 
-        #self.__forceConstant = 1e-9 * 9e9  
         self.__forceConstant = 10
-        self.__maximumForceDistance = 50 
+        self.__maxRepulsionDist = 50 
+        self.__fadeDist = self.__maxRepulsionDist * 0.75
+        self.__gravityIncrease = 0.1
         
         # Array to contain references to CanvasNode objectd
         self.__nodes = []
@@ -84,7 +85,9 @@ class TraversalModel():
     
     # Getters for data used in physics calculations
     def getForceConstant(self) -> float: return self.__forceConstant  
-    def getMaximumForceDistance(self) -> int: return self.__maximumForceDistance  
+    def getMaxRepulsionDist(self) -> int: return self.__maxRepulsionDist   
+    def getFadeDist(self) -> float:return self.__fadeDist
+    def getGravityIncrease(self) -> float: return self.__gravityIncrease
     
     # Getters and setters for nodes array
     def getNodes(self) -> list[CanvasNode]: return self.__nodes
