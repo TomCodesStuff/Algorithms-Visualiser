@@ -600,7 +600,7 @@ class TraversalController():
     # Need way to stop this being called when screen moves 
     def __updateCanvas(self) -> None: 
         
-        
+        # TODO make wrapper method in physics handler 
         self.__physicsHandler.applyGravity()
         self.__physicsHandler.calculateNodeRepulsion()
         self.__physicsHandler.applyForces()

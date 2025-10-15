@@ -125,7 +125,8 @@ class NodeHandler():
         # Handles if the mouse moves outside of canvas 
         # Also makes sure centre of node aligns with cursor
         xCoord, yCoord = self.__calculateCoords(event.x, event.y)
-
+        # Set is dragged flag to True 
+        canvasNode.setDragged()
         # Updates coords in the CanvasNode object
         canvasNode.updateCoords((xCoord, yCoord, xCoord + circleSize, yCoord + circleSize))
         
@@ -153,9 +154,13 @@ class NodeHandler():
         # Delete node from the canvas
         self.__deleteNodeFromCanvas(canvasNode) 
         # Delete node object from array stored in model 
-        self.__model.deleteNode(canvasNode)
-    
+        self.__model.deleteNode(canvasNode) 
 
+    
+    # Reset boolean flag allows forces to be applied when node stopped being dragged
+    def __resetDragged(self, canvasNode : CanvasNode): 
+        canvasNode.resetDragged()
+    
     # Add event handlers to the newly created node
     def __addNodeEvents(self, circle : int, canvasNode : CanvasNode) -> None:     
         # Add event to change nodes colour when the mouse hovers over it
@@ -164,13 +169,15 @@ class NodeHandler():
         self.__canvas.tag_bind(circle, "<Leave>", lambda _: self.__changeColourOnLeave(canvasNode)) 
         
         # Add event listener to move node when it's dragged by the mouse 
-        self.__canvas.tag_bind(circle, "<B1-Motion>", lambda event: self.__moveNode(event, canvasNode))   
+        self.__canvas.tag_bind(circle, "<B1-Motion>", lambda event: self.__moveNode(event, canvasNode))    
+        # Add event listener to detect when mouse button released 
+        self.__canvas.tag_bind(circle, "<ButtonRelease-1>", lambda _: self.__resetDragged(canvasNode))
         
         # Add event listener to add an edge when a node is clicked 
         self.__canvas.tag_bind(circle, "<Button-1>", lambda _: self.__controller.handleNodeClickEvent(canvasNode))
         # Add event to delete a node when it is double clicked 
         self.__canvas.tag_bind(circle, "<Double-Button-1>", lambda _: self.__deleteNodeOnDoubleClick(canvasNode)) 
-    
+
     
     # Draws a circle (node) on the canvas  
     def spawnNode(self, coords : tuple) -> int:   

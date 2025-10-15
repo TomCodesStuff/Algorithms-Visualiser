@@ -26,7 +26,8 @@ class PhysicsHandler():
     
 
     # Updates the forces in the passed nodes so they can be applied later 
-    def __updateNodeForces(self, node : CanvasNode, forceX : float, forceY : float) -> None: 
+    def __updateNodeForces(self, node : CanvasNode, forceX : float, forceY : float) -> None:  
+        if node.isBeingDragged(): return
         node.adjustForceX(forceX)
         node.adjustForceY(forceY)
 
@@ -55,10 +56,6 @@ class PhysicsHandler():
                 # If the circles are too far apart the result force would be neglible 
                 if(dist > maxRepulsionDist): continue
                 
-                # Linear fade allows for less jitter when nodes get closer to maximum repulsion distance 
-                # Repulsion fade distance = 0.75 * maximum repulsion distance  
-                fade = 1 - ((dist - repulsionFadeDist) / (repulsionFadeDist - maxRepulsionDist))
-
                 # Resultant force as a scalar 
                 force = self.__model.getForceConstant() / max(dist, 1) 
                 # Convert scalar coords into standardised vector form 
@@ -66,51 +63,15 @@ class PhysicsHandler():
                 # Calculate X-Y forces to be applied to each node
                 forceX, forceY = dx * force, dy * force
                 
-                # Update each nodes forces
+                # Update each nodes forces 
                 self.__updateNodeForces(self.__model.getNode(i), -forceX, -forceY) 
                 self.__updateNodeForces(self.__model.getNode(j), forceX, forceY)  
-    
-    
-    # Returns -1, 0, 1 depending if a is less than, equal to or greater than b 
-    def __getAxisDirection(self, a, b): 
-        return (a > b) - (a < b)
-    
-
-    # Checks if either passed X-Y values are less than lower bounds
-    def __checkLowerBounds(self, x : float, y : float, lowerX : int, lowerY : int) -> bool: 
-        return True if x <= lowerX or y <= lowerY else False 
-    
-    
-    # Checks if either passed X-Y values are greater than upper bounds 
-    def __checkUpperBounds(self, x : float, y : float, upperX : int, upperY : int) -> bool: 
-        return True if x >= upperX or y >= upperY else False
-
-
-    def __isNodeOffscreen(self, coords : tuple) -> bool: 
-        # Node Coords
-        x0, y0, x1, y1 = coords  
-        # Upper and Lower bounds of the canvas 
-        lowerX, lowerY, upperX, upperY = self.__canvasBounds 
-        # Return True if node is out of bounds 
-        return self.__checkLowerBounds(x0, y0, lowerX, lowerY) or \
-            self.__checkUpperBounds(x1, y1, upperX, upperY) 
-
-
-    def __calculateGravityForce(self, node: CanvasNode) -> tuple:  
-        circleSize = self.__model.getCircleSize() 
-        x0, y0, _, _ = node.getCoords()
-        centreDirectionX = self.__getAxisDirection(self.__canvasCentreX,  x0 + circleSize)
-        centreDirectionY = self.__getAxisDirection(self.__canvasCentreX,  y0 + circleSize)
-        # Returns the X-Y directions relative to the centre of the canvas 
-        return (centreDirectionX * node.getGravityPull(), 
-                centreDirectionY * node.getGravityPull())
-    
-    
+        
     # Calculates force that drags nodes towards centre of the canvas 
     # Acts as way to stop nodes going offscreen 
     def applyGravity(self):  
         circleOffset = self.__model.getCircleSize() // 2
-        for node in self.__model.getNodes(): 
+        for node in self.__model.getNodes():  
             x0, y0, _, _ = node.getCoords() 
             circleCentreX = x0 + circleOffset
             circleCentreY = y0 + circleOffset
@@ -120,7 +81,6 @@ class PhysicsHandler():
             
             if dist <= self.__model.getMaximumGravityDist(): continue
             
-            hi = dist - self.__model.getMaximumGravityDist()
             dx = (self.__canvasCentreX - circleCentreX) / max(dist, 0.1) 
             dy = (self.__canvasCentreY - circleCentreY) / max(dist, 0.1)
 
