@@ -67,6 +67,7 @@ class PhysicsHandler():
                 self.__updateNodeForces(self.__model.getNode(i), -forceX, -forceY) 
                 self.__updateNodeForces(self.__model.getNode(j), forceX, forceY)  
         
+
     # Calculates force that drags nodes towards centre of the canvas 
     # Acts as way to stop nodes going offscreen 
     def applyGravity(self):  
@@ -89,8 +90,6 @@ class PhysicsHandler():
          
             self.__updateNodeForces(node, forceX, forceY)
             
-
-    
 
     # Apply all calculated forces 
     def applyForces(self) -> None:
