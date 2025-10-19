@@ -4,6 +4,7 @@ if(__name__ == "__main__"):
     print("This is file shouldn't be run on it's own. \nIt should be imported only.")
     exit()
 
+from typing import Set
 from canvas_objects import CanvasNode, CanvasEdge
 
 class TraversalModel():
@@ -37,13 +38,15 @@ class TraversalModel():
         self.__maxRepulsionDist = 50 
         self.__fadeDist = self.__maxRepulsionDist * 0.75
         self.__gravityConstant = 0.001
-        self.__maximumGravityDist = 250
+        self.__maximumGravityDist = 150
 
         
         # Array to contain references to CanvasNode objectd
         self.__nodes = []
-        # Dictionary for edges, keys are tuples node IDs 
-        self.__edges = {}
+        # Set for edges, keys are tuples node IDs 
+        self.__edges = set()
+        # TODO Add dict mapping nodes to edge object
+
 
         # Minimum Weight edges can be 
         self.__minWeight = 1
@@ -99,14 +102,14 @@ class TraversalModel():
     def deleteNode(self, canvasNode : CanvasNode) -> None: self.__nodes.remove(canvasNode)
     
     # Getters and setters for edges dictionary 
-    def getEdges(self) -> dict: return self.__edges 
+    def getEdges(self) -> Set[CanvasEdge]: return self.__edges 
     def getEdge(self, nodes : tuple) -> int: 
         if(nodes in self.__edges): return self.__edges[nodes] 
         else: return -1 
-    def addEdge(self, nodes : tuple, edge : CanvasEdge) -> None: 
-        self.__edges[nodes] = edge  
-    def deleteEdge(self, nodes : tuple) -> None:
-         self.__edges.pop(nodes)
+    def addEdge(self, edge : CanvasEdge) -> None: 
+        self.__edges.add(edge)
+    def deleteEdge(self, edge : CanvasEdge) -> None:
+         self.__edges.pop(edge)
 
 
     # Getters for edge weight 

@@ -119,7 +119,59 @@ class TraversalController():
         connectedEdges = (self.__edgeHandler.getEdgeStartNode(), self.__edgeHandler.getEdgeEndNode())
         if(connectedEdges in self.__model.getEdges()): 
             return self.__model.getEdge(connectedEdges)
-        else: return self.__model.getEdge(connectedEdges[::-1])
+        else: return self.__model.getEdge(connectedEdges[::-1]) 
+
+
+    def __centreEdge(self) -> tuple: 
+        circleOffset = self.__model.getCircleSize() // 2 
+        # Reference to canvas 
+        canvas = self.__screen.getCanvas()  
+        # Get Coords of the destination node 
+        x1, y1, _, _ = self.__edgeHandler.getEdgeEndNode().getCoords()
+        # Gets current coords of the edges
+        coords = canvas.coords(self.__edgeHandler.getCurrentEdgeID()) 
+        # Update coords of the edge to be in the middle of the passed node
+        coords[2] = x1 + circleOffset 
+        coords[3] = y1 + circleOffset 
+        # Send updated coords to the canvas
+        canvas.coords(self.__edgeHandler.getCurrentEdgeID(), coords)  
+        # Return the updated coords of the edge 
+        return coords 
+
+
+    # TODO Move to edge handler
+    def adjustEdgeCoords(self) -> tuple: 
+        # Move edge to end in the middle of the destination node
+        return self.__centreEdge()
+
+
+    def __drawEdge(self, event : Event, canvasNode : CanvasNode) -> None:  
+        canvas = self.__screen.getCanvas()   
+        circleOffset = self.__model.getCircleSize() // 2
+        x0, y0, _, _ = canvasNode.getCoords() 
+        lineCoords, edgeID = None, None 
+
+        # Checks if mouse has left the node the edge starts from
+        collisions = canvas.find_overlapping(event.x, event.y, event.x, event.y)  
+        # If the mouse is still in the node, the edge is not drawn yet
+        if(canvasNode.getCanvasID() in collisions): return  
+        # If there is no current edge 
+        if(self.__edgeHandler.getCurrentEdgeID() is None): 
+            # Create a new edge on screen
+            edgeID = canvas.create_line(x0 + circleOffset, y0 + circleOffset, 
+                                                    event.x, event.y, width = "3", arrow=BOTH)   
+            self.__edgeHandler.setCurrentEdgeID(edgeID)
+            # Lowers the priority of the edge, so it appears below nodes 
+            canvas.tag_lower(edgeID) 
+        # If there is an edge being drawn on screen
+        else:   
+            # Gets current coordinates of the line
+            lineCoords = canvas.coords(self.__edgeHandler.getCurrentEdgeID())
+            # Change XY coordinates to where the mouse is
+            lineCoords[2] = event.x 
+            lineCoords[3] = event.y 
+            # Updates the lines coordinates 
+            canvas.coords(self.__edgeHandler.getCurrentEdgeID(), lineCoords)
 
             
     # Add event to draw a line representing an edge
@@ -143,14 +195,11 @@ class TraversalController():
     
 
     # Update positions of edges on the canvas 
-    def __redrawEdges(self):
-        canvas = self.__screen.getCanvas() 
-        circleOffset = self.__model.getCircleSize() // 2  
-        # Iterate through each edge
-        for canvasEdge in self.__model.getEdges().values(): 
-            # Get coords of the edge
-            x0, y0, _, _ = canvasEdge.getCoords()
-            canvas.moveto(canvasEdge.getCanvasID(), x0, y0)
+    def __redrawEdges(self): 
+        canvas = self.__screen.getCanvas()
+        for edge in self.__model.getEdges():   
+            x0, y0, x1, y1 = edge.getCoords() 
+            canvas.coords(edge.getCanvasID(), x0, y0, x1, y1)
 
 
     # Calculates distance between two nodes using the pythagoras theorem 
@@ -191,13 +240,15 @@ class TraversalController():
         
         # TODO make wrapper method in physics handler 
         self.__physicsHandler.applyGravity()
-        self.__physicsHandler.calculateNodeRepulsion()
+        self.__physicsHandler.applyNodeRepulsion()
+        self.__physicsHandler.applyEdgeRestoration()
         self.__physicsHandler.applyForces()
         
         # Redrawn nodes so that there positions updated on screen 
-        self.__redrawNodes() 
-        # Redraw edges 
+        self.__redrawNodes()  
         self.__redrawEdges()
+        # Redraw edges 
+        #self.__redrawEdges()
         # Update canvas 
         self.__screen.getWindow().update()
         # Schedule function to run after 50ms

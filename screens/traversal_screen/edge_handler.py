@@ -165,6 +165,7 @@ class EdgeHandler():
         if(connectedNodes in self.__model.getEdges()): 
             self.__deleteEdgeFromCanvas()  
             return self.__model.getEdge(connectedNodes) 
+        
         # Checks if reverse tuple of the connected nodes is in the dictionary 
         elif(connectedNodes[::-1] in self.__model.getEdges()):  
             self.__deleteEdgeFromCanvas()
@@ -174,9 +175,9 @@ class EdgeHandler():
         adjustedCoords = self.__controller.adjustEdgeCoords()
         
         # Create new object, weight is initially set to the default 
-        newEdge = CanvasEdge(self.__currentEdgeID, adjustedCoords, self.__model.getDefaultWeight())  
+        newEdge = CanvasEdge(self.__currentEdgeID, adjustedCoords, self.__model.getDefaultWeight(), 75)  
         # Add node to dictionary 
-        self.__model.addEdge(connectedNodes, newEdge)   
+        self.__model.addEdge(newEdge)   
         # Add references to nodes in CanvasEdge object
         newEdge.addNodes(self.__nodeEdgeStart, self.__nodeEdgeEnd) 
         # Add reference to edge in CanvasNode objects 
