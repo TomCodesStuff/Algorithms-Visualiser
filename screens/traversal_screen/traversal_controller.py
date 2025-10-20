@@ -237,11 +237,15 @@ class TraversalController():
     # Updates canvas to display nodes and edges interacting  
     # Need way to stop this being called when screen moves 
     def __updateCanvas(self) -> None: 
-        
+        canvas = self.__screen.getCanvas()
+        x0, y0 = self.__getCanvasCentreCoords()
+        canvas.create_oval(x0 - 10, y0 - 10, x0 + 10, y0 + 10)
+        canvas.create_oval(x0 - 150, y0 - 150, x0 + 150, y0 + 150)
+
         # TODO make wrapper method in physics handler 
         self.__physicsHandler.applyGravity()
         self.__physicsHandler.applyNodeRepulsion()
-        self.__physicsHandler.applyEdgeRestoration()
+        #self.__physicsHandler.applyEdgeRestoration()
         self.__physicsHandler.applyForces()
         
         # Redrawn nodes so that there positions updated on screen 

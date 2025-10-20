@@ -53,8 +53,8 @@ class PhysicsHandler():
             dx, dy = self.__calculateStandarisedVector((circleCentreX, circleCentreY, 
                                                         self.__canvasCentreX, self.__canvasCentreY), dist)
 
-            forceX, forceY = dx * self.__model.getGravityConstant(), dy * self.__model.getGravityConstant() 
-         
+            forceX = dx * self.__model.getGravityConstant() 
+            forceY = dy * self.__model.getGravityConstant() 
             self.__updateNodeForces(node, forceX, forceY)
             
 
@@ -81,11 +81,16 @@ class PhysicsHandler():
                 
                 # If the circles are too far apart the result force would be neglible 
                 if(dist > maxRepulsionDist): continue
+
+                # Calculate linear fall off 
+                # Forces get smaller closer to max repulsion distance, better than just hard limit 
+                linearFallOff = (1 - dist / maxRepulsionDist)
                 
                 # Resultant force as a scalar 
-                force = self.__model.getForceConstant() / max(dist, 1) 
+                force = (self.__model.getForceConstant() * linearFallOff) / max(dist, 1) 
                 # Convert scalar coords into standardised vector form 
-                dx, dy = self.__calculateStandarisedVector((centreX0, centreY0, centreX1, centreY1), dist)
+                dx, dy = self.__calculateStandarisedVector((centreX0, centreY0, centreX1, centreY1), dist) 
+
                 # Calculate X-Y forces to be applied to each node
                 forceX, forceY = dx * force, dy * force
                 

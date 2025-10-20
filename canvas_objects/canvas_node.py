@@ -84,21 +84,18 @@ class CanvasNode():
         self.__forceX = 0
         self.__forceY = 0
     
+
+    def __roundForce(self, force : float, coord : float) -> float: 
+         return math.floor(coord) if force < 0 else math.ceil(coord)
+
     def applyForces(self) -> None:  
         # Get top-left coordinates of the node 
         x0, y0, _, _ = self.__coords 
         
         # Calculate new x0 and y0 
-        newX0 =  x0 + self.__forceX
-        newY0 = y0 + self.__forceY
-
-        # Coords need to be rounded to nearest number
-        # Due to issues with floating point coords causing nodes to move left/right forever
-        if self.__forceX < 0: newX0 = math.floor(newX0)
-        else: newX0 = math.ceil(newX0)
-
-        if self.__forceY < 0: newY0 = math.floor(newY0)
-        else: newY0 = math.ceil(newY0)
+        # Coords needed to be rounded to prevent issues with floating point precision 
+        newX0 = self.__roundForce(self.__forceX, x0 + self.__forceX)
+        newY0 = self.__roundForce(self.__forceY, y0 + self.__forceY)
 
         # Update coords 
         self.__coords = (newX0, newY0, newX0 + self.__nodeSize, newY0 + self.__nodeSize)  
