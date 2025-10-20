@@ -25,6 +25,10 @@ class PhysicsHandler():
         return math.sqrt(math.pow(x1 - x0, 2) + math.pow(y1 - y0, 2)) 
     
 
+    def __calculateStandarisedVector(self, coords : tuple, dist : float) -> tuple:
+        x0, y0, x1, y1 = coords 
+        return ((x1 - x0) / max(dist, 0.1), (y1 - y0) / max(dist, 0.1))
+
     # Updates the forces in the passed nodes so they can be applied later 
     def __updateNodeForces(self, node : CanvasNode, forceX : float, forceY : float) -> None:  
         if node.isBeingDragged(): return
@@ -45,12 +49,11 @@ class PhysicsHandler():
                                             self.__canvasCentreX, self.__canvasCentreY)
             
             if dist <= self.__model.getMaximumGravityDist(): continue
-            
-            dx = (self.__canvasCentreX - circleCentreX) / max(dist, 0.1) 
-            dy = (self.__canvasCentreY - circleCentreY) / max(dist, 0.1)
 
-            forceX = dx * self.__model.getGravityConstant() 
-            forceY = dy * self.__model.getGravityConstant() 
+            dx, dy = self.__calculateStandarisedVector((circleCentreX, circleCentreY, 
+                                                        self.__canvasCentreX, self.__canvasCentreY), dist)
+
+            forceX, forceY = dx * self.__model.getGravityConstant(), dy * self.__model.getGravityConstant() 
          
             self.__updateNodeForces(node, forceX, forceY)
             
@@ -82,7 +85,7 @@ class PhysicsHandler():
                 # Resultant force as a scalar 
                 force = self.__model.getForceConstant() / max(dist, 1) 
                 # Convert scalar coords into standardised vector form 
-                dx, dy = (centreX1 - centreX0) / max(dist, 0.1), (centreY1 - centreY0) / max(dist, 0.1)
+                dx, dy = self.__calculateStandarisedVector((centreX0, centreY0, centreX1, centreY1), dist)
                 # Calculate X-Y forces to be applied to each node
                 forceX, forceY = dx * force, dy * force
                 
@@ -100,20 +103,17 @@ class PhysicsHandler():
             x0, y0, _, _ = startNode.getCoords()
             x1, y1, _, _ = endNode.getCoords()
 
-            dist = self.__calculateDistance(x0 + circleOffset, y0 + circleOffset, x1 + circleOffset, y1 + circleOffset)
+            centreX0, centreY0 = x0 + circleOffset, y0 + circleOffset
+            centreX1, centreY1 = x1 + circleOffset, y1 + circleOffset
+
+            dist = self.__calculateDistance(centreX0, centreY0, centreX1, centreY1)
             displacement = dist - canvasEdge.getScreenSize() 
 
-            if abs(displacement) < 1: continue
+            dx, dy = self.__calculateStandarisedVector((centreX0, centreY0, centreX1, centreY1), dist)
+            forceX, forceY = displacement * k * dx, displacement * k * dy
 
-            dx = (x0 - x1) / max(dist, 0.1)
-            dy = (y0 - y1) / max(dist, 0.1)
-
-            fx = displacement * k * dx 
-            fy = displacement * k * dy
-
-
-            self.__updateNodeForces(startNode, -fx, -fy)
-            self.__updateNodeForces(endNode, fx, fy)
+            self.__updateNodeForces(startNode, forceX, forceY)
+            self.__updateNodeForces(endNode, -forceX, -forceY)
 
 
     # Apply all calculated forces 
@@ -133,6 +133,4 @@ class PhysicsHandler():
             canvasEdge.updateCoords((x0 + circleOffset, y0 + circleOffset, 
                                     x1 + circleOffset, y1 +  circleOffset))
 
-
-            
 # Listen to Yesterday by The Beatles  
