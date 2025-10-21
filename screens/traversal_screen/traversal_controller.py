@@ -191,15 +191,20 @@ class TraversalController():
         canvas = self.__screen.getCanvas()
         for node in self.__model.getNodes():  
             x0, y0, _, _ = node.getCoords()
-            canvas.moveto(node.getCanvasID(), x0, y0)
+            canvas.moveto(node.getCanvasID(), round(x0), round(y0))
     
 
     # Update positions of edges on the canvas 
-    def __redrawEdges(self): 
+    def __redrawEdges(self):  
+        circleOffset = self.__model.getCircleSize() // 2
         canvas = self.__screen.getCanvas()
         for edge in self.__model.getEdges():   
-            x0, y0, x1, y1 = edge.getCoords() 
-            canvas.coords(edge.getCanvasID(), x0, y0, x1, y1)
+            startNode, endNode = edge.getNodes()
+            x0, y0, _, _ = startNode.getCoords()
+            x1, y1, _, _ = endNode.getCoords()
+
+            canvas.coords(edge.getCanvasID(), round(x0 + circleOffset), round(y0 + circleOffset),
+                          round(x1 + circleOffset), round(y1 + circleOffset))
 
 
     # Calculates distance between two nodes using the pythagoras theorem 
@@ -237,22 +242,16 @@ class TraversalController():
     # Updates canvas to display nodes and edges interacting  
     # Need way to stop this being called when screen moves 
     def __updateCanvas(self) -> None: 
-        canvas = self.__screen.getCanvas()
-        x0, y0 = self.__getCanvasCentreCoords()
-        canvas.create_oval(x0 - 10, y0 - 10, x0 + 10, y0 + 10)
-        canvas.create_oval(x0 - 150, y0 - 150, x0 + 150, y0 + 150)
 
         # TODO make wrapper method in physics handler 
         self.__physicsHandler.applyGravity()
         self.__physicsHandler.applyNodeRepulsion()
-        #self.__physicsHandler.applyEdgeRestoration()
+        self.__physicsHandler.applyEdgeRestoration()
         self.__physicsHandler.applyForces()
         
         # Redrawn nodes so that there positions updated on screen 
         self.__redrawNodes()  
         self.__redrawEdges()
-        # Redraw edges 
-        #self.__redrawEdges()
         # Update canvas 
         self.__screen.getWindow().update()
         # Schedule function to run after 50ms

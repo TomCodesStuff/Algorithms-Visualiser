@@ -34,10 +34,10 @@ class TraversalModel():
         self.__maxNumNodes = 20
         
         # Values for physics calculations 
-        self.__forceConstant = 10
+        self.__forceConstant = 200
         self.__maxRepulsionDist = 50 
         self.__fadeDist = self.__maxRepulsionDist * 0.75
-        self.__gravityConstant = 0.001
+        self.__gravityConstant = 2
         self.__maximumGravityDist = 150
 
         

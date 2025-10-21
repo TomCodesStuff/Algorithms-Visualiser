@@ -29,10 +29,8 @@ class CanvasEdge():
         self.__weight = weight
     
     # Coordinates Getter and setters
-    def getCoords(self) -> tuple: 
-        return self.__coords
-    def updateCoords(self, coords : tuple) -> None:
-        self.__coords = coords 
+    def getCoords(self) -> tuple: return self.__coords
+    def updateCoords(self, coords : tuple) -> None: self.__coords = coords 
     
     # Getter/Setters for adding the nodes the edge connects  
     # Takes in CanvasNode Objects

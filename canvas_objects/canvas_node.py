@@ -19,6 +19,8 @@ class CanvasNode():
         CanvasNode.nodeID += 1 
         # X-Y Coordindates of the node on screen
         self.__coords = coords
+        # TODO
+        self.__velocity = (0, 0)
         # Dictionary mapping nodes connected by edges 
         # Keys are the node objects with the values being the weight of the connection
         self.__connectedNodes = {} 
@@ -89,13 +91,14 @@ class CanvasNode():
          return math.floor(coord) if force < 0 else math.ceil(coord)
 
     def applyForces(self) -> None:  
+        
         # Get top-left coordinates of the node 
         x0, y0, _, _ = self.__coords 
         
         # Calculate new x0 and y0 
         # Coords needed to be rounded to prevent issues with floating point precision 
-        newX0 = self.__roundForce(self.__forceX, x0 + self.__forceX)
-        newY0 = self.__roundForce(self.__forceY, y0 + self.__forceY)
+        newX0 = x0 + self.__forceX
+        newY0 = y0 + self.__forceY
 
         # Update coords 
         self.__coords = (newX0, newY0, newX0 + self.__nodeSize, newY0 + self.__nodeSize)  
