@@ -32,16 +32,8 @@ class TraversalModel():
         self.__nodesSpacingOffset = 20  
         # Number of nodes that can be on screen at once
         self.__maxNumNodes = 20
-        
-        # Values for physics calculations 
-        self.__forceConstant = 200
-        self.__maxRepulsionDist = 50 
-        self.__fadeDist = self.__maxRepulsionDist * 0.75
-        self.__gravityConstant = 2
-        self.__maximumGravityDist = 150
-
-        
-        # Array to contain references to CanvasNode objectd
+               
+        # Array to contain references to CanvasNode objects
         self.__nodes = []
         # Set for edges, keys are tuples node IDs 
         self.__edges = set()
@@ -88,13 +80,6 @@ class TraversalModel():
     def getCanvasLowerBoundOffset(self) -> int: return self.__canvasLowerBoundOffset 
     def getSpaceBetweenNodes(self) -> int: return self.__nodesSpacingOffset 
     
-    # Getters for data used in physics calculations
-    def getForceConstant(self) -> float: return self.__forceConstant  
-    def getMaxRepulsionDist(self) -> int: return self.__maxRepulsionDist   
-    def getFadeDist(self) -> float: return self.__fadeDist
-    def getMaximumGravityDist(self) -> int: return self.__maximumGravityDist
-    def getGravityConstant(self) -> int: return self.__gravityConstant
-
     # Getters and setters for nodes array
     def getNodes(self) -> list[CanvasNode]: return self.__nodes
     def getNode(self, idx: int) -> CanvasNode: return self.__nodes[idx]
@@ -111,13 +96,11 @@ class TraversalModel():
     def deleteEdge(self, edge : CanvasEdge) -> None:
          self.__edges.pop(edge)
 
-
     # Getters for edge weight 
     def getMinWeight(self) -> int: return self.__minWeight
     def getMaxWeight(self) -> int: return self.__maxWeight 
     def getDefaultWeight(self) -> int: return self.__defaultWeight
     def getWeightSliderResolution(self) -> int: return self.__weightSliderResolution 
-
 
     # Getter for delay used when updating the canvas
     def getUpdateDelay(self) -> int: return self.__updateDelay

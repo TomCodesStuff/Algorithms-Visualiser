@@ -24,20 +24,10 @@ class TraversalController():
         self.__nodeHandler = NodeHandler(self.__screen.getCanvas(), self, 
                                          model, self.__edgeHandler)   
         # Handles 'physics based' calculations 
-        self.__physicsHandler = PhysicsHandler(self.__model, self.__getCanvasBounds(), 
-                                               self.__getCanvasCentreCoords())  
-        # Refreshes canvas preiodically   
+        self.__physicsHandler = PhysicsHandler(self.__model, self.__getCanvasCentreCoords())  
+        # Refreshes canvas periodically   
         self.__updateCanvas()
 
-
-    # Returns coords of the lower and upper bounds of the canvas 
-    def __getCanvasBounds(self) -> tuple:
-        canvas = self.__screen.getCanvas() 
-        return (self.__model.getCanvasLowerBoundOffset(), 
-                self.__model.getCanvasLowerBoundOffset(), 
-                canvas.winfo_width() - self.__model.getCanvasUpperBoundOffset(), 
-                canvas.winfo_height() - self.__model.getCanvasUpperBoundOffset())
-    
 
     # Calculates and returns coords of the centre of the canvas  
     def __getCanvasCentreCoords(self) -> tuple: 
@@ -207,11 +197,6 @@ class TraversalController():
                           round(x1 + circleOffset), round(y1 + circleOffset))
 
 
-    # Calculates distance between two nodes using the pythagoras theorem 
-    def __calculateDistance(self, x0 : int, y0 : int, x1 : int, y1 : int) -> float: 
-        return math.sqrt(math.pow(x1 - x0, 2) + math.pow(y1 - y0, 2)) 
-    
-
     # Spawns node when user double clicks the canvas 
     def __spawnNodeOnDoubleClick(self, event : Event) -> None:  
         # Sanity checking to prevent event triggering when it shouldn't 
@@ -242,15 +227,12 @@ class TraversalController():
     # Updates canvas to display nodes and edges interacting  
     # Need way to stop this being called when screen moves 
     def __updateCanvas(self) -> None: 
-
-        # TODO make wrapper method in physics handler 
-        self.__physicsHandler.applyGravity()
-        self.__physicsHandler.applyNodeRepulsion()
-        self.__physicsHandler.applyEdgeRestoration()
-        self.__physicsHandler.applyForces()
         
-        # Redrawn nodes so that there positions updated on screen 
-        self.__redrawNodes()  
+        self.__physicsHandler.applyPhysics()
+        
+        # Update positions updated of nodes onscreen 
+        self.__redrawNodes()   
+        # Update positions of edges onscreen
         self.__redrawEdges()
         # Update canvas 
         self.__screen.getWindow().update()

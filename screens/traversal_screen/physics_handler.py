@@ -11,15 +11,20 @@ from canvas_objects import CanvasNode
 
 # Handles all physics-based calculations 
 class PhysicsHandler():
-    def __init__(self, model : TraversalModel, canvasBounds : tuple, canvasCentre : tuple) -> None:  
+    def __init__(self, model : TraversalModel, canvasCentre : tuple) -> None:  
         # Reference to model
         self.__model = model
-        # Edges of the canvas   
-        self.__canvasBounds = canvasBounds
         # Centre X-Y Coordinates the canvas 
         self.__canvasCentreX, self.__canvasCentreY = canvasCentre
 
-        
+        # Values for physics calculations 
+        self.__forceConstant = 200
+        self.__maxRepulsionDist = 50 
+        self.__gravityConstant = 2
+        self.__maximumGravityDist = 150
+        self.__springConstant = 0.05
+
+
     # Calculates distance between passed coords (pythagoras) 
     def __calculateDistance(self, x0 : float, y0 : float, x1 : float, y1 : float) -> float: 
         return math.sqrt(math.pow(x1 - x0, 2) + math.pow(y1 - y0, 2)) 
@@ -28,6 +33,7 @@ class PhysicsHandler():
     def __calculateStandarisedVector(self, coords : tuple, dist : float) -> tuple:
         x0, y0, x1, y1 = coords 
         return ((x1 - x0) / max(dist, 0.1), (y1 - y0) / max(dist, 0.1))
+
 
     # Updates the forces in the passed nodes so they can be applied later 
     def __updateNodeForces(self, node : CanvasNode, forceX : float, forceY : float) -> None:  
@@ -38,7 +44,7 @@ class PhysicsHandler():
 
     # Calculates force that drags nodes towards centre of the canvas 
     # Acts as way to stop nodes going offscreen 
-    def applyGravity(self):  
+    def __calculateGravity(self):  
         circleOffset = self.__model.getCircleSize() // 2
         for node in self.__model.getNodes():  
             x0, y0, _, _ = node.getCoords() 
@@ -48,23 +54,22 @@ class PhysicsHandler():
             dist = self.__calculateDistance(circleCentreX, circleCentreY, 
                                             self.__canvasCentreX, self.__canvasCentreY)
             
-            if dist <= self.__model.getMaximumGravityDist(): continue
+            if dist <= self.__maximumGravityDist: continue
 
             dx, dy = self.__calculateStandarisedVector((circleCentreX, circleCentreY, 
                                                         self.__canvasCentreX, self.__canvasCentreY), dist)
 
-            forceX = dx * self.__model.getGravityConstant() 
-            forceY = dy * self.__model.getGravityConstant() 
+            forceX = dx * self.__gravityConstant 
+            forceY = dy * self.__gravityConstant 
             self.__updateNodeForces(node, forceX, forceY)
             
 
 
     # Calculates node-node repulsion
-    def applyNodeRepulsion(self):
+    def __calculateNodeRepulsion(self):
         n = len(self.__model.getNodes())
         circleSize = self.__model.getCircleSize()
         circleOffset = circleSize // 2 
-        maxRepulsionDist = self.__model.getMaxRepulsionDist() 
 
         # Iterate through each pair of nodes 
         for i in range(n): 
@@ -80,17 +85,12 @@ class PhysicsHandler():
                 dist = self.__calculateDistance(centreX0, centreY0, centreX1, centreY1)  
                 
                 # If the circles are too far apart the result force would be neglible 
-                if(dist > maxRepulsionDist): continue
-
-                # Calculate linear fall off 
-                # Forces get smaller closer to max repulsion distance, better than just hard limit 
-                linearFallOff = (1 - dist / maxRepulsionDist)
+                if(dist > self.__maxRepulsionDist): continue
                 
                 # Resultant force as a scalar 
-                force = (self.__model.getForceConstant() * linearFallOff) / max(dist, 1) 
+                force = (self.__forceConstant) / max(dist, 1) 
                 # Convert scalar coords into standardised vector form 
                 dx, dy = self.__calculateStandarisedVector((centreX0, centreY0, centreX1, centreY1), dist) 
-
                 # Calculate X-Y forces to be applied to each node
                 forceX, forceY = dx * force, dy * force
                 
@@ -99,9 +99,8 @@ class PhysicsHandler():
                 self.__updateNodeForces(self.__model.getNode(j), forceX, forceY)   
     
 
-    def applyEdgeRestoration(self) -> None:
+    def __calculateEdgeRestoration(self) -> None:
         circleOffset = self.__model.getCircleSize() // 2  
-        k = 0.05
 
         for canvasEdge in self.__model.getEdges():
             startNode, endNode = canvasEdge.getNodes() 
@@ -114,28 +113,38 @@ class PhysicsHandler():
             dist = self.__calculateDistance(centreX0, centreY0, centreX1, centreY1)
             displacement = dist - canvasEdge.getScreenSize() 
 
-            dx, dy = self.__calculateStandarisedVector((centreX0, centreY0, centreX1, centreY1), dist)
-            forceX, forceY = displacement * k * dx, displacement * k * dy
+            dx, dy = self.__calculateStandarisedVector((centreX0, centreY0, centreX1, centreY1), dist)  
+            # Calcalate spring restoration force applied to both nodes 
+            springForce = displacement * self.__springConstant
+            forceX, forceY = springForce * dx, springForce * dy
 
             self.__updateNodeForces(startNode, forceX, forceY)
             self.__updateNodeForces(endNode, -forceX, -forceY)
 
 
     # Apply all calculated forces 
-    def applyForces(self) -> None:
+    def __applyForces(self) -> None:
         circleOffset = self.__model.getCircleSize() // 2  
-
+        # Update coords of each node
         for node in self.__model.getNodes():
-            if not node.isBeingDragged():
-                node.applyForces()
+            if not node.isBeingDragged(): node.__applyForces()
             node.resetForces()
         
+        # Update coords of each edge 
         for canvasEdge in self.__model.getEdges():
             startNode, endNode = canvasEdge.getNodes()  
             x0, y0, _, _ = startNode.getCoords()
             x1, y1, _, _ = endNode.getCoords() 
 
             canvasEdge.updateCoords((x0 + circleOffset, y0 + circleOffset, 
-                                    x1 + circleOffset, y1 +  circleOffset))
+                                    x1 + circleOffset, y1 +  circleOffset)) 
+        
+    
+    # Caclulate and apply forces to each object drawn on screen
+    def applyPhysics(self) -> None: 
+        self.__calculateGravity()
+        self.__calculateNodeRepulsion()
+        self.__calculateEdgeRestoration()
+        self.__applyForces()
 
 # Listen to Yesterday by The Beatles  
