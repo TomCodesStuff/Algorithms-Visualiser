@@ -112,27 +112,19 @@ class TraversalController():
         else: return self.__model.getEdge(connectedEdges[::-1]) 
 
 
-    def __centreEdge(self) -> tuple: 
+    def centreEdge(self) -> tuple: 
         circleOffset = self.__model.getCircleSize() // 2 
         # Reference to canvas 
         canvas = self.__screen.getCanvas()  
+        x0, y0, _, _ = self.__edgeHandler.getEdgeStartNode()
         # Get Coords of the destination node 
-        x1, y1, _, _ = self.__edgeHandler.getEdgeEndNode().getCoords()
-        # Gets current coords of the edges
-        coords = canvas.coords(self.__edgeHandler.getCurrentEdgeID()) 
-        # Update coords of the edge to be in the middle of the passed node
-        coords[2] = x1 + circleOffset 
-        coords[3] = y1 + circleOffset 
+        x1, y1, _, _ = self.__edgeHandler.getEdgeEndNode().getCoords() 
+        coords = (x0 + circleOffset, y0 + circleOffset, 
+                  x1 + circleOffset, y1 + circleOffset)
         # Send updated coords to the canvas
         canvas.coords(self.__edgeHandler.getCurrentEdgeID(), coords)  
         # Return the updated coords of the edge 
         return coords 
-
-
-    # TODO Move to edge handler
-    def adjustEdgeCoords(self) -> tuple: 
-        # Move edge to end in the middle of the destination node
-        return self.__centreEdge()
 
 
     def __drawEdge(self, event : Event, canvasNode : CanvasNode) -> None:  

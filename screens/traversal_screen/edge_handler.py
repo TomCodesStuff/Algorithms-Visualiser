@@ -172,7 +172,7 @@ class EdgeHandler():
             return self.__model.getEdge(connectedNodes[::-1]) 
         
         # Adjust edge coords it's in the correct place 
-        adjustedCoords = self.__controller.adjustEdgeCoords()
+        adjustedCoords = self.__controller.centreEdge()
         
         # Create new object, weight is initially set to the default 
         newEdge = CanvasEdge(self.__currentEdgeID, adjustedCoords, self.__model.getDefaultWeight(), 75)  
