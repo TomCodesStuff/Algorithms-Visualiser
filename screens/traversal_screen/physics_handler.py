@@ -127,7 +127,7 @@ class PhysicsHandler():
         circleOffset = self.__model.getCircleSize() // 2  
         # Update coords of each node
         for node in self.__model.getNodes():
-            if not node.isBeingDragged(): node.__applyForces()
+            if not node.isBeingDragged(): node.applyForces()
             node.resetForces()
         
         # Update coords of each edge 

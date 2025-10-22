@@ -116,7 +116,7 @@ class TraversalController():
         circleOffset = self.__model.getCircleSize() // 2 
         # Reference to canvas 
         canvas = self.__screen.getCanvas()  
-        x0, y0, _, _ = self.__edgeHandler.getEdgeStartNode()
+        x0, y0, _, _ = self.__edgeHandler.getEdgeStartNode().getCoords()
         # Get Coords of the destination node 
         x1, y1, _, _ = self.__edgeHandler.getEdgeEndNode().getCoords() 
         coords = (x0 + circleOffset, y0 + circleOffset, 
@@ -146,12 +146,10 @@ class TraversalController():
             # Lowers the priority of the edge, so it appears below nodes 
             canvas.tag_lower(edgeID) 
         # If there is an edge being drawn on screen
-        else:   
-            # Gets current coordinates of the line
-            lineCoords = canvas.coords(self.__edgeHandler.getCurrentEdgeID())
-            # Change XY coordinates to where the mouse is
-            lineCoords[2] = event.x 
-            lineCoords[3] = event.y 
+        else:    
+            # Updates edge to follow mouse 
+            # (Also if the node has moved the edges starting position is updated)
+            lineCoords = (x0 + circleOffset, y0 + circleOffset, event.x, event.y)
             # Updates the lines coordinates 
             canvas.coords(self.__edgeHandler.getCurrentEdgeID(), lineCoords)
 
@@ -188,6 +186,14 @@ class TraversalController():
             canvas.coords(edge.getCanvasID(), round(x0 + circleOffset), round(y0 + circleOffset),
                           round(x1 + circleOffset), round(y1 + circleOffset))
 
+        # If the user is creating an edge, the edges position is updated
+        # (In case the start node is being moved on screen) 
+        if self.__edgeHandler.isEdgeBeingDrawn() and self.__edgeHandler.getCurrentEdgeID(): 
+            x0, y0, _, _ = self.__edgeHandler.getEdgeStartNode().getCoords()
+            _, _, x1, y1 = canvas.coords(self.__edgeHandler.getCurrentEdgeID())
+            newCoords = (x0 + circleOffset, y0 + circleOffset, x1, y1)
+            # Updates the lines coordinates  
+            canvas.coords(self.__edgeHandler.getCurrentEdgeID(), newCoords)
 
     # Spawns node when user double clicks the canvas 
     def __spawnNodeOnDoubleClick(self, event : Event) -> None:  
