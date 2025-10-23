@@ -41,7 +41,8 @@ class ScreenTemplate():
         borderFrame = self.__createBorderFrame(contentFrame, contentFrameWidth, contentFrameHeight)
         # Frame to store the options users can interact with 
         # The size of the frame is calculated using the fixed size of the home frame
-        optionsFrame = self.__createOptionsFrame(borderFrame, optionsHomeWidth, contentFrameHeight - homeButtonFrameHeight - borderSize)
+        optionsFrame = self.__createOptionsFrame(borderFrame, optionsHomeWidth, 
+                                                 contentFrameHeight - homeButtonFrameHeight - borderSize)
         # Frame to store button to redirect user back to Introduction Screen
         # This frame should always be fixed in height
         homeButtonFrame = self.__createHomeButtonFrame(borderFrame, optionsHomeWidth, homeButtonFrameHeight)

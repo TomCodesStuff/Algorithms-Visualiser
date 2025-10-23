@@ -25,7 +25,8 @@ class IntroductionScreen(sc.Screen):
     # Creates the title displaying the projects name
     def __createTitle(self) -> None:
         # Header label
-        tk.Label(self.__contentFrame, text = "Welcome to Algorithms Anonymous.", font = (self.__FONT, 18, "underline"), bg = "white")\
+        tk.Label(self.__contentFrame, text = "Welcome to Algorithms Anonymous.", 
+                 font = (self.__FONT, 18, "underline"), bg = "white")\
             .pack(pady = 10) 
 
     # Create introduction paragraph
@@ -47,16 +48,19 @@ class IntroductionScreen(sc.Screen):
         buttonsFrame.pack()
         # Navigate to path finding algorithms screen
         tk.Button(buttonsFrame, text = "Path Finding", font = (self.__FONT, 12), height = 2, width = 15, relief = "solid", 
-                  command = lambda : [self.__window.removeScreen(), self.__window.loadScreen(sc.TraversalScreen(self.__window, self))])\
+                  command = lambda : [self.__window.removeScreen(), 
+                                      self.__window.loadScreen(sc.TraversalScreen(self.__window, self))])\
             .pack(pady = (25, 0))  
         # Navigate to array searching screen
         tk.Button(buttonsFrame, text = "Array Searching",  font = (self.__FONT, 12), height = 2, width = 15, relief = "solid", \
-                command = lambda : [self.__window.removeScreen(), self.__window.loadScreen(sc.SearchScreen(self.__window, self))])\
+                command = lambda : [self.__window.removeScreen(), 
+                                    self.__window.loadScreen(sc.SearchScreen(self.__window, self))])\
                     .pack(side = "left", pady = 15, padx = (100, 0)) 
        
         # Navigate to array sorting screen
         tk.Button(buttonsFrame, text = "Array Sorting",  font = (self.__FONT, 12), height = 2, width = 15, relief = "solid", 
-                  command = lambda : [self.__window.removeScreen(), self.__window.loadScreen(sc.SortScreen(self.__window, self))])\
+                  command = lambda : [self.__window.removeScreen(), 
+                                      self.__window.loadScreen(sc.SortScreen(self.__window, self))])\
                     .pack(side = "left", padx = 100) 
         tk.Label(self.__contentFrame, text = "Created by Thomas Gibson", bg = "white", justify = "left")\
             .pack(side = "bottom", anchor = "w", pady = 5, padx = 5) 
