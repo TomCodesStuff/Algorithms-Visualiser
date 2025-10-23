@@ -167,9 +167,7 @@ class EdgeHandler():
     def __createCanvasEdge(self) -> CanvasEdge: 
         # Edges are stored in a dictionary with the key being a tuple of the two nodes being connected
         connectedNodes = (self.__nodeEdgeStart, self.__nodeEdgeEnd) 
-        
-        #TODO Clean this up 
-        
+
         # If edge exists between the two nodes, 
         # return the already existing object 
         if(connectedNodes in self.__model.getEdges()): 

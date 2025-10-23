@@ -103,7 +103,16 @@ class TraversalController():
         # Update screen length if edge
         self.__edgeHandler.getCurrentEdgeObj().setscreenLen(self.__edgeHandler.calculateEdgeScreenLength(newWeight))
         # Clear variables used  
-        self.__edgeHandler.clearVariables() 
+        self.__edgeHandler.clearVariables()  
+
+    
+    # Delete an edge from screen and relevant data structures
+    def deleteEdge(self) -> None: 
+        canvas = self.__screen.getCanvas()
+        canvas.delete(self.__edgeHandler.getCurrentEdgeID())
+        self.__model.deleteEdge(self.__edgeHandler.getCurrentEdgeObj())
+        # Clear Variables 
+        self.__edgeHandler.clearVariables()
 
     
     # Returns the Edge Canvas object

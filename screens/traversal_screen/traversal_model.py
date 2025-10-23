@@ -48,7 +48,7 @@ class TraversalModel():
 
         # Minimum and Maximum on screen size for edges
         self.__edgeMinScreenLen = 55
-        self.__edgeMaxScreenLen = 150
+        self.__edgeMaxScreenLen = 200
 
         # Smallest distance nodes can be apart on screen 
         self.__minScreenDist = 50
@@ -87,15 +87,10 @@ class TraversalModel():
     def addNode(self, canvasNode : CanvasNode) -> None: self.__nodes.append(canvasNode)  
     def deleteNode(self, canvasNode : CanvasNode) -> None: self.__nodes.remove(canvasNode)
     
-    # Getters and setters for edges dictionary 
+    # Getters and setters for edges set 
     def getEdges(self) -> Set[CanvasEdge]: return self.__edges 
-    def getEdge(self, nodes : tuple) -> int: 
-        if(nodes in self.__edges): return self.__edges[nodes] 
-        else: return -1 
-    def addEdge(self, edge : CanvasEdge) -> None: 
-        self.__edges.add(edge)
-    def deleteEdge(self, edge : CanvasEdge) -> None:
-         self.__edges.pop(edge)
+    def addEdge(self, edge : CanvasEdge) -> None: self.__edges.add(edge)
+    def deleteEdge(self, edge : CanvasEdge) -> None: self.__edges.discard(edge)
 
     # Getters for edge weight 
     def getMinWeight(self) -> int: return self.__minWeight
