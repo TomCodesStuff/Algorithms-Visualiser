@@ -35,11 +35,8 @@ class TraversalModel():
                
         # Array to contain references to CanvasNode objects
         self.__nodes = []
-        # Set for edges, keys are tuples node IDs 
+        # Set for edges
         self.__edges = set()
-        # TODO Add dict mapping nodes to edge object
-
-
         # Minimum Weight edges can be 
         self.__minWeight = 1
         # Maximum weight edges can be 
@@ -48,6 +45,10 @@ class TraversalModel():
         self.__defaultWeight = 20
         # Resolution of the weight slider
         self.__weightSliderResolution = 1
+
+        # Minimum and Maximum on screen size for edges
+        self.__edgeMinScreenLen = 55
+        self.__edgeMaxScreenLen = 150
 
         # Smallest distance nodes can be apart on screen 
         self.__minScreenDist = 50
@@ -103,6 +104,9 @@ class TraversalModel():
     def getWeightSliderResolution(self) -> int: return self.__weightSliderResolution 
 
     # Getter for delay used when updating the canvas
-    def getUpdateDelay(self) -> int: return self.__updateDelay
+    def getUpdateDelay(self) -> int: return self.__updateDelay 
+
+    def getEdgeMinScreenLen(self) -> int: return self.__edgeMinScreenLen
+    def getEdgeMaxScreenLen(self) -> int: return self.__edgeMaxScreenLen
 
 # Listen to Jigsaws Falling Into Place by Radiohead

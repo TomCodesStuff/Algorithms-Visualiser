@@ -111,7 +111,7 @@ class PhysicsHandler():
             centreX1, centreY1 = x1 + circleOffset, y1 + circleOffset
 
             dist = self.__calculateDistance(centreX0, centreY0, centreX1, centreY1)
-            displacement = dist - canvasEdge.getScreenSize() 
+            displacement = dist - canvasEdge.getScreenLen() 
 
             dx, dy = self.__calculateStandarisedVector((centreX0, centreY0, centreX1, centreY1), dist)  
             # Calcalate spring restoration force applied to both nodes 

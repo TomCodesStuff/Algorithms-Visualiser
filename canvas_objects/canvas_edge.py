@@ -4,7 +4,7 @@ if(__name__ == "__main__"):
     exit() 
 
 class CanvasEdge(): 
-    def __init__(self, canvasID : int, coords : tuple, weight : int, screenSize : int) -> None: 
+    def __init__(self, canvasID : int, coords : tuple, weight : int, screenLen : int) -> None: 
         # ID used to identify edge on the canvas
         self.__canvasID = canvasID
         # On screen coords of the edge
@@ -16,7 +16,7 @@ class CanvasEdge():
         # The node that the edges XY coords end at
         self.__endNode = None 
         # Size edge should be onscreen 
-        self.__screenSize = screenSize
+        self.__screenLen = screenLen
     
     # Getter for canvas ID 
     def getCanvasID(self): 
@@ -40,9 +40,9 @@ class CanvasEdge():
     
     def getNodes(self) -> tuple: return (self.__startNode, self.__endNode) 
     
-    def getScreenSize(self) -> int: return self.__screenSize
+    def getScreenLen(self) -> int: return self.__screenLen
     
     # TODO error hanlding and adjustment for screen size
-    def setScreenSize(self, val : int): self.__screenSize = val
+    def setscreenLen(self, val : int): self.__screenLen = val
 
 # Listen to Live Forever by Oasis 

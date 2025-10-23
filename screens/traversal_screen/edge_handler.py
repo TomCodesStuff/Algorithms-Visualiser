@@ -153,6 +153,16 @@ class EdgeHandler():
         self.__canvas.tag_bind(edge, "<Double-Button-1>", lambda _: self.__deleteEdgeOnDoubleClick(canvasEdge)) 
 
 
+    # Calculates the screen length of an edge using it's weight
+    def calculateEdgeScreenLength(self, weight : int) -> int:
+        # output = output_start + ((output_end - output_start) / (input_end - input_start)) * (input - input_start)
+        minScreenLength, maxScreenLength = self.__model.getEdgeMinScreenLen(), self.__model.getEdgeMaxScreenLen()
+        minWeight, maxWeight = self.__model.getMinWeight(), self.__model.getMaxWeight() 
+
+        return round(minScreenLength + ((maxScreenLength - minScreenLength) / (maxWeight - minWeight)) * 
+                     (weight - minWeight))
+
+
     # Creates and returns a new CanvasEdge object
     def __createCanvasEdge(self) -> CanvasEdge: 
         # Edges are stored in a dictionary with the key being a tuple of the two nodes being connected
@@ -173,9 +183,11 @@ class EdgeHandler():
         
         # Adjust edge coords it's in the correct place 
         adjustedCoords = self.__controller.centreEdge()
-        
+        # Default weight 
+        defaultWeight = self.__model.getDefaultWeight()
+
         # Create new object, weight is initially set to the default 
-        newEdge = CanvasEdge(self.__currentEdgeID, adjustedCoords, self.__model.getDefaultWeight(), 75)  
+        newEdge = CanvasEdge(self.__currentEdgeID, adjustedCoords, defaultWeight, self.calculateEdgeScreenLength(defaultWeight))
         # Add node to dictionary 
         self.__model.addEdge(newEdge)   
         # Add references to nodes in CanvasEdge object

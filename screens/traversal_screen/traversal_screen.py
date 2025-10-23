@@ -166,6 +166,7 @@ class TraversalScreen(sc.Screen, sc.ScreenTemplate):
 
     def __deleteEdge(self) -> None:  
         # Deletes newly drawn weight or pre-existing weight 
+        # TODO RE-implement this btw 
         self.__controller.deleteEdge()
         # Hides options to edit edge from view 
         self.disableWeightOptions()

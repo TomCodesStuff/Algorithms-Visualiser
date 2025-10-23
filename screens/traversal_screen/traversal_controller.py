@@ -10,7 +10,7 @@ from .node_handler import NodeHandler
 from .edge_handler import EdgeHandler 
 from .physics_handler import PhysicsHandler
 from tkinter import Event, BOTH 
-import math
+
 
 class TraversalController():
     def __init__(self, screen, model : TraversalModel): 
@@ -99,7 +99,9 @@ class TraversalController():
     # Changes weight of current edge to passed value 
     def saveEdge(self, newWeight : int) -> None: 
         # Update weight of current edge object
-        self.__edgeHandler.getCurrentEdgeObj().setWeight(newWeight) 
+        self.__edgeHandler.getCurrentEdgeObj().setWeight(newWeight)  
+        # Update screen length if edge
+        self.__edgeHandler.getCurrentEdgeObj().setscreenLen(self.__edgeHandler.calculateEdgeScreenLength(newWeight))
         # Clear variables used  
         self.__edgeHandler.clearVariables() 
 
@@ -182,7 +184,6 @@ class TraversalController():
             startNode, endNode = edge.getNodes()
             x0, y0, _, _ = startNode.getCoords()
             x1, y1, _, _ = endNode.getCoords()
-
             canvas.coords(edge.getCanvasID(), round(x0 + circleOffset), round(y0 + circleOffset),
                           round(x1 + circleOffset), round(y1 + circleOffset))
 
@@ -194,6 +195,7 @@ class TraversalController():
             newCoords = (x0 + circleOffset, y0 + circleOffset, x1, y1)
             # Updates the lines coordinates  
             canvas.coords(self.__edgeHandler.getCurrentEdgeID(), newCoords)
+
 
     # Spawns node when user double clicks the canvas 
     def __spawnNodeOnDoubleClick(self, event : Event) -> None:  
