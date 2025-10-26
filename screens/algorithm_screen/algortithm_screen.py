@@ -15,20 +15,23 @@ from .algorithm_data_model import AlgorithmDataModel
 # All screens that visualise the algorithms have the same fundamental layout
 # This class delegates the reponsiblity of creating the basic layout
 class AlgorithmScreen(sc.Screen):
-    def __init__(self, controller : AlgorithmController, model : AlgorithmModel, dataModel : AlgorithmDataModel, window, introScreen) -> None:
+    def __init__(self, window) -> None:
         # Stores reference to Window object
         self.__window = window  
-        self.__introScreen = introScreen
         # Font every widget uses 
         self.__FONT = "Arial"
         self.__FONTSIZE = 12 
 
-        # Thread algorithm runs in
-        self.__algorithmThread = None
-        self.__controller = controller 
-        self.__model = model
-        self.__dataModel = dataModel 
 
+        # References to controller, model and data model        
+        self.__controller = None 
+        self.__model = None
+        self.__dataModel = None
+
+
+    def setController(self, controller) -> None: self.__controller = controller
+    def setModel(self, model) -> None: self.__model = model 
+    def setDataModel(self, dataModel) -> None: self.__dataModel = dataModel
     
     def createTemplate(self) -> None:
         # Get content Frame to store all widgets

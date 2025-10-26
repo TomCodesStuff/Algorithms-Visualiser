@@ -148,6 +148,7 @@ class SharedController():
     def setDataModel(self, dataModel):
         self.__dataModel = dataModel
     
+    # TODO 
     # Schedule function to redraw array after a certain amount of time 
     # Prevents the canvas flickering as updating is done by the main GUI thread
     def scheduleArrayUpdate(self):
@@ -186,6 +187,7 @@ class SharedController():
         # If generated number not in array then just return value
         else: return target  
     
+    # TODO
     # Cancels any scheduled function calls left by a terminated thread
     def cancelScheduledProcesses(self):
         # If there are still processed scheduled from the terminated thread
