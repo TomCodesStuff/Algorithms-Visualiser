@@ -1,1 +1,0 @@
-from .screens_template import ScreenTemplate

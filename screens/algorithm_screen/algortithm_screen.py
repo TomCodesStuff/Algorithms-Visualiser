@@ -5,18 +5,31 @@ if(__name__ == "__main__"):
     exit()
 
 import tkinter as tk 
+import screens as sc
+from tkinter import ttk
+from abc import abstractmethod 
+from .algorithm_controller import AlgorithmController 
+from .algorithm_model import AlgorithmModel 
+from .algorithm_data_model import AlgorithmDataModel
 
 # All screens that visualise the algorithms have the same fundamental layout
 # This class delegates the reponsiblity of creating the basic layout
-class ScreenTemplate():
-    def __init__(self, window, introScreen) -> None:
+class AlgorithmScreen(sc.Screen):
+    def __init__(self, controller : AlgorithmController, model : AlgorithmModel, dataModel : AlgorithmDataModel, window, introScreen) -> None:
         # Stores reference to Window object
         self.__window = window  
         self.__introScreen = introScreen
         # Font every widget uses 
         self.__FONT = "Arial"
-        self.__FONTSIZE = 12
-   
+        self.__FONTSIZE = 12 
+
+        # Thread algorithm runs in
+        self.__algorithmThread = None
+        self.__controller = controller 
+        self.__model = model
+        self.__dataModel = dataModel 
+
+    
     def createTemplate(self) -> None:
         # Get content Frame to store all widgets
         contentFrame = self.__window.getContentFrame()
@@ -58,11 +71,12 @@ class ScreenTemplate():
         # Updates widths
         self.__window.update()  
         # Creates canvas to display the array 
-        self.__createArrayCanvas(canvasFrame, canvasFrame.winfo_width(), canvasFrame.winfo_height())
+        self.__createCanvas(canvasFrame, canvasFrame.winfo_width(), canvasFrame.winfo_height())
         # This frame will be where information on the algorithm will be displayed 
         self.__createAlgorithmIntoFrame(borderFrame, algorithmInfoFrameWidth, 50)
         # Updates widths
         self.__window.update()  
+
 
     # Creates frame to display the border
     def __createBorderFrame(self, root : tk.Frame, frameWidth : int, frameHeight : int) -> tk.Frame:
@@ -71,6 +85,7 @@ class ScreenTemplate():
         borderFrame.pack()
         borderFrame.grid_propagate(False)    
         return borderFrame     
+
 
     # Creates frame to display the options
     def __createOptionsFrame(self, root : tk.Frame, frameWidth : int, frameHeight : int) -> tk.Frame:
@@ -82,6 +97,7 @@ class ScreenTemplate():
         optionsFrame.pack_propagate(False) 
         return optionsFrame
 
+
     # Creates frame to display the home button
     def __createHomeButtonFrame(self, root : tk.Frame, frameWidth : int, frameHeight : int) -> tk.Frame:
         # Frame to store button to redirect user back to Introduction Screen
@@ -91,6 +107,7 @@ class ScreenTemplate():
         homeButtonFrame.pack_propagate(False)
         return homeButtonFrame 
     
+
     # Creates widget to store options, prevents formatting from breaking on different devices 
     def __createOptionWidget(self, root : tk.Frame, frameWidth : int, frameHeight : int) -> None:
         # This is the frame where the actual option widgets are stored
@@ -100,6 +117,7 @@ class ScreenTemplate():
         self.__optionsWidgetsFrame.pack()
         self.__optionsWidgetsFrame.pack_propagate(False)
     
+
     # Creates the button to let the user navigate back to the main menu
     def __createHomeButton(self, root : tk.Frame) -> None: 
         # Creates and places button in the centre of the frame
@@ -107,6 +125,7 @@ class ScreenTemplate():
                                       relief = "solid", command = self.loadHomeScreen)
         self.__homeButton.place(relx = 0.5, rely = 0.5, anchor = "center") 
     
+
     # Creates the frame to store the canvas
     def __createCanvasFrame(self, root : tk.Frame, frameWidth : int, frameHeight : int) -> tk.Frame:
         # This frame stores the canvas that displays array
@@ -115,19 +134,114 @@ class ScreenTemplate():
         canvasFrame.pack_propagate(False)
         return canvasFrame
     
+
     # Creates canvas to display the array
-    def __createArrayCanvas(self, root : tk.Frame, canvasWidth : int, canvasHeight : int) -> None:
+    def __createCanvas(self, root : tk.Frame, canvasWidth : int, canvasHeight : int) -> None:
          # This canvas will be where the array is displayed.    
-        self.__arrayCanvas = tk.Canvas(root, width = canvasWidth, height = canvasHeight, bg = "white") 
-        self.__arrayCanvas.pack()
-        self.__arrayCanvas.pack_propagate(False)
+        self.__canvas = tk.Canvas(root, width = canvasWidth, height = canvasHeight, bg = "white") 
+        self.__canvas.pack()
+        self.__canvas.pack_propagate(False)
     
+
     # Creates frame to store the algorithm information
     def __createAlgorithmIntoFrame(self, root : tk.Frame, frameWidth : int, frameHeight : int) -> None:
         # This frame will be where information on the algorithm will be displayed 
         self.__algorithmInfoFrame = tk.Frame(root, width = frameWidth, height = frameHeight, bg = "white")
         self.__algorithmInfoFrame.grid(row = 1, column = 1, pady = (2,0), padx = (2,0)) 
         self.__algorithmInfoFrame.pack_propagate(False) 
+
+
+    # Creates a combo box which displays all algorithms 
+    def __createAlgorithmSelect(self) -> None:
+        #combo box, allows the user to choose what algorithm they want
+        self.__algorithmOptions = ttk.Combobox(self.getOptionsWidgetFrame(), textvariable = tk.StringVar(), state = "readonly", 
+                                               font = (self.getFont(), self.getFontSize()),\
+             width = self.getOptionsWidgetFrame().winfo_width())
+        self.__algorithmOptions.set('Select an algorithm.')
+        # Removes the blue highlighting when something is selected that annoyed me
+        self.__algorithmOptions.bind("<<ComboboxSelected>>", lambda _: self.getOptionsWidgetFrame().focus())
+        self.__algorithmOptions.pack(pady = (10,0))  
+
+
+    # When the slider has changed value a label is added with the relevant speed 
+    # The delay is also changed in the DataModel Object
+    def __updateDelay(self, value : str) -> None: 
+        self.__speedSlider.config(label = f"Delay: {value} {self.__sliderUnitsText}")  
+
+
+    # Sets the delay that pauses algorithms during execution     
+    def __setDelay(self) -> None:  
+        if(self.__model.isDelayMilliSeconds()):  
+            self.__dataModel.setDelay(self.__speedSlider.get() // 1000)
+        else:  self.__dataModel.setDelay(self.__speedSlider.get())
+  
+
+    # Creates a slider that allows users to adjust an algorithms speed
+    def __createSpeedAdjuster(self) -> None:
+        # Creates a slider that goes from the maximum delay to the minmum delay 
+        # Every time the sliders value is changed the updateDelay() method is called to update the value seen on screen
+        self.__speedSlider = tk.Scale(self.getOptionsWidgetFrame(), from_ = self.__model.getMaxDelay(), to_ = self.__model.getMinDelay(), 
+                                      resolution=self.__model.getResolution(), 
+                                      length = self.getOptionsWidgetFrame().winfo_width(), orient = "horizontal", showvalue = False, 
+                                      bg =  "white", highlightbackground = "white", command = self.__updateDelay)
+        self.__speedSlider.pack(pady = (10, 0))  
+        self.__speedSlider.set(self.__model.getMaxDelay())
+        # When the user stops moving the slider the slider is updated in the DataModel class 
+        self.__speedSlider.bind("<ButtonRelease-1>", lambda _ : self.__setDelay()) 
+        # Time units of the delay 
+        self.__sliderUnitsText = "Seconds" 
+ 
+ 
+    # TODO look into these 
+    @abstractmethod
+    def __pauseAlgorithm(self) -> None: pass
+    @abstractmethod
+    def __initAlgorithm(self) -> None: pass 
+    @abstractmethod
+    def __resumeAlgorithm(self) -> None: pass
+    @abstractmethod
+    def __pauseAlgorithm(self) -> None: pass
+    
+
+    # Creates buttons that lets user execute algorithms or stop them
+    def __createStopSolveButtons(self) -> None:
+        # Frame to store stop and solve buttons in a grid layout
+        algorithmToggleFrame = tk.Frame(self.getOptionsWidgetFrame(), bg = "white")
+        algorithmToggleFrame.pack(side = "bottom", pady = (0,5))
+        # Allows user to see the algorithm in action
+        self.__solveStopButton = tk.Button(algorithmToggleFrame, text = "Solve.", width = 7, relief = "solid", 
+                                           font = (self.getFont(), self.getFontSize()), 
+                                           command = lambda: self.__initAlgorithm())
+        self.__solveStopButton.grid(row = 0, column = 0, padx = (0,5)) 
+        # Allows user to stop algorithm whilst it's running - button is initially disabled
+        self.__pauseResumeButton = tk.Button(algorithmToggleFrame, text = "Pause.", width = 7, relief = "solid", 
+                                             font = (self.getFont(), self.getFontSize()), 
+                                             state = "disabled", command = lambda : self.__pauseAlgorithm())
+        self.__pauseResumeButton.grid(row = 0, column = 1)  
+
+
+    # TODO 
+    def __createAlgorithmOptions(self) -> None: 
+        self.__createAlgorithmSelect()               
+        self.__createSpeedAdjuster()
+        self.__createStopSolveButtons()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     # Returns window the screen is displayed in
     def getWindow(self) -> object: return self.__window
@@ -142,7 +256,7 @@ class ScreenTemplate():
     def getOptionsWidgetFrame(self) -> tk.Frame: return self.__optionsWidgetsFrame 
     
     # Gets canvas array is displayed in
-    def getCanvas(self) -> tk.Canvas: return self.__arrayCanvas 
+    def getCanvas(self) -> tk.Canvas: return self.__canvas 
 
     # Loads the home screen 
     def loadHomeScreen(self) -> None:

@@ -11,7 +11,7 @@ from .traversal_controller import TraversalController
 from .traversal_model import TraversalModel
 from canvas_objects import CanvasEdge
 
-class TraversalScreen(sc.Screen, sc.ScreenTemplate): 
+class TraversalScreen(sc.Screen, sc.AlgorithmScreen): 
     def initScreen(self) -> None:
         self.createTemplate() 
 

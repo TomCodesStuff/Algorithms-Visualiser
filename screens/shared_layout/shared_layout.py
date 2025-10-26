@@ -15,7 +15,7 @@ from tkinter import ttk
 import random
 import threading
 
-class SharedLayout(sc.ScreenTemplate):
+class SharedLayout(sc.AlgorithmScreen):
     
     # Creates basic layout and shared settings 
     def createBaseLayout(self) -> None:
@@ -118,8 +118,8 @@ class SharedLayout(sc.ScreenTemplate):
                                              state = "disabled", command = lambda : self.__pauseAlgorithm())
         self.__pauseResumeButton.grid(row = 0, column = 1)  
 
+
     # When the slider has changed value a label is added with the relevant speed 
-    # The delay is also changed in the DataModel Object
     def __updateDelay(self, value : str) -> None: 
         self.__speedSlider.config(label = f"Delay: {value} {self.__sliderUnitsText}")  
  
