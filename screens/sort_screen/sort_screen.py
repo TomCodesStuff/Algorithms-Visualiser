@@ -4,19 +4,18 @@ if(__name__ == "__main__"):
     print("This is file shouldn't be run on it's own. \nIt should be imported only.")
     exit()
 
-import screens as sc
-import tkinter as tk 
-from .sort_controller import SortController
-from .sort_model import SortModel
 
-class SortScreen(sc.Screen, sc.SharedLayout):    
+import tkinter as tk 
+
+
+class SortScreen():    
     def initScreen(self) -> None:
         self.createBaseLayout()
         self.loadAlgorithmOptions("sort")
        
         # Controller and Model classes
-        self.__sortModel = SortModel()
-        self.__sortController = SortController(self, self.__sortModel, self.getDataModel())  
+        self.__sortModel = None
+        self.__sortController = None
 
         self.__createSortOptionButtons()
         self.configSpeedSlider(to_= self.__sortModel.getSliderEnd(), from_=self.__sortModel.getSliderStart(),

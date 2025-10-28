@@ -1,8 +1,8 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Type, Tuple
- 
+import screens as scr 
+
 if TYPE_CHECKING:
-    import screens as scr 
     from app_window import Window
 
     ScreenClass = Type[scr.AlgorithmScreen]
@@ -32,22 +32,22 @@ class ScreenCreator():
             case scr.ScreenType.INTRO: return scr.IntroductionScreen(window)  
             case scr.ScreenType.SEARCH: 
                 return cls.__createScreen(window, (
-                    scr.SearchScreen, 
-                    scr.SearchController, 
-                    scr.SearchModel, 
-                    scr.SharedDataModel))
-            case scr.ScreenType.SORT:
-                return cls.__createScreen(window, (
-                    scr.SortScreen, 
-                    scr.SortController, 
-                    scr.SortModel, 
-                    scr.SharedDataModel))
-            case scr.ScreenType.TRAVERSAL:
-                return cls.__createScreen(window, (
-                    scr.TraversalScreen, 
-                    scr.TraversalController, 
-                    scr.TraversalModel, 
-                    scr.SharedDataModel))
-            case _: return None
+                    scr.AlgorithmScreen, 
+                    scr.AlgorithmController, 
+                    scr.AlgorithmModel, 
+                    scr.AlgorithmDataModel))
+            #case scr.ScreenType.SORT:
+            #    return cls.__createScreen(window, (
+            #        scr.SortScreen, 
+            #        scr.SortController, 
+            #        scr.SortModel, 
+            #        scr.SharedDataModel))
+            #case scr.ScreenType.TRAVERSAL:
+            #    return cls.__createScreen(window, (
+            #        scr.TraversalScreen, 
+            #        scr.TraversalController, 
+            #        scr.TraversalModel, 
+            #        scr.SharedDataModel))
+            #case _: return None
 
 

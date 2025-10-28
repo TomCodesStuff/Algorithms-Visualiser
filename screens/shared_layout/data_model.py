@@ -44,9 +44,11 @@ class SharedDataModel():
     def shuffleArray(self) -> None:
         random.shuffle(self.__array)
 
+
     # Updates the screen so changes to the array are shown
     def updateArrayOnScreen(self) -> None:
         self.__controller.scheduleArrayUpdate() 
+
 
     # Swaps the elements at the specified indexed
     def swapElements(self, sourceIndex : int, destinationIndex : int) -> None: 

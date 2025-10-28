@@ -5,17 +5,14 @@ if(__name__ == "__main__"):
     print("This is file shouldn't be run on it's own. \nIt should be imported only.")
     exit()
 
-import screens as sc 
-from .shared_controller import SharedController
-from .shared_model import SharedModel
-from .data_model import SharedDataModel
+
 from algorithms.handlers import callAlgorithm, getAlgorithms
 import tkinter as tk 
 from tkinter import ttk
 import random
 import threading
 
-class SharedLayout(sc.AlgorithmScreen):
+class SharedLayout():
     
     # Creates basic layout and shared settings 
     def createBaseLayout(self) -> None:
@@ -25,11 +22,11 @@ class SharedLayout(sc.AlgorithmScreen):
         self.__overrideHomeButtonCommand()
 
         # Stores data needed for calculating size of the on-screen widgets
-        self.__model = SharedModel()
+        self.__model = None
         # Stores data relating to the algorithm 
-        self.__dataModel = SharedDataModel() 
+        self.__dataModel = None
         # Handles the logic 
-        self.__controller = SharedController(self, self.__model, self.__dataModel) 
+        self.__controller = None
         
         # Adds reference to the controller 
         self.__dataModel.addController(self.__controller) 
@@ -326,7 +323,7 @@ class SharedLayout(sc.AlgorithmScreen):
             widget.config(state="active")
     
     # Returns the data model class
-    def getDataModel(self) -> SharedDataModel:
+    def getDataModel(self) -> None:
         return self.__dataModel
     
 # Listen to Whatsername by Green Day    

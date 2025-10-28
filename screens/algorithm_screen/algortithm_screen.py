@@ -5,12 +5,10 @@ if(__name__ == "__main__"):
     exit()
 
 import tkinter as tk 
+import threading
 import screens as sc
 from tkinter import ttk
-from abc import abstractmethod 
-from .algorithm_controller import AlgorithmController 
-from .algorithm_model import AlgorithmModel 
-from .algorithm_data_model import AlgorithmDataModel
+from algorithms import callAlgorithm, getAlgorithms
 
 # All screens that visualise the algorithms have the same fundamental layout
 # This class delegates the reponsiblity of creating the basic layout
@@ -28,57 +26,8 @@ class AlgorithmScreen(sc.Screen):
         self.__model = None
         self.__dataModel = None
 
-
-    def setController(self, controller) -> None: self.__controller = controller
-    def setModel(self, model) -> None: self.__model = model 
-    def setDataModel(self, dataModel) -> None: self.__dataModel = dataModel
-    
-    def createTemplate(self) -> None:
-        # Get content Frame to store all widgets
-        contentFrame = self.__window.getContentFrame()
-        # Get content frames width and height
-        contentFrameHeight = self.__window.getContentFrameHeight()
-        contentFrameWidth = self.__window.getContentFrameWidth()
-
-        # width of the border
-        borderSize = 2
-        # Distance between the widgets and the edge of the frame
-        padding = 10
-        # Height of frame that contains home button       
-        homeButtonFrameHeight = 50
-        # Width of the home button frame and the options frame
-        optionsHomeWidth = 200
-        # Width of canvas frame
-        canvasFrameWidth = algorithmInfoFrameWidth = contentFrameWidth - optionsHomeWidth - borderSize 
-        # Height of canvas frame
-        canvasFrameHeight = contentFrameHeight - homeButtonFrameHeight - borderSize
-
-        # Border frame gives appearence of a border between different frames
-        borderFrame = self.__createBorderFrame(contentFrame, contentFrameWidth, contentFrameHeight)
-        # Frame to store the options users can interact with 
-        # The size of the frame is calculated using the fixed size of the home frame
-        optionsFrame = self.__createOptionsFrame(borderFrame, optionsHomeWidth, 
-                                                 contentFrameHeight - homeButtonFrameHeight - borderSize)
-        # Frame to store button to redirect user back to Introduction Screen
-        # This frame should always be fixed in height
-        homeButtonFrame = self.__createHomeButtonFrame(borderFrame, optionsHomeWidth, homeButtonFrameHeight)
-        # Updates sizes of frames
-        self.__window.update()
-
-        # This is the frame where the actual option widgets are stored
-        self.__createOptionWidget(optionsFrame, optionsHomeWidth - padding, optionsFrame.winfo_height())
-        # Creates a home button so user can navigate back to the intro screen
-        self.__createHomeButton(homeButtonFrame)
-        # This frame stores the canvas that displays array
-        canvasFrame = self.__createCanvasFrame(borderFrame, canvasFrameWidth, canvasFrameHeight)
-        # Updates widths
-        self.__window.update()  
-        # Creates canvas to display the array 
-        self.__createCanvas(canvasFrame, canvasFrame.winfo_width(), canvasFrame.winfo_height())
-        # This frame will be where information on the algorithm will be displayed 
-        self.__createAlgorithmIntoFrame(borderFrame, algorithmInfoFrameWidth, 50)
-        # Updates widths
-        self.__window.update()  
+        # Array containing widgets that are disabled when an algorithm runs and renabled when an algorithm resumes 
+        self.__toggleableWidgets = []
 
 
     # Creates frame to display the border
@@ -125,7 +74,7 @@ class AlgorithmScreen(sc.Screen):
     def __createHomeButton(self, root : tk.Frame) -> None: 
         # Creates and places button in the centre of the frame
         self.__homeButton = tk.Button(root, text = "Home.", font = (self.__FONT, self.__FONTSIZE), width = 7, height = 1, borderwidth = 2, 
-                                      relief = "solid", command = self.loadHomeScreen)
+                                      relief = "solid", command = self.__loadHomeScreen)
         self.__homeButton.place(relx = 0.5, rely = 0.5, anchor = "center") 
     
 
@@ -164,6 +113,7 @@ class AlgorithmScreen(sc.Screen):
         # Removes the blue highlighting when something is selected that annoyed me
         self.__algorithmOptions.bind("<<ComboboxSelected>>", lambda _: self.getOptionsWidgetFrame().focus())
         self.__algorithmOptions.pack(pady = (10,0))  
+        self.addToggleableWidget(self.__algorithmOptions)
 
 
     # When the slider has changed value a label is added with the relevant speed 
@@ -192,19 +142,8 @@ class AlgorithmScreen(sc.Screen):
         # When the user stops moving the slider the slider is updated in the DataModel class 
         self.__speedSlider.bind("<ButtonRelease-1>", lambda _ : self.__setDelay()) 
         # Time units of the delay 
-        self.__sliderUnitsText = "Seconds" 
- 
- 
-    # TODO look into these 
-    @abstractmethod
-    def __pauseAlgorithm(self) -> None: pass
-    @abstractmethod
-    def __initAlgorithm(self) -> None: pass 
-    @abstractmethod
-    def __resumeAlgorithm(self) -> None: pass
-    @abstractmethod
-    def __pauseAlgorithm(self) -> None: pass
-    
+        self.__sliderUnitsText = "Seconds"  
+
 
     # Creates buttons that lets user execute algorithms or stop them
     def __createStopSolveButtons(self) -> None:
@@ -223,50 +162,207 @@ class AlgorithmScreen(sc.Screen):
         self.__pauseResumeButton.grid(row = 0, column = 1)  
 
 
-    # TODO 
-    def __createAlgorithmOptions(self) -> None: 
+    # Creates widgets that all algorithm screens use 
+    def __createBaseAlgorithmOptions(self) -> None: 
         self.__createAlgorithmSelect()               
         self.__createSpeedAdjuster()
         self.__createStopSolveButtons()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    # Returns window the screen is displayed in
-    def getWindow(self) -> object: return self.__window
     
-    # Returns font used for all text
-    def getFont(self) -> str: return self.__FONT 
 
-    # Returns the font size used for most of the text
-    def getFontSize(self) -> int: return self.__FONTSIZE
-    
-    # Returns the frame the options are stored in 
-    def getOptionsWidgetFrame(self) -> tk.Frame: return self.__optionsWidgetsFrame 
-    
-    # Gets canvas array is displayed in
-    def getCanvas(self) -> tk.Canvas: return self.__canvas 
+    # Creates the layout all algorithms screens use
+    def createBaseLayout(self) -> None:
+        # Get content Frame to store all widgets
+        contentFrame = self.__window.getContentFrame()
+        # Get content frames width and height
+        contentFrameHeight = self.__window.getContentFrameHeight()
+        contentFrameWidth = self.__window.getContentFrameWidth()
+        # width of the border
+        borderSize = 2
+        # Distance between the widgets and the edge of the frame
+        padding = 10
+        # Height of frame that contains home button       
+        homeButtonFrameHeight = 50
+        # Width of the home button frame and the options frame
+        optionsHomeWidth = 200
+        # Width of canvas frame
+        canvasFrameWidth = algorithmInfoFrameWidth = contentFrameWidth - optionsHomeWidth - borderSize 
+        # Height of canvas frame
+        canvasFrameHeight = contentFrameHeight - homeButtonFrameHeight - borderSize
 
+        # Border frame gives appearence of a border between different frames
+        borderFrame = self.__createBorderFrame(contentFrame, contentFrameWidth, contentFrameHeight)
+        # Frame to store the options users can interact with 
+        # The size of the frame is calculated using the fixed size of the home frame
+        optionsFrame = self.__createOptionsFrame(borderFrame, optionsHomeWidth, 
+                                                 contentFrameHeight - homeButtonFrameHeight - borderSize)
+        # Frame to store button to redirect user back to Introduction Screen
+        # This frame should always be fixed in height
+        homeButtonFrame = self.__createHomeButtonFrame(borderFrame, optionsHomeWidth, homeButtonFrameHeight)
+        # Updates sizes of frames
+        self.__window.update()
+
+        # This is the frame where the actual option widgets are stored
+        self.__createOptionWidget(optionsFrame, optionsHomeWidth - padding, optionsFrame.winfo_height())
+        # Creates a home button so user can navigate back to the intro screen
+        self.__createHomeButton(homeButtonFrame)
+        # This frame stores the canvas that displays array
+        canvasFrame = self.__createCanvasFrame(borderFrame, canvasFrameWidth, canvasFrameHeight)
+        # Updates widths
+        self.__window.update()  
+        # Creates canvas to display the array 
+        self.__createCanvas(canvasFrame, canvasFrame.winfo_width(), canvasFrame.winfo_height())
+        # This frame will be where information on the algorithm will be displayed 
+        self.__createAlgorithmIntoFrame(borderFrame, algorithmInfoFrameWidth, 50) 
+        # Create options common across all algorithms
+        self.__createBaseAlgorithmOptions()
+        # Updates widths
+        self.__window.update()  
+
+
+    # Changes pause button text and function it calls when it's pressed
+    def __pauseToResume(self) -> None: 
+         self.__pauseResumeButton.config(text="Resume.", command=self.__resumeAlgorithm) 
+
+
+    # Changes resume button text and function it calls when it's pressed    
+    def __resumeToPause(self) -> None:
+        self.__pauseResumeButton.config(text="Pause.", command=self.__pauseAlgorithm) 
+    
+
+    # Changes stop button text and function it calls when it's pressed
+    def __stopToSolve(self) -> None:
+        self.__solveStopButton.config(text="Solve.", command=self.__initAlgorithm)  
+    
+
+    # Changes solve button text and function it calls when it's pressed
+    def __solveToStop(self) -> None:
+        self.__solveStopButton.config(text="Stop.", command=self.__stopAlgorithm)
+
+
+    # Enables all widgets stores in the array
+    def __enableWidgets(self) -> None:
+        for widget in self.__toggleableWidgets:
+            widget.config(state="active") 
+    
+
+    # Enables all widgets stores in the array
+    def __disableWidgets(self) -> None:
+        for widget in self.__toggleableWidgets:
+            widget.config(state="active") 
+
+
+    # Enables the button to pause/resume algorithm
+    def __enablePauseResumeButton(self) -> None:
+        self.__pauseResumeButton.config(state="active")
+
+
+    # Disables the button to pause/resume algorithm
+    def __disablePauseResumeButton(self) -> None:
+        self.__pauseResumeButton.config(state="disabled")  
+    
+
+    def __updateUIAlgorithmStart(self) -> None:
+        self.__disableWidgets()
+        self.__solveToStop()
+        self.__enablePauseResumeButton() 
+    
+    
+    def __updateUIAlgorithmStop(self) -> None:
+        self.__enableWidgets()
+        self.__stopToSolve()
+        self.__disablePauseResumeButton()     
+    
+
+    # TODO -> move to abstract screen     
+    def loadAlgorithmOptions(self, algorithmsType : str) -> None:
+        self.__algorithmOptions['value'] = getAlgorithms(algorithmsType)
+    
+
+    # Returns algorithm the user has selected 
+    def __getAlgorithmChoice(self) -> str:
+        return self.__algorithmOptions.get()  
+    
+    def __getAlgorithmType(self) -> str: 
+        return self.__algorithmOptions.get().split(" ")[-1].lower()
+
+
+    # Releases the lock, letting the algorithm thread run again
+    def __resumeAlgorithm(self) -> None: 
+        self.__dataModel.releaseLock()
+        self.__resumeToPause()
+
+
+    # Holds the lock, pausing the algorithm Thread
+    def __pauseAlgorithm(self) -> None:
+        self.__dataModel.acquireLock() 
+        self.__pauseToResume() 
+
+
+    # Call algorithm user has selected
+    def __initAlgorithm(self) -> None:  
+        # Doesn't do anything if user hasn't chosen an algorithm
+        if(self.__getAlgorithmChoice() == 'Select an algorithm.'): 
+            self.__algorithmOptions.config(foreground = "red")
+        else:
+            # Disables solve button and enables stop button
+            self.__solveToStop()
+            # Sets flag indicating the algorithm needs to halt to false
+            if(self.__dataModel.isStopped()): self.__dataModel.clearStopFlag()  
+            # Enabling/Disabling options 
+            self.__updateUIAlgorithmStart()
+            # Generates the target based on the setting (Only applicable when searching)
+            self.__controller.generateTarget(self.__dataModel.getTargetSetting()) 
+            # Call algorithm -> so this program actually has a use
+            self.__algorithmThread = threading.Thread(target=callAlgorithm, 
+                                                      args=(self.__dataModel, self.__getAlgorithmChoice(), 
+                                                            self.__getAlgorithmType(), 
+                                                            self.__updateUIAlgorithmStop))
+            # Start Thread
+            self.__algorithmThread.start()  
+    
+
+    # Forces current running algorithm thread to terminate (safely)
+    def __stopAlgorithm(self) -> None:
+        # Sets to flag to True -> this is what tells the thread/s to stop
+        self.__dataModel.setStopFlag()   
+        # If the algorithm has been paused
+        if(self.__dataModel.isPaused()):
+            # Tell algorithm to resume, so it can stop...
+            self.__resumeAlgorithm()  
+        # Otherwise makes sure pause/resume button has the correct text/function
+        else: self.__resumeToPause() 
+        self.__updateUIAlgorithmStop()
+    
+    
     # Loads the home screen 
-    def loadHomeScreen(self) -> None:
+    # Ensures any algorithm threads are terminated 
+    def __loadHomeScreen(self) -> None:
+        # If a thread exists and it is still running
+        if(self.__algorithmThread and self.__algorithmThread.is_alive()): 
+            # Tell the thread to stop
+            self.__stopAlgorithm()  
+            self.__controller.cancelScheduledProcesses()
+
         self.__window.removeScreen()
-        self.__window.loadScreen(self.__introScreen) 
+        # TODO fix
+        self.__window.loadScreen(self.__introScreen)   
     
-    def getHomeButton(self) -> tk.Button:
-        return self.__homeButton
+
+    # Setters
+    def setController(self, controller) -> None: self.__controller = controller
+    def setModel(self, model) -> None: self.__model = model 
+    def setDataModel(self, dataModel) -> None: self.__dataModel = dataModel  
+    def addToggleableWidget(self, widget : tk.Widget) -> None: self.__toggleableWidgets.append(widget)
+    def removeToggleableWidget(self, widget : tk.Widget) -> None:  
+        if widget in self.__toggleableWidgets:
+            self.__toggleableWidgets.remove(widget)
+
+    # Getters 
+    def getWindow(self) -> object: return self.__window
+    def getFont(self) -> str: return self.__FONT 
+    def getFontSize(self) -> int: return self.__FONTSIZE
+    def getOptionsWidgetFrame(self) -> tk.Frame: return self.__optionsWidgetsFrame 
+    def getCanvas(self) -> tk.Canvas: return self.__canvas 
+    
 
 # Listen to Under You by Foo Fighters
