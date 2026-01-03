@@ -33,19 +33,19 @@ class ScreenCreator():
         match screenType:
             case scr.ScreenType.INTRO: return scr.IntroductionScreen(window)  
             case scr.ScreenType.SEARCH: 
-                return cls.__createClasses(window, (
+                return cls.__createScreen(window, (
                     scr.SearchScreen, 
                     scr.SearchController, 
                     scr.SearchModel, 
                     scr.SharedDataModel))
             case scr.ScreenType.SORT:
-                return cls.__createClasses(window, (
+                return cls.__createScreen(window, (
                     scr.SortScreen, 
                     scr.SortController, 
                     scr.SortModel, 
                     scr.SharedDataModel))
             case scr.ScreenType.TRAVERSAL:
-                return cls.__createClasses(window, (
+                return cls.__createScreen(window, (
                     scr.TraversalScreen, 
                     scr.TraversalController, 
                     scr.TraversalModel, 

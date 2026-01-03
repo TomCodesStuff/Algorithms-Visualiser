@@ -4,20 +4,19 @@ if(__name__ == "__main__"):
     print("This is file shouldn't be run on it's own. \nIt should be imported only.")
     exit()
 
-import screens as sc
+
 import tkinter as tk 
 
-from .search_controller import SearchController
-from .search_model import SearchModel
 
-class SearchScreen(sc.Screen, sc.SharedLayout):    
+
+class SearchScreen():    
     def initScreen(self) -> None:
         self.createBaseLayout()
         self.loadAlgorithmOptions("search")
     
         # Controller and Model classes
-        self.__searchModel = SearchModel()
-        self.__searchController = SearchController(self, self.__searchModel, self.getDataModel()) 
+        self.__searchModel = None
+        self.__searchController = None
 
         # Create Target slider
         self.__createTargetAdjuster() 

@@ -4,21 +4,18 @@ if(__name__ == "__main__"):
     print("This is file shouldn't be run on it's own. \nIt should be imported only.")
     exit()
 
-import screens as sc 
 import tkinter as tk 
 from tkinter import ttk 
-from .traversal_controller import TraversalController
-from .traversal_model import TraversalModel
 from canvas_objects import CanvasEdge
 
-class TraversalScreen(sc.Screen, sc.AlgorithmScreen): 
+class TraversalScreen(): 
     def initScreen(self) -> None:
         self.createTemplate() 
 
         # Create model class
-        self.__model = TraversalModel() 
+        self.__model = None
         # Create controller class and add referencces to screen and model
-        self.__controller = TraversalController(self, self.__model)
+        self.__controller = None
         # Add reference to controller to the model object
         self.__model.addController(self.__controller)
         # Add event handlers to the canvas
