@@ -1,25 +1,27 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Type, Tuple
- 
-if TYPE_CHECKING:
-    import screens as scr 
-    from app_window import Window
+from typing import TYPE_CHECKING, Type, Tuple 
+import screens as scr 
 
-    ScreenClass = Type[scr.AlgorithmScreen]
-    ControllerClass = Type[scr.AlgorithmController]
-    ModelClass = Type[scr.AlgorithmModel]
-    DataModelClass = Type[scr.AlgorithmDataModel]
+if TYPE_CHECKING: 
+    from app_window import Window 
+    MVCClasses = Tuple[
+        Type[scr.AlgorithmScreen],
+        Type[scr.AlgorithmController],
+        Type[scr.AlgorithmModel],
+        Type[scr.AlgorithmDataModel]
+    ]
 
 
 class ScreenCreator(): 
     
     @staticmethod
-    def __createScreen(window : Window, mvcClasses : Tuple[ScreenClass, ControllerClass, ModelClass, DataModelClass] ) -> scr.AlgorithmScreen: 
-        screenClass, controllerClass, modelClass, dataModelClass = mvcClasses
-        screen = screenClass(window)
-        model = modelClass()
-        dataModel = dataModelClass()
-        controller = controllerClass(screen, model, dataModel)
+    def __createClasses(window : Window, mvcClasses : MVCClasses) -> scr.AlgorithmScreen: 
+        Screen, Controller, Model, DataModel = mvcClasses
+        screen = Screen(window)
+        model = Model()
+        dataModel = DataModel()
+        controller = Controller(screen, model, dataModel)
+        
         screen.setController(controller)
         screen.setModel(model)
         screen.setDataModel(dataModel)
@@ -27,23 +29,23 @@ class ScreenCreator():
 
 
     @classmethod
-    def createScreen(cls, window : Window, screenType : str) -> scr.Screen|None:
+    def createScreen(cls, window : Window, screenType : scr.ScreenType) -> scr.Screen|None:
         match screenType:
             case scr.ScreenType.INTRO: return scr.IntroductionScreen(window)  
             case scr.ScreenType.SEARCH: 
-                return cls.__createScreen(window, (
+                return cls.__createClasses(window, (
                     scr.SearchScreen, 
                     scr.SearchController, 
                     scr.SearchModel, 
                     scr.SharedDataModel))
             case scr.ScreenType.SORT:
-                return cls.__createScreen(window, (
+                return cls.__createClasses(window, (
                     scr.SortScreen, 
                     scr.SortController, 
                     scr.SortModel, 
                     scr.SharedDataModel))
             case scr.ScreenType.TRAVERSAL:
-                return cls.__createScreen(window, (
+                return cls.__createClasses(window, (
                     scr.TraversalScreen, 
                     scr.TraversalController, 
                     scr.TraversalModel, 
