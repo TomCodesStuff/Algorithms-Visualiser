@@ -1,33 +1,47 @@
+from __future__ import annotations
+import tkinter as tk 
+import screens as sc 
+from typing import TYPE_CHECKING, Generic, TypeVar
+from tkinter import ttk
+from algorithms import getAlgorithms
+
+
 # If this isn't at the top the program breaks :/
 # If the file is run as is message this returned and program exits
 if(__name__ == "__main__"):
     print("This is file shouldn't be run on it's own. \nIt should be imported only.")
     exit()
 
-import tkinter as tk 
-import threading
-import screens as sc
-from tkinter import ttk
-from algorithms import callAlgorithm, getAlgorithms
+
+if TYPE_CHECKING:
+    from app_window import Window 
+    from algorithm_screen import AlgorithmController, AlgorithmModel, AlgorithmDataModel 
+
+C = TypeVar("C", bound="AlgorithmController")
+M = TypeVar("M", bound="AlgorithmModel")
+D = TypeVar("D", bound="AlgorithmDataModel")
 
 # All screens that visualise the algorithms have the same fundamental layout
 # This class delegates the reponsiblity of creating the basic layout
-class AlgorithmScreen(sc.Screen):
-    def __init__(self, window) -> None:
+class AlgorithmScreen(Generic[C, M ,D], sc.Screen):
+    def __init__(self, window : Window) -> None:
         # Stores reference to Window object
         self.__window = window  
         # Font every widget uses 
+        # TODO why are these in caps? 
         self.__FONT = "Arial"
         self.__FONTSIZE = 12 
-
 
         # References to controller, model and data model        
         self.__controller = None 
         self.__model = None
         self.__dataModel = None
 
-        # Array containing widgets that are disabled when an algorithm runs and renabled when an algorithm resumes 
+        # Array containing widgets that are disabled when an algorithm runs 
+        # and then renabled when an algorithm ends 
         self.__toggleableWidgets = []
+        # For each object in this array '' method is called before an algorithm is run 
+        self.__algorithmStartObservers = []
 
 
     # Creates frame to display the border
@@ -167,8 +181,10 @@ class AlgorithmScreen(sc.Screen):
         self.__createAlgorithmSelect()               
         self.__createSpeedAdjuster()
         self.__createStopSolveButtons()
-    
 
+    def render(self):
+        self.createBaseLayout() 
+        
     # Creates the layout all algorithms screens use
     def createBaseLayout(self) -> None:
         # Get content Frame to store all widgets
@@ -288,45 +304,40 @@ class AlgorithmScreen(sc.Screen):
 
     # Releases the lock, letting the algorithm thread run again
     def __resumeAlgorithm(self) -> None: 
-        self.__dataModel.releaseLock()
+        self.__controller.resumeAlgorithm()
         self.__resumeToPause()
 
 
     # Holds the lock, pausing the algorithm Thread
-    def __pauseAlgorithm(self) -> None:
-        self.__dataModel.acquireLock() 
+    def __pauseAlgorithm(self) -> None: 
+        self.__controller.pauseAlgorithm()
         self.__pauseToResume() 
 
 
     # Call algorithm user has selected
     def __initAlgorithm(self) -> None:  
         # Doesn't do anything if user hasn't chosen an algorithm
-        if(self.__getAlgorithmChoice() == 'Select an algorithm.'): 
+        if(not self.__getAlgorithmChoice() == 'Select an algorithm.'): 
             self.__algorithmOptions.config(foreground = "red")
         else:
             # Disables solve button and enables stop button
             self.__solveToStop()
-            # Sets flag indicating the algorithm needs to halt to false
-            if(self.__dataModel.isStopped()): self.__dataModel.clearStopFlag()  
-            # Enabling/Disabling options 
             self.__updateUIAlgorithmStart()
-            # Generates the target based on the setting (Only applicable when searching)
-            self.__controller.generateTarget(self.__dataModel.getTargetSetting()) 
-            # Call algorithm -> so this program actually has a use
-            self.__algorithmThread = threading.Thread(target=callAlgorithm, 
-                                                      args=(self.__dataModel, self.__getAlgorithmChoice(), 
-                                                            self.__getAlgorithmType(), 
-                                                            self.__updateUIAlgorithmStop))
-            # Start Thread
-            self.__algorithmThread.start()  
-    
+            
+            for observer in self.__algorithmStartObservers: 
+                try:
+                    observer.beforeAlgorithmStart()
+                except AttributeError: continue
+            
+            self.__controller.startAlgorithmThread(self.__getAlgorithmChoice(), "HELLO")
+            
 
     # Forces current running algorithm thread to terminate (safely)
     def __stopAlgorithm(self) -> None:
         # Sets to flag to True -> this is what tells the thread/s to stop
-        self.__dataModel.setStopFlag()   
+        self.__controller.stopAlgorithmThread()
         # If the algorithm has been paused
-        if(self.__dataModel.isPaused()):
+        if(self.__controller.isAlgorithmPaused()):
             # Tell algorithm to resume, so it can stop...
             self.__resumeAlgorithm()  
         # Otherwise makes sure pause/resume button has the correct text/function
@@ -336,33 +347,38 @@ class AlgorithmScreen(sc.Screen):
     
     # Loads the home screen 
     # Ensures any algorithm threads are terminated 
-    def __loadHomeScreen(self) -> None:
+    def __loadHomeScreen(self) -> None: 
         # If a thread exists and it is still running
-        if(self.__algorithmThread and self.__algorithmThread.is_alive()): 
+        if(self.__controller.isAlgorithmRunning()): 
             # Tell the thread to stop
             self.__stopAlgorithm()  
             self.__controller.cancelScheduledProcesses()
 
         self.__window.removeScreen()
+        print("Load Homescreen here")
         # TODO fix
-        self.__window.loadScreen(self.__introScreen)   
+        #self.__window.loadScreen(self.__introScreen)   
     
 
     # Setters
-    def setController(self, controller) -> None: self.__controller = controller
-    def setModel(self, model) -> None: self.__model = model 
-    def setDataModel(self, dataModel) -> None: self.__dataModel = dataModel  
+    def setController(self, controller : C) -> None: self.__controller = controller
+    def setModel(self, model : M) -> None: self.__model = model 
+    def setDataModel(self, dataModel : D) -> None: self.__dataModel = dataModel  
     def addToggleableWidget(self, widget : tk.Widget) -> None: self.__toggleableWidgets.append(widget)
     def removeToggleableWidget(self, widget : tk.Widget) -> None:  
-        if widget in self.__toggleableWidgets:
+        if widget in self.__toggleableWidgets: 
             self.__toggleableWidgets.remove(widget)
 
     # Getters 
-    def getWindow(self) -> object: return self.__window
+    def getWindow(self) -> Window: return self.__window
     def getFont(self) -> str: return self.__FONT 
     def getFontSize(self) -> int: return self.__FONTSIZE
     def getOptionsWidgetFrame(self) -> tk.Frame: return self.__optionsWidgetsFrame 
-    def getCanvas(self) -> tk.Canvas: return self.__canvas 
+    def getCanvas(self) -> tk.Canvas: return self.__canvas  
+    def getController(self) -> C: return self.__controller
+    def getModel(self) -> M: return self.__model
+    def getDataModel(self) -> D: return self.__dataModel 
+
     
 
 # Listen to Under You by Foo Fighters

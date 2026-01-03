@@ -16,7 +16,7 @@ class IntroductionScreen(sc.Screen):
         self.__FONT = "Arial"
 
     # Creates the screen
-    def initScreen(self) -> None:
+    def render(self) -> None:
         # Get content Frame to store all widgets
         self.__contentFrame = self.__window.getContentFrame()
         self.__createTitle()

@@ -69,20 +69,6 @@ class ArrayAlgorithmScreen(AlgorithmScreen):
         else: return target
             
 
-    # Forces current running algorithm thread to terminate (safely)
-    def __stopAlgorithm(self) -> None:
-        # Sets to flag to True -> this is what tells the thread/s to stop
-        self.__dataModel.setStopFlag()   
-        # If the algorithm has been paused
-        if(self.__dataModel.isPaused()):
-            # Tell algorithm to resume, so it can stop...
-            self.__resumeAlgorithm()  
-        # Otherwise makes sure pause/resume button has the correct text/function
-        else: 
-            self.__resumeToPause() 
-        self.__widgetsAlgorithmStops()
-    
-
     # Sorts and displays the array
     def __sortArray(self) -> None:
         self.__dataModel.sortArray()

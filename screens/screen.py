@@ -7,7 +7,7 @@ from abc import ABC, abstractmethod
 # Abstract class - every screen must implement the initScreen method
 class Screen(ABC):
     @abstractmethod
-    def initScreen(self): pass 
+    def render(self): pass 
 
 
 # Listen to Runnin' Wild by Airbourne

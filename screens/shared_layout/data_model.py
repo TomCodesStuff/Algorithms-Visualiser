@@ -13,8 +13,6 @@ class SharedDataModel():
         self.__targetSetting = 0
         self.__isAscending = True
         self.__delay = None 
-        self.__algorithmRunning = threading.Event()
-        self.__algorithmPauseLock = threading.Lock()
         self.__delayLock = threading.Lock()
 
     # Sets controller attribute to value passed
@@ -107,31 +105,8 @@ class SharedDataModel():
     # Sets the element being looked for to the passed value
     def setTarget(self, value : int) -> None:
         self.__target = value   
-    
-    # Sets the stop flag, used to tell algorithm threads to stop
-    def setStopFlag(self) -> None:
-        self.__algorithmRunning.set()
-    
-    # Sets stop flag back to false
-    def clearStopFlag(self) -> None:
-        self.__algorithmRunning.clear()
-    
-    # Returns True if algorithm thread needs to stop, else false
-    def isStopped(self) -> bool:
-        return True if self.__algorithmRunning.is_set() else False
 
-    # Threads call this to hold the lock
-    def acquireLock(self) -> None:
-        self.__algorithmPauseLock.acquire() 
-    
-    # Threads call this to release the lock
-    def releaseLock(self) -> None:
-        self.__algorithmPauseLock.release() 
-    
-    # Checks if the algorithm thread is paused or not 
-    def isPaused(self) -> bool: 
-        return self.__algorithmPauseLock.locked()
-    
+
      # Returns the size of the array
     def getArraySize(self) -> int:
         return len(self.__array)

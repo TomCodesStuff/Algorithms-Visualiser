@@ -1,20 +1,27 @@
-from __future__ import annotations
-from typing import TYPE_CHECKING, Type, Tuple
+from __future__ import annotations 
+
+# If this isn't at the top the program breaks :/
+# If the file is run as is message this returned and program exits
+if(__name__ == "__main__"):
+    print("This is file shouldn't be run on it's own. \nIt should be imported only.")
+    exit()
+
+
+from typing import TYPE_CHECKING
 import screens as scr 
 
 if TYPE_CHECKING:
     from app_window import Window
 
-    ScreenClass = Type[scr.AlgorithmScreen]
-    ControllerClass = Type[scr.AlgorithmController]
-    ModelClass = Type[scr.AlgorithmModel]
-    DataModelClass = Type[scr.AlgorithmDataModel]
+    ScreenClass = type[scr.AlgorithmScreen]
+    ControllerClass = type[scr.AlgorithmController]
+    ModelClass = type[scr.AlgorithmModel]
+    DataModelClass = type[scr.AlgorithmDataModel]
 
 
 class ScreenCreator(): 
-    
     @staticmethod
-    def __createScreen(window : Window, mvcClasses : Tuple[ScreenClass, ControllerClass, ModelClass, DataModelClass] ) -> scr.AlgorithmScreen: 
+    def __createScreen(window : Window, mvcClasses : tuple[ScreenClass, ControllerClass, ModelClass, DataModelClass] ) -> scr.AlgorithmScreen: 
         screenClass, controllerClass, modelClass, dataModelClass = mvcClasses
         screen = screenClass(window)
         model = modelClass()
@@ -49,5 +56,3 @@ class ScreenCreator():
             #        scr.TraversalModel, 
             #        scr.SharedDataModel))
             #case _: return None
-
-
