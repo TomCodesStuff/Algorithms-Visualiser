@@ -8,7 +8,7 @@ if(__name__ == "__main__"):
 
 import tkinter as tk
 import random 
-from algorithm_screen import AlgorithmScreen
+from algorithm_base import AlgorithmScreen
 
 
 class ArrayAlgorithmScreen(AlgorithmScreen):

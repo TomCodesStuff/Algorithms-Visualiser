@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING, TypeVar, Generic
 from .thread_handler import ThreadHandler
 
 if TYPE_CHECKING:
-    from algorithm_screen import AlgorithmScreen, AlgorithmModel, AlgorithmDataModel
+    from algorithm_base import AlgorithmScreen, AlgorithmModel, AlgorithmDataModel
 
 S = TypeVar("S", bound="AlgorithmScreen")
 M = TypeVar("M", bound="AlgorithmModel")

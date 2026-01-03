@@ -15,7 +15,7 @@ if(__name__ == "__main__"):
 
 if TYPE_CHECKING:
     from app_window import Window 
-    from algorithm_screen import AlgorithmController, AlgorithmModel, AlgorithmDataModel 
+    from algorithm_base import AlgorithmController, AlgorithmModel, AlgorithmDataModel 
 
 C = TypeVar("C", bound="AlgorithmController")
 M = TypeVar("M", bound="AlgorithmModel")
@@ -40,7 +40,7 @@ class AlgorithmScreen(Generic[C, M ,D], sc.Screen):
         # Array containing widgets that are disabled when an algorithm runs 
         # and then renabled when an algorithm ends 
         self.__toggleableWidgets = []
-        # For each object in this array '' method is called before an algorithm is run 
+        # For each object in this array 'beforeAlgorithmStart()' method is called before an algorithm is run 
         self.__algorithmStartObservers = []
 
 
@@ -288,8 +288,7 @@ class AlgorithmScreen(Generic[C, M ,D], sc.Screen):
         self.__stopToSolve()
         self.__disablePauseResumeButton()     
     
-
-    # TODO -> move to abstract screen     
+ 
     def loadAlgorithmOptions(self, algorithmsType : str) -> None:
         self.__algorithmOptions['value'] = getAlgorithms(algorithmsType)
     
