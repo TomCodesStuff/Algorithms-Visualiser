@@ -1,4 +1,4 @@
-class AlgorithmDataModel(): 
+class DataStructure(): 
     def __init__(self):
         self.__delay = 0 
 
@@ -15,7 +15,7 @@ class AlgorithmDataModel():
         self.__delayLock.release()
         return delay
     
-
+    
     # Updates the screen so changes to the array are shown
     def updateArrayOnScreen(self) -> None:
         self.__controller.scheduleArrayUpdate() 

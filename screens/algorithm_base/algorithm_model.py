@@ -1,5 +1,6 @@
 class AlgorithmModel(): 
     def __init__(self):
+        self.__delay = 0
         self.__minimumDelay = 0 
         self.__maximumDelay = 0  
         self.__resolution = 0 

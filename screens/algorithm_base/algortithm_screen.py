@@ -15,11 +15,11 @@ if(__name__ == "__main__"):
 
 if TYPE_CHECKING:
     from app_window import Window 
-    from algorithm_base import AlgorithmController, AlgorithmModel, AlgorithmDataModel 
+    from algorithm_base import AlgorithmController, AlgorithmModel, DataStructure 
 
 C = TypeVar("C", bound="AlgorithmController")
 M = TypeVar("M", bound="AlgorithmModel")
-D = TypeVar("D", bound="AlgorithmDataModel")
+D = TypeVar("D", bound="DataStructure")
 
 # All screens that visualise the algorithms have the same fundamental layout
 # This class delegates the reponsiblity of creating the basic layout
@@ -35,7 +35,7 @@ class AlgorithmScreen(Generic[C, M ,D], sc.Screen):
         # References to controller, model and data model        
         self.__controller = None 
         self.__model = None
-        self.__dataModel = None
+        self.__dataStructure = None
 
         # Array containing widgets that are disabled when an algorithm runs 
         # and then renabled when an algorithm ends 
@@ -139,8 +139,8 @@ class AlgorithmScreen(Generic[C, M ,D], sc.Screen):
     # Sets the delay that pauses algorithms during execution     
     def __setDelay(self) -> None:  
         if(self.__model.isDelayMilliSeconds()):  
-            self.__dataModel.setDelay(self.__speedSlider.get() // 1000)
-        else:  self.__dataModel.setDelay(self.__speedSlider.get())
+            self.__dataStructure.setDelay(self.__speedSlider.get() // 1000)
+        else: self.__dataStructure.setDelay(self.__speedSlider.get())
   
 
     # Creates a slider that allows users to adjust an algorithms speed
@@ -362,7 +362,7 @@ class AlgorithmScreen(Generic[C, M ,D], sc.Screen):
     # Setters
     def setController(self, controller : C) -> None: self.__controller = controller
     def setModel(self, model : M) -> None: self.__model = model 
-    def setDataModel(self, dataModel : D) -> None: self.__dataModel = dataModel  
+    def setDataModel(self, dataModel : D) -> None: self.__dataStructure = dataModel  
     def addToggleableWidget(self, widget : tk.Widget) -> None: self.__toggleableWidgets.append(widget)
     def removeToggleableWidget(self, widget : tk.Widget) -> None:  
         if widget in self.__toggleableWidgets: 
@@ -376,7 +376,7 @@ class AlgorithmScreen(Generic[C, M ,D], sc.Screen):
     def getCanvas(self) -> tk.Canvas: return self.__canvas  
     def getController(self) -> C: return self.__controller
     def getModel(self) -> M: return self.__model
-    def getDataModel(self) -> D: return self.__dataModel 
+    def getDataModel(self) -> D: return self.__dataStructure 
 
     
 
