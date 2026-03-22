@@ -84,6 +84,10 @@ class Window():
     def update(self) -> None:
         self.__window.update() 
     
+    
+    def update_idle_tasks(self) -> None:
+        self.__window.update_idletasks()
+    
 
     # Schedule the passed function to be executed after the passed amount of time
     # Assumes function has no parameters

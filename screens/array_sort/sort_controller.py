@@ -4,17 +4,28 @@ if(__name__ == "__main__"):
     print("This is file shouldn't be run on it's own. \nIt should be imported only.")
     exit()
 
-class SortController():
-    def __init__(self, screen, model, dataModel) -> None:
-        self.__screen = screen 
-        self.__model = model 
-        self.__dataModel = dataModel
+
+from typing import TYPE_CHECKING, TypeVar
+from ..array_algorithm import ArrayAlgorithmController
+
+if TYPE_CHECKING: 
+    from array_sort import SortScreen, SortModel
+    from array_algorithm import Array
+
+S = TypeVar("S", bound="SortScreen")
+M = TypeVar("M", bound="SortModel")
+D = TypeVar("D", bound="Array")
+
+
+class SortController(ArrayAlgorithmController[S, M, D]):
+    def __init__(self, screen, model, dataStructure):
+        super().__init__(screen, model, dataStructure)
     
     # Changes the sort direction 
     def toggleSortDirection(self):
         # Changes the sort direction
-        self.__dataModel.toggleSortDirection()  
+        self.getDataStructure().toggleSortDirection()  
         # Disables the button that called the function and enables the currently disabled button
-        self.__screen.disableEnableButtons(self.__dataModel.isAscending())
+        self.getScreen().disableEnableButtons(self.getDataStructure().isAscending())
 
 # Listen to Give Me Novacaine by Green Day

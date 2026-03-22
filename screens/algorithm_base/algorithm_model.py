@@ -1,21 +1,22 @@
 class AlgorithmModel(): 
     def __init__(self):
         self.__delay = 0
-        self.__minimumDelay = 0 
-        self.__maximumDelay = 0  
+        self.__minDelay = 0 
+        self.__maxDelay = 0  
         self.__resolution = 0 
         self.__isDelayMilliseconds = False 
 
     def setDelay(self, val : float) -> None:
         if val > 0: self.__delay = val 
 
+    
     def setMaxDelay(self, val : int) -> None:
-        if val > 0 and val > self.__minimumDelay: 
-            self.__maximumDelay = val
+        if  val > 0 and (self.__minDelay == 0 or val > self.__minDelay): 
+            self.__maxDelay = val
     
     def setMinDelay(self, val : int) -> None:
-        if val > 0 and val < self.__maximumDelay: 
-            self.__minimumDelay = val
+        if val > 0 and (self.__maxDelay == 0 or val < self.__maxDelay): 
+            self.__minDelay = val
 
     def setResolution(self, val : int) -> None:
         if val > 0: self.__resolution = val  
@@ -28,7 +29,7 @@ class AlgorithmModel():
 
 
     def getDelay(self) -> float: return self.__delay
-    def getMaxDelay(self) -> int: return self.__maximumDelay
-    def getMinDelay(self) -> int: return self.__minimumDelay 
+    def getMaxDelay(self) -> int: return self.__maxDelay
+    def getMinDelay(self) -> int: return self.__minDelay 
     def getResolution(self) -> int: return self.__resolution 
     def isDelayMilliSeconds(self) -> bool: return self.__isDelayMilliseconds

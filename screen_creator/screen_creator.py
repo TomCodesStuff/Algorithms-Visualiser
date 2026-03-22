@@ -8,20 +8,20 @@ if TYPE_CHECKING:
     Screen = Type[AlgorithmScreen]
     Controller = Type[AlgorithmController]
     Model = Type[AlgorithmModel]
-    
+    Hello = Type[DataStructure]
 
 class ScreenCreator(): 
     @staticmethod
-    def __createAlgorithmScreen(window : Window, mvcClasses :  Tuple[Screen, Controller, Model]) -> AlgorithmScreen: 
-        screenClass, controllerClass, modelClass, dataModelClass = mvcClasses
+    def __createAlgorithmScreen(window : Window, mvcClasses :  Tuple[Screen, Controller, Model, Hello]) -> AlgorithmScreen: 
+        screenClass, controllerClass, modelClass, dataStructureClass = mvcClasses
         screen = screenClass(window)
         model = modelClass()
-        dataModel = None 
-        controller = controllerClass(screen, model, dataModel)
+        dataStructure = dataStructureClass()
+        controller = controllerClass(screen, model, dataStructure)
         
         screen.setController(controller)
         screen.setModel(model)
-        screen.setDataModel(dataModel)
+        screen.setDataStructure(dataStructure)
         return screen 
 
 
@@ -31,22 +31,22 @@ class ScreenCreator():
             case ScreenType.MAIN_MENU: return MainMenu(window)  
             case ScreenType.SEARCH: 
                 return cls.__createAlgorithmScreen(window, (
-                    AlgorithmScreen, 
-                    AlgorithmController, 
-                    AlgorithmModel, 
-                    None))
-            #case scr.ScreenType.SORT:
-            #    return cls.__createAlgorithmScreen(window, (
-            #        scr.SortScreen, 
-            #        scr.SortController, 
-            #        scr.SortModel, 
-            #        scr.SharedDataModel))
+                    SearchScreen, 
+                    SearchController, 
+                    SearchModel, 
+                    Array))
+            case ScreenType.SORT:
+               return cls.__createAlgorithmScreen(window, (
+                   SortScreen, 
+                   SortController, 
+                   SortModel, 
+                   Array))
             #case scr.ScreenType.TRAVERSAL:
             #    return cls.__createAlgorithmScreen(window, (
             #        scr.TraversalScreen, 
             #        scr.TraversalController, 
             #        scr.TraversalModel, 
-            #        scr.SharedDataModel))
+            #        scr.ShareddataStructure))
             #case _: return None
 
 

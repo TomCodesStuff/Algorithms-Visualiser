@@ -3,19 +3,33 @@
 if(__name__ == "__main__"):
     print("This is file shouldn't be run on it's own. \nIt should be imported only.")
     exit()
-class SearchController():
-    def __init__(self, screen, model, dataModel) -> None:
-        self.__searchScreen = screen
-        self.__searchModel = model
-        self.__dataModel = dataModel
+
+
+from typing import TYPE_CHECKING, TypeVar
+from ..array_algorithm import ArrayAlgorithmController
+
+if TYPE_CHECKING: 
+    from array_search import SearchScreen, SearchModel
+    from array_algorithm import Array
+
+S = TypeVar("S", bound="SearchScreen")
+M = TypeVar("M", bound="SearchModel")
+D = TypeVar("D", bound="Array")
+
+
+class SearchController(ArrayAlgorithmController[S, M, D]):
+    def __init__(self, screen, model, dataStructure):
+        super().__init__(screen, model, dataStructure)
     
+
     # Returns the text to be displayed above the slider
     def updateSliderText(self, value : str) -> str:
         self.__updateTargetSetting(value)
-        return self.__searchModel.getSliderText(int(value))
-        
-    # Updates the target setting attribute in the DataModel class 
+        return self.getModel().getSliderText(int(value))
+
+
+    # Updates the target setting attribute in the dataStructure class 
     def __updateTargetSetting(self, value : str) -> None:
-        self.__dataModel.setTargetSetting(int(value)) 
+        self.getDataStructure().setTargetSetting(int(value)) 
                     
 # Listen to Give Me Novacaine by Green Day

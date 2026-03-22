@@ -1,16 +1,23 @@
-class SortModel(): 
-    def __init__(self) -> None: 
-        self.__interval = 1 
-        self.__sliderStart = 1000 
-        self.__sliderEnd = 1 
+# If this isn't at the top the program breaks :/
+# If the file is run as is message this returned and program exits
+if(__name__ == "__main__"):
+    print("This is file shouldn't be run on it's own. \nIt should be imported only.")
+    exit()
+
+from ..array_algorithm import ArrayAlgorithmModel
+
+class SortModel(ArrayAlgorithmModel):
+
+    def __init__(self):
+        super().__init__()
         self.__buttonWidth = 16
 
-    # Returns the interval for the slider bar
-    def getSlidernterval(self) -> int: return self.__interval 
-    # Returns the starting value of the slider bar
-    def getSliderStart(self) -> int: return self.__sliderStart  
-    # Returns the ending value of the slider bar
-    def getSliderEnd(self) -> int: return self.__sliderEnd  
+        self.setDelayToMilliseconds()
+        self.setResolution(1)
+        self.setMinDelay(1)
+        self.setMaxDelay(1000)
+
+
     # Returns the width used for the buttons 
     def getButtonWidth(self) -> int: return self.__buttonWidth 
     

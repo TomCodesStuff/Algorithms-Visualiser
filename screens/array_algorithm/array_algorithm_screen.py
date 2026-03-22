@@ -8,19 +8,29 @@ if(__name__ == "__main__"):
 
 import tkinter as tk
 import random 
-from algorithm_base import AlgorithmScreen
+from typing import TYPE_CHECKING, TypeVar
+from ..algorithm_base import AlgorithmScreen
 
 
-class ArrayAlgorithmScreen(AlgorithmScreen):
+if TYPE_CHECKING:
+    from array_algorithm import ArrayAlgorithmController, ArrayAlgorithmModel, Array
+
+
+C = TypeVar("C", bound="ArrayAlgorithmController")
+M = TypeVar("M", bound="ArrayAlgorithmModel")
+D = TypeVar("D", bound="Array")
+
+
+class ArrayAlgorithmScreen(AlgorithmScreen[C, M, D]):
     def __init__(self, window):
         super().__init__(window)
 
 
     # Creates a slider that allows users to alter an arrays size
     def __createArrayAdjuster(self) -> None:
-        self.__arraySizeSlider = tk.Scale(self.getOptionsWidgetFrame(), from_ = 1, to_ = self.__model.getMaxBars(), 
+        self.__arraySizeSlider = tk.Scale(self.getOptionsWidgetFrame(), from_ = 1, to_ = self.getModel().getMaxBars(), 
                                           length = self.getOptionsWidgetFrame().winfo_width(),\
-            orient = "horizontal", bg = "white", highlightbackground = "white", command = self.__controller.adjustArray)
+            orient = "horizontal", bg = "white", highlightbackground = "white", command = self.getController().adjustArray)
         self.__arraySizeSlider.pack(pady = (10, 0))
         self.addToggleableWidget(self.__arraySizeSlider)
 
@@ -53,7 +63,7 @@ class ArrayAlgorithmScreen(AlgorithmScreen):
     # Guarantees target is in the array
     def targetIn(self) -> int: 
        # Randomly chooses index from array and returns the number at that index
-       return self.__dataModel.getArray()[random.randint(0, len(self.__dataModel.getArray()) - 1)] 
+       return self.getdataStructure().getArray()[random.randint(0, len(self.getdataStructure().getArray()) - 1)] 
 
 
     # Guarantees target is not in array
@@ -61,24 +71,24 @@ class ArrayAlgorithmScreen(AlgorithmScreen):
     #      -> or make list of nums from min to max excluding elements and select from there 
     def targetOut(self) -> int: 
         # Chooses a number between the range of arrays smallest value - 20 and arrays largest value + 20
-        target = random.randint(min(self.__dataModel.getArray()) - self.__model.getBuffer(), 
-                                max(self.__dataModel.getArray()) + self.__model.getBuffer())
+        target = random.randint(min(self.getdataStructure().getArray()) - self.getModel().getBuffer(), 
+                                max(self.getdataStructure().getArray()) + self.getModel().getBuffer())
         # If generated number in array re-run function
-        if target in self.__dataModel.getArray(): self.targetOut()
+        if target in self.getdataStructure().getArray(): self.targetOut()
         # If generated number not in array then just return value
         else: return target
             
 
     # Sorts and displays the array
     def __sortArray(self) -> None:
-        self.__dataModel.sortArray()
-        self.__controller.displayArray() 
+        self.getdataStructure().sortArray()
+        self.getController().displayArray() 
     
 
     # Shuffles and displays the array
     def __shuffleArray(self) -> None:
-        self.__dataModel.shuffleArray()
-        self.__controller.displayArray()  
+        self.getdataStructure().shuffleArray()
+        self.getController().displayArray()  
 
 
     # This functions handles creating and displaying the options the user is presented with
@@ -87,7 +97,8 @@ class ArrayAlgorithmScreen(AlgorithmScreen):
         self.__createSortShuffleButtons()
 
          
-    def render(self):
+    def createBaseArrayLayout(self):
         self.createBaseLayout()
-        self.createArrayOptions()
-    
+        self.getController().calculateArrayBounds()
+        self.createArrayOptions() 
+        

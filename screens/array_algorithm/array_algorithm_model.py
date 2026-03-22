@@ -1,4 +1,4 @@
-from algorithm_base import AlgorithmModel
+from ..algorithm_base import AlgorithmModel
 
 class ArrayAlgorithmModel(AlgorithmModel):
     def __init__(self) -> None: 
@@ -28,9 +28,7 @@ class ArrayAlgorithmModel(AlgorithmModel):
         self.__higherBound = None
         # Maximum number of bars that can be drawn, ie the maximum size of the array
         self.__maxBars = None 
-        # Default minimum and maximum delay for algorithms 
-        self.__minDelay = 0.1
-        self.__maxDelay = 4
+                
         # Sets the default resolution of the speed slider 
         self.__defaultResolution = 0.1  
         # The buffer used when selecting a target outside the array 
@@ -73,10 +71,6 @@ class ArrayAlgorithmModel(AlgorithmModel):
     def getMaxBars(self) -> int: return self.__maxBars 
     # Set maximum bars that can be drawn on screen to passed value
     def setMaxBars(self, value : int) -> None: self.__maxBars = value 
-    # Get the minimum delay
-    def getMinDelay(self): return self.__minDelay 
-    # Get the maximum delay 
-    def getMaxDelay(self): return self.__maxDelay 
     # Gets the default resolution 
     def getDefaultResolution(self): return self.__defaultResolution
     # Gets the buffer used when selecting a target outside the array 

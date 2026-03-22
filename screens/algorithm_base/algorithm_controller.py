@@ -11,23 +11,24 @@ from .mediator import Mediator
 from .thread_handler import ThreadHandler
 
 if TYPE_CHECKING:
-    from algorithm_base import AlgorithmScreen, AlgorithmModel
+    from algorithm_base import AlgorithmScreen, AlgorithmModel, DataStructure
+
 
 S = TypeVar("S", bound="AlgorithmScreen")
 M = TypeVar("M", bound="AlgorithmModel")
+D = TypeVar("D", bound="DataStructure")
 
-class AlgorithmController(Generic[S, M]):  
+class AlgorithmController(Generic[S, M, D]):  
 
-    def __init__(self, screen : S, model : M, dataModel):
+    def __init__(self, screen : S, model : M, dataStructure : D):
         self.__screen = screen
         self.__model = model
-        self.__dataModel = dataModel
+        self.__dataStructure = dataStructure
         self.__threadHandler = ThreadHandler() 
-
 
         # TODO create some abstract methods to make sure these are defined
         self.__updateFunc = None
-        self.__dataStructure = None
+
 
     # TODO unfuck this 
     # Cancels any scheduled function calls left by a terminated thread
@@ -79,6 +80,11 @@ class AlgorithmController(Generic[S, M]):
         delay = self.__model.getDelay()
         self.__threadHandler.releaseDelayLock() 
         return delay
+
+
+    def getScreen(self) -> S: return self.__screen 
+    def getModel(self) -> M: return self.__model
+    def getDataStructure(self) -> D: return self.__dataStructure
 
 
     def scheduleScreenUpdate(self) -> None:

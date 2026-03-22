@@ -6,20 +6,23 @@ if(__name__ == "__main__"):
 
 
 import tkinter as tk 
+from typing import TYPE_CHECKING, TypeVar
+from ..array_algorithm import ArrayAlgorithmScreen, Array
+
+if TYPE_CHECKING:
+    from array_search import SearchController, SearchModel 
+
+
+C = TypeVar("C", bound="SearchController")
+M = TypeVar("M", bound="SearchModel")
+D = TypeVar("D", bound="Array")
 
 
 
-class SearchScreen():    
-    def initScreen(self) -> None:
-        self.createBaseLayout()
-        self.loadAlgorithmOptions("search")
-    
-        # Controller and Model classes
-        self.__searchModel = None
-        self.__searchController = None
+class SearchScreen(ArrayAlgorithmScreen[C, M, D]): 
+    def __init__(self, window):
+        super().__init__(window) 
 
-        # Create Target slider
-        self.__createTargetAdjuster() 
     
     # Creates a slider that lets sers decide if the target is in the array, not in the array or randomly generated
     def __createTargetAdjuster(self) -> None:
@@ -34,6 +37,12 @@ class SearchScreen():
 
     # When the target slider has changed value a label is added to show the relevant target information 
     def updateDisplayedText(self, value : str) -> None: 
-        self.__targetSlider.config(label = self.__searchController.updateSliderText(value)) 
+        self.__targetSlider.config(label = self.getController().updateSliderText(value)) 
+
+
+    def render(self) -> None: 
+        self.createBaseArrayLayout()  
+        self.__createTargetAdjuster()
+
 
 # Wretches and Kings by Linkin Park                 

@@ -4,8 +4,18 @@ if(__name__ == "__main__"):
     print("This is file shouldn't be run on it's own. \nIt should be imported only.")
     exit()
 
-class SearchModel(): 
-    def __init__(self) -> None: 
+
+from ..array_algorithm import ArrayAlgorithmModel
+
+
+class SearchModel(ArrayAlgorithmModel): 
+    def __init__(self) -> None:  
+        super().__init__()
+        
+        self.setResolution(0.1)
+        self.setMinDelay(0.1)
+        self.setMaxDelay(4)
+        
         # Dictionary pairing numbers to speed 
         # This allows the slider to show text rather than just numbers
         self.__numbersToText = {

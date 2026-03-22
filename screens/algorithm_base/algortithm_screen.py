@@ -36,6 +36,8 @@ class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
         self.__model = None
         self.__dataStructure = None
 
+        self.__canvas = None
+
         # Array containing widgets that are disabled when an algorithm runs 
         # and then renabled when an algorithm ends 
         self.__toggleableWidgets = []
@@ -153,10 +155,13 @@ class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
                                       bg =  "white", highlightbackground = "white", command = self.__updateDelay)
         self.__speedSlider.pack(pady = (10, 0))  
         self.__speedSlider.set(self.__model.getMaxDelay())
-        # When the user stops moving the slider the slider is updated in the DataModel class 
+        # When the user stops moving the slider the slider is updated in the dataStructure class 
         self.__speedSlider.bind("<ButtonRelease-1>", lambda _ : self.__setDelay()) 
         # Time units of the delay 
-        self.__sliderUnitsText = "Seconds"  
+
+        if self.getModel().isDelayMilliSeconds():
+            self.__sliderUnitsText = "Milliseconds"
+        else: self.__sliderUnitsText = "Seconds"  
 
 
     # Creates buttons that lets user execute algorithms or stop them
@@ -336,20 +341,24 @@ class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
     # Setters
     def setController(self, controller : C) -> None: self.__controller = controller
     def setModel(self, model : M) -> None: self.__model = model 
-    def setDataModel(self, dataModel : D) -> None: self.__dataStructure = dataModel  
+    def setDataStructure(self, dataStructure : D) -> None: self.__dataStructure = dataStructure  
     def addToggleableWidget(self, widget : tk.Widget) -> None: self.__toggleableWidgets.append(widget)
     def removeToggleableWidget(self, widget : tk.Widget) -> None:  
         if widget in self.__toggleableWidgets: 
             self.__toggleableWidgets.remove(widget)
 
+
+    # Getters 
+    def getController(self) -> C: return self.__controller
+    def getModel(self) -> M: return self.__model
+    def getdataStructure(self) -> D: return self.__dataStructure 
+    
     def getFont(self) -> str: return self.__FONT 
     def getFontSize(self) -> int: return self.__FONTSIZE
     def getOptionsWidgetFrame(self) -> tk.Frame: return self.__optionsWidgetsFrame 
     def getCanvas(self) -> tk.Canvas: return self.__canvas  
-    def getController(self) -> C: return self.__controller
-    def getModel(self) -> M: return self.__model
-    def getDataModel(self) -> D: return self.__dataStructure 
 
-    
+
+
 
 # Listen to Under You by Foo Fighters
