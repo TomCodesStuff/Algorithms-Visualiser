@@ -7,9 +7,20 @@ class ThreadHandler():
         self.__algorithmStopped = threading.Event()
         self.__algorithmPauseLock = threading.Lock()
         self.__delayLock = threading.Lock() 
-    
+
+
+    def thread_function(self): 
+        running = True
+        while(running):
+            print("I am Running") 
+            if self.hasAlgorithmStopped(): running = False
+            self.acquirePauseLock()
+            self.releasePauseLock()
+
+        print("I have stoppped")
 
     def isThreadAlive(self) -> bool:
+        if self.__algorithmThread is None: return True 
         return self.__algorithmThread and self.__algorithmThread.is_alive()
 
 
@@ -29,7 +40,7 @@ class ThreadHandler():
         self.__algorithmPauseLock.acquire()
     
 
-    def relasePauseLock(self) -> None: 
+    def releasePauseLock(self) -> None: 
         self.__algorithmPauseLock.release()  
     
 
@@ -43,14 +54,33 @@ class ThreadHandler():
 
     def releaseDelayLock(self) -> None: 
         self.__delayLock.release()
-    
-    def startAlgorithm(self, algorithmChoice : str, algorithmType : str) -> None: 
-        # Sets flag indicating the algorithm needs to halt to false
+
+
+    def stopAlgorithm(self) -> None: 
+        if(self.isAlgorithmPaused()): self.releasePauseLock() 
+        if(self.__delayLock.locked()): self.releaseDelayLock()
+        self.setAlgorithmStopFlag() 
+
+        if self.__algorithmThread is None: return
+        while(self.isThreadAlive()): 
+            print("Waiting for Thread to halt")
+        
+        print("Thread Terminated :)")
+        self.__algorithmThread = None
+        return 
+
+
+    def startAlgorithm(self, algorithmChoice : str, algorithmType : str) -> None:  
+        if self.__algorithmThread is not None: self.stopAlgorithm() 
+
+        # Ensure various locks are released 
         if(self.hasAlgorithmStopped()): self.clearAlgorithmStopFlag()  
+        if(self.isAlgorithmPaused()): self.releasePauseLock() 
+        if(self.__delayLock.locked()): self.releaseDelayLock()
+
+        print("Starting Thread")
         # Call algorithm -> so this program actually has a use
-        self.__algorithmThread = threading.Thread(target=callAlgorithm, 
-                                                    args=(self.__dataModel, self.__mediator, 
-                                                          algorithmChoice, algorithmType))
+        self.__algorithmThread = threading.Thread(target=self.thread_function)
         # Start Thread
         self.__algorithmThread.start() 
 

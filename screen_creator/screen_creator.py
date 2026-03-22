@@ -2,22 +2,23 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Type, Tuple 
 import screens as scr 
 
+# TODO NOT a fan of this wtf 
+
 if TYPE_CHECKING:
     from app_window import Window
 
     ScreenClass = Type[scr.AlgorithmScreen]
     ControllerClass = Type[scr.AlgorithmController]
     ModelClass = Type[scr.AlgorithmModel]
-    DataModelClass = Type[scr.AlgorithmDataModel]
 
 
 class ScreenCreator(): 
     @staticmethod
-    def __createScreen(window : Window, mvcClasses : Tuple[ScreenClass, ControllerClass, ModelClass, DataModelClass] ) -> scr.AlgorithmScreen: 
+    def __createScreen(window : Window, mvcClasses : Tuple[ScreenClass, ControllerClass, ModelClass] ) -> scr.AlgorithmScreen: 
         screenClass, controllerClass, modelClass, dataModelClass = mvcClasses
         screen = screenClass(window)
         model = modelClass()
-        dataModel = dataModelClass()
+        dataModel = None 
         controller = controllerClass(screen, model, dataModel)
         screen.setController(controller)
         screen.setModel(model)
@@ -34,7 +35,7 @@ class ScreenCreator():
                     scr.AlgorithmScreen, 
                     scr.AlgorithmController, 
                     scr.AlgorithmModel, 
-                    scr.AlgorithmDataModel))
+                    None))
             #case scr.ScreenType.SORT:
             #    return cls.__createScreen(window, (
             #        scr.SortScreen, 

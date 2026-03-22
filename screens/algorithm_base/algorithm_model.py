@@ -5,7 +5,9 @@ class AlgorithmModel():
         self.__maximumDelay = 0  
         self.__resolution = 0 
         self.__isDelayMilliseconds = False 
-    
+
+    def setDelay(self, val : int) -> None:
+        if val > 0: self.__delay = val 
 
     def setMaxDelay(self, val : int) -> None:
         if val > 0 and val > self.__minimumDelay: 
@@ -25,6 +27,7 @@ class AlgorithmModel():
         self.__isDelayMilliseconds = False
 
 
+    def getDelay(self) -> int: return self.__delay
     def getMaxDelay(self) -> int: return self.__maximumDelay
     def getMinDelay(self) -> int: return self.__minimumDelay 
     def getResolution(self) -> int: return self.__resolution 

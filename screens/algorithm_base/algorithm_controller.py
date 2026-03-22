@@ -10,22 +10,20 @@ from typing import TYPE_CHECKING, TypeVar, Generic
 from .thread_handler import ThreadHandler
 
 if TYPE_CHECKING:
-    from algorithm_base import AlgorithmScreen, AlgorithmModel, AlgorithmDataModel
+    from algorithm_base import AlgorithmScreen, AlgorithmModel
 
 S = TypeVar("S", bound="AlgorithmScreen")
 M = TypeVar("M", bound="AlgorithmModel")
-D = TypeVar("D", bound="AlgorithmDataModel")
 
+class AlgorithmController(Generic[S, M]):  
 
-class AlgorithmController(Generic[S, M, D]):  
-
-    def __init__(self, screen : S, model : M, dataModel : D):
+    def __init__(self, screen : S, model : M, dataModel):
         self.__screen = screen
         self.__model = model
         self.__dataModel = dataModel
         self.__threadHandler = ThreadHandler()
 
-    # TODO
+    # TODO unfuck this 
     # Cancels any scheduled function calls left by a terminated thread
     def cancelScheduledProcesses(self):
         # If there are still processed scheduled from the terminated thread
@@ -35,18 +33,20 @@ class AlgorithmController(Generic[S, M, D]):
     
 
     def startAlgorithmThread(self, algorithmChoice : str, algorithmType : str) -> None: 
-        print("START ALgorithm")
-        #self.__threadHandler.startAlgorithm(algorithmChoice, algorithmType)
+        self.__threadHandler.startAlgorithm(algorithmChoice, algorithmType)
 
 
     def stopAlgorithmThread(self) -> None: 
+        self.cancelScheduledProcesses()
+        self.__threadHandler.stopAlgorithm()
+
         self.__threadHandler.setAlgorithmStopFlag() 
         if self.__threadHandler.isAlgorithmPaused(): 
-            self.__threadHandler.relasePauseLock() 
+            self.__threadHandler.releasePauseLock() 
     
 
     def resumeAlgorithm(self) -> None: 
-        self.__threadHandler.relasePauseLock() 
+        self.__threadHandler.releasePauseLock() 
 
 
     def pauseAlgorithm(self) -> None: 
@@ -64,6 +64,6 @@ class AlgorithmController(Generic[S, M, D]):
     # TODO 
     # Schedule function to redraw array after a certain amount of time 
     # Prevents the canvas flickering as updating is done by the main GUI thread
-    def scheduleArrayUpdate(self):
-        self.__screen.getWindow().scheduleFunctionExecution(self.displayArray, 0)
+    # def scheduleArrayUpdate(self):
+    #     self.__screen.getWindow().scheduleFunctionExecution(self.displayArray, 0)
     

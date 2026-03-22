@@ -43,6 +43,8 @@ class AlgorithmScreen(Generic[C, M ,D], sc.Screen):
         # For each object in this array 'beforeAlgorithmStart()' method is called before an algorithm is run 
         self.__algorithmStartObservers = []
 
+        self.__isAlgorithmRunning = False 
+        self.__isAlgorithmPaused = False 
 
     # Creates frame to display the border
     def __createBorderFrame(self, root : tk.Frame, frameWidth : int, frameHeight : int) -> tk.Frame:
@@ -139,8 +141,8 @@ class AlgorithmScreen(Generic[C, M ,D], sc.Screen):
     # Sets the delay that pauses algorithms during execution     
     def __setDelay(self) -> None:  
         if(self.__model.isDelayMilliSeconds()):  
-            self.__dataStructure.setDelay(self.__speedSlider.get() // 1000)
-        else: self.__dataStructure.setDelay(self.__speedSlider.get())
+            self.__model.setDelay(self.__speedSlider.get() // 1000)
+        else: self.__model.setDelay(self.__speedSlider.get())
   
 
     # Creates a slider that allows users to adjust an algorithms speed
@@ -165,15 +167,15 @@ class AlgorithmScreen(Generic[C, M ,D], sc.Screen):
         algorithmToggleFrame = tk.Frame(self.getOptionsWidgetFrame(), bg = "white")
         algorithmToggleFrame.pack(side = "bottom", pady = (0,5))
         # Allows user to see the algorithm in action
-        self.__solveStopButton = tk.Button(algorithmToggleFrame, text = "Solve.", width = 7, relief = "solid", 
+        self.__runButton = tk.Button(algorithmToggleFrame, text = "Solve.", width = 7, relief = "solid", 
                                            font = (self.getFont(), self.getFontSize()), 
                                            command = lambda: self.__initAlgorithm())
-        self.__solveStopButton.grid(row = 0, column = 0, padx = (0,5)) 
+        self.__runButton.grid(row = 0, column = 0, padx = (0,5)) 
         # Allows user to stop algorithm whilst it's running - button is initially disabled
-        self.__pauseResumeButton = tk.Button(algorithmToggleFrame, text = "Pause.", width = 7, relief = "solid", 
+        self.__stateButton = tk.Button(algorithmToggleFrame, text = "Pause.", width = 7, relief = "solid", 
                                              font = (self.getFont(), self.getFontSize()), 
                                              state = "disabled", command = lambda : self.__pauseAlgorithm())
-        self.__pauseResumeButton.grid(row = 0, column = 1)  
+        self.__stateButton.grid(row = 0, column = 1)  
 
 
     # Creates widgets that all algorithm screens use 
@@ -234,61 +236,41 @@ class AlgorithmScreen(Generic[C, M ,D], sc.Screen):
         # Updates widths
         self.__window.update()  
 
+    
+    def __updateStateButton(self) -> None:
+        if self.__isAlgorithmPaused:
+            self.__stateButton.config(text="Resume.", command=self.__resumeAlgorithm) 
+        else:
+            self.__stateButton.config(text="Pause.", command=self.__pauseAlgorithm)  
 
-    # Changes pause button text and function it calls when it's pressed
-    def __pauseToResume(self) -> None: 
-         self.__pauseResumeButton.config(text="Resume.", command=self.__resumeAlgorithm) 
+
+    def __updateRunButton(self) -> None: 
+        if self.__isAlgorithmRunning:
+            self.__runButton.config(text="Stop.", command=self.__stopAlgorithm)
+        else: 
+            self.__runButton.config(text="Solve.", command=self.__initAlgorithm)  
 
 
-    # Changes resume button text and function it calls when it's pressed    
-    def __resumeToPause(self) -> None:
-        self.__pauseResumeButton.config(text="Pause.", command=self.__pauseAlgorithm) 
+    def __updateToggleWidgets(self) -> None:
+        for widget in self.__toggleableWidgets:  
+            if self.__isAlgorithmRunning:
+                widget.config(state="disabled")   
+            else: widget.config(state="active")
     
 
-    # Changes stop button text and function it calls when it's pressed
-    def __stopToSolve(self) -> None:
-        self.__solveStopButton.config(text="Solve.", command=self.__initAlgorithm)  
-    
-
-    # Changes solve button text and function it calls when it's pressed
-    def __solveToStop(self) -> None:
-        self.__solveStopButton.config(text="Stop.", command=self.__stopAlgorithm)
+    def __toggleStateButton(self) -> None: 
+        if self.__isAlgorithmRunning: 
+            self.__stateButton.config(state="active")
+        else: self.__stateButton.config(state="disabled")
 
 
-    # Enables all widgets stores in the array
-    def __enableWidgets(self) -> None:
-        for widget in self.__toggleableWidgets:
-            widget.config(state="active") 
-    
-
-    # Enables all widgets stores in the array
-    def __disableWidgets(self) -> None:
-        for widget in self.__toggleableWidgets:
-            widget.config(state="active") 
+    def __updateWidgets(self) -> None: 
+        self.__updateToggleWidgets()
+        self.__updateRunButton() 
+        self.__updateStateButton() 
+        self.__toggleStateButton()
 
 
-    # Enables the button to pause/resume algorithm
-    def __enablePauseResumeButton(self) -> None:
-        self.__pauseResumeButton.config(state="active")
-
-
-    # Disables the button to pause/resume algorithm
-    def __disablePauseResumeButton(self) -> None:
-        self.__pauseResumeButton.config(state="disabled")  
-    
-
-    def __updateUIAlgorithmStart(self) -> None:
-        self.__disableWidgets()
-        self.__solveToStop()
-        self.__enablePauseResumeButton() 
-    
-    
-    def __updateUIAlgorithmStop(self) -> None:
-        self.__enableWidgets()
-        self.__stopToSolve()
-        self.__disablePauseResumeButton()     
-    
- 
     def loadAlgorithmOptions(self, algorithmsType : str) -> None:
         self.__algorithmOptions['value'] = getAlgorithms(algorithmsType)
     
@@ -297,6 +279,7 @@ class AlgorithmScreen(Generic[C, M ,D], sc.Screen):
     def __getAlgorithmChoice(self) -> str:
         return self.__algorithmOptions.get()  
     
+
     def __getAlgorithmType(self) -> str: 
         return self.__algorithmOptions.get().split(" ")[-1].lower()
 
@@ -304,13 +287,15 @@ class AlgorithmScreen(Generic[C, M ,D], sc.Screen):
     # Releases the lock, letting the algorithm thread run again
     def __resumeAlgorithm(self) -> None: 
         self.__controller.resumeAlgorithm()
-        self.__resumeToPause()
+        self.__isAlgorithmPaused = False
+        self.__updateStateButton()
 
 
     # Holds the lock, pausing the algorithm Thread
     def __pauseAlgorithm(self) -> None: 
         self.__controller.pauseAlgorithm()
-        self.__pauseToResume() 
+        self.__isAlgorithmPaused = True 
+        self.__updateStateButton() 
 
 
     # Call algorithm user has selected
@@ -319,9 +304,9 @@ class AlgorithmScreen(Generic[C, M ,D], sc.Screen):
         if(not self.__getAlgorithmChoice() == 'Select an algorithm.'): 
             self.__algorithmOptions.config(foreground = "red")
         else:
-            # Disables solve button and enables stop button
-            self.__solveToStop()
-            self.__updateUIAlgorithmStart()
+            self.__isAlgorithmRunning = True 
+            self.__isAlgorithmPaused = False
+            self.__updateWidgets()
             
             for observer in self.__algorithmStartObservers: 
                 try:
@@ -333,17 +318,12 @@ class AlgorithmScreen(Generic[C, M ,D], sc.Screen):
 
     # Forces current running algorithm thread to terminate (safely)
     def __stopAlgorithm(self) -> None:
-        # Sets to flag to True -> this is what tells the thread/s to stop
         self.__controller.stopAlgorithmThread()
-        # If the algorithm has been paused
-        if(self.__controller.isAlgorithmPaused()):
-            # Tell algorithm to resume, so it can stop...
-            self.__resumeAlgorithm()  
-        # Otherwise makes sure pause/resume button has the correct text/function
-        else: self.__resumeToPause() 
-        self.__updateUIAlgorithmStop()
-    
-    
+        self.__isAlgorithmRunning = False
+        self.__isAlgorithmPaused = False 
+        self.__updateWidgets()
+
+
     # Loads the home screen 
     # Ensures any algorithm threads are terminated 
     def __loadHomeScreen(self) -> None: 
@@ -351,10 +331,10 @@ class AlgorithmScreen(Generic[C, M ,D], sc.Screen):
         if(self.__controller.isAlgorithmRunning()): 
             # Tell the thread to stop
             self.__stopAlgorithm()  
-            self.__controller.cancelScheduledProcesses()
 
-        self.__window.removeScreen()
-        print("Load Homescreen here")
+        print("Load Homescreen by calling screen creator?")
+        # self.__window.removeScreen()
+
         # TODO fix
         #self.__window.loadScreen(self.__introScreen)   
     

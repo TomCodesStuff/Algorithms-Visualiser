@@ -61,7 +61,7 @@ class Window():
         self.__window.mainloop() 
  
     # Takes in a new object (the new screen) and calls the relevant function
-    def loadScreen(self, newScreen ) -> None:
+    def loadScreen(self, newScreen) -> None:
         newScreen.render()
 
     # Removes every widget from the passed frame
