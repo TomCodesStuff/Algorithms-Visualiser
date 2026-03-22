@@ -1,7 +1,7 @@
 from enum import Enum
 
 class ScreenType(Enum):
-    INTRO = "intro"
+    MAIN_MENU = "main_menu"
     SEARCH = "search"
     SORT = "sort"
     TRAVERSAL = "traversal"

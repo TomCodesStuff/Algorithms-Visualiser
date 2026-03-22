@@ -1,7 +1,7 @@
 import tkinter as tk
 from typing import Callable
-from screens import ScreenInterface
-from screen_creator import ScreenCreator, ScreenType
+from screen_creator import ScreenCreator
+from enums import ScreenType
 
 # If the file is run as is message this returned and program exits
 if(__name__ == "__main__"):
@@ -71,15 +71,13 @@ class Window():
             widget.destroy()
 
 
-    def loadMainMenu(self) -> None:
-        self.loadScreen(ScreenCreator.createScreen(self, ScreenType.INTRO))
 
-
-    # Takes in a new object (the new screen) and calls the relevant function
-    def loadScreen(self, newScreen : ScreenInterface) -> None:  
+    # Clears current screen and loads new one
+    def loadScreen(self, screenType : ScreenType) -> None:  
         # Clear previous screen
         self.removeScreen() 
-        newScreen.render()
+        newScreen = ScreenCreator.createScreen(self, screenType)
+        if newScreen is not None: newScreen.render()
 
 
     # Refreshes the screen, so any changes can be displayed

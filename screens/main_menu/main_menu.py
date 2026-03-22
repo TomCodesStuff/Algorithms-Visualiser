@@ -5,8 +5,8 @@ if(__name__ == "__main__"):
     exit()
 
 import tkinter as tk 
-# from screen_creator import ScreenCreator
 from screens import ScreenInterface
+from enums import ScreenType
 
 # Ideally this should be the first screen the user sees 
 class MainMenu(ScreenInterface):
@@ -53,7 +53,8 @@ class MainMenu(ScreenInterface):
         #                              self.getWindow().loadScreen(sc.TraversalScreen(self.getWindow(), self))])\
         #    .pack(pady = (25, 0))  
         # Navigate to array searching screen
-        tk.Button(buttonsFrame, text = "Array Searching",  font = (self.__FONT, 12), height = 2, width = 15, relief = "solid").pack(side = "left", pady = 15, padx = (100, 0)) 
+        tk.Button(buttonsFrame, text = "Array Searching",  font = (self.__FONT, 12), height = 2, width = 15, relief = "solid",\
+                  command=lambda: self.getWindow().loadScreen(ScreenType.SEARCH)).pack(side = "left", pady = 15, padx = (100, 0)) 
        
         # Navigate to array sorting screen
         #tk.Button(buttonsFrame, text = "Array Sorting",  font = (self.__FONT, 12), height = 2, width = 15, relief = "solid", 

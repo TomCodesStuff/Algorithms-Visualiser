@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Generic, TypeVar
 from tkinter import ttk
 from algorithms import getAlgorithms
 from screens import ScreenInterface
+from enums import ScreenType
 
 
 # If this isn't at the top the program breaks :/
@@ -25,8 +26,6 @@ D = TypeVar("D", bound="DataStructure")
 class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
     def __init__(self, window) -> None:
         super().__init__(window)
-        # Stores reference to Window object
-        self.__window = window  
         # Font every widget uses 
         # TODO why are these in caps? 
         self.__FONT = "Arial"
@@ -189,10 +188,10 @@ class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
     # Creates the layout all algorithms screens use
     def createBaseLayout(self) -> None:
         # Get content Frame to store all widgets
-        contentFrame = self.__window.getContentFrame()
+        contentFrame = self.getWindow().getContentFrame()
         # Get content frames width and height
-        contentFrameHeight = self.__window.getContentFrameHeight()
-        contentFrameWidth = self.__window.getContentFrameWidth()
+        contentFrameHeight = self.getWindow().getContentFrameHeight()
+        contentFrameWidth = self.getWindow().getContentFrameWidth()
         # width of the border
         borderSize = 2
         # Distance between the widgets and the edge of the frame
@@ -216,7 +215,7 @@ class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
         # This frame should always be fixed in height
         homeButtonFrame = self.__createHomeButtonFrame(borderFrame, optionsHomeWidth, homeButtonFrameHeight)
         # Updates sizes of frames
-        self.__window.update()
+        self.getWindow().update()
 
         # This is the frame where the actual option widgets are stored
         self.__createOptionWidget(optionsFrame, optionsHomeWidth - padding, optionsFrame.winfo_height())
@@ -225,7 +224,7 @@ class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
         # This frame stores the canvas that displays array
         canvasFrame = self.__createCanvasFrame(borderFrame, canvasFrameWidth, canvasFrameHeight)
         # Updates widths
-        self.__window.update()  
+        self.getWindow().update()  
         # Creates canvas to display the array 
         self.__createCanvas(canvasFrame, canvasFrame.winfo_width(), canvasFrame.winfo_height())
         # This frame will be where information on the algorithm will be displayed 
@@ -233,7 +232,7 @@ class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
         # Create options common across all algorithms
         self.__createBaseAlgorithmOptions()
         # Updates widths
-        self.__window.update()  
+        self.getWindow().update()  
 
     
     def __updateStateButton(self) -> None:
@@ -331,12 +330,8 @@ class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
             # Tell the thread to stop
             self.__stopAlgorithm()  
 
-        print("Load Homescreen by calling screen creator?")
-        # self.__window.removeScreen()
+        self.getWindow().loadScreen(ScreenType.MAIN_MENU)
 
-        # TODO fix
-        #self.__window.loadScreen(self.__introScreen)   
-    
 
     # Setters
     def setController(self, controller : C) -> None: self.__controller = controller
@@ -347,8 +342,6 @@ class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
         if widget in self.__toggleableWidgets: 
             self.__toggleableWidgets.remove(widget)
 
-    # Getters 
-    def getWindow(self): return self.__window
     def getFont(self) -> str: return self.__FONT 
     def getFontSize(self) -> int: return self.__FONTSIZE
     def getOptionsWidgetFrame(self) -> tk.Frame: return self.__optionsWidgetsFrame 
