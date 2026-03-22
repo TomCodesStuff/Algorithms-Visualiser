@@ -1,4 +1,7 @@
 import tkinter as tk
+from typing import Callable
+from screens import ScreenInterface
+from screen_creator import ScreenCreator, ScreenType
 
 # If the file is run as is message this returned and program exits
 if(__name__ == "__main__"):
@@ -56,42 +59,58 @@ class Window():
         # Stops frame resizing to same size as widgets inside it 
         self.__contentFrame.pack_propagate(False) 
 
+
     # Draws window
     def show(self) -> None:
         self.__window.mainloop() 
- 
-    # Takes in a new object (the new screen) and calls the relevant function
-    def loadScreen(self, newScreen) -> None:
-        newScreen.render()
 
+    
     # Removes every widget from the passed frame
     def removeScreen(self) -> None: 
         for widget in self.__contentFrame.winfo_children():
             widget.destroy()
 
+
+    def loadMainMenu(self) -> None:
+        self.loadScreen(ScreenCreator.createScreen(self, ScreenType.INTRO))
+
+
+    # Takes in a new object (the new screen) and calls the relevant function
+    def loadScreen(self, newScreen : ScreenInterface) -> None:  
+        # Clear previous screen
+        self.removeScreen() 
+        newScreen.render()
+
+
     # Refreshes the screen, so any changes can be displayed
     def update(self) -> None:
         self.__window.update() 
     
+
     # Schedule the passed function to be executed after the passed amount of time
     # Assumes function has no parameters
-    def scheduleFunctionExecution(self, function, delay : int) -> None:
+    def scheduleFunctionExecution(self, function : Callable, delay : int) -> None:
         self.__window.after(int(delay), function)
     
+
     def getNumScheduledFunctions(self) -> int:
         return len(self.__window.tk.call('after', 'info'))
+
 
     def cancelScheduledFunctions(self) -> None:
         for functionID in self.__window.tk.call('after', 'info'): 
             self.__window.after_cancel(functionID)
 
+
     # Returns the frame widgets are displayed in
     def getContentFrame(self) -> tk.Frame:
         return self.__contentFrame
-    
+
+
     # Returns the content frames height
     def getContentFrameHeight(self) -> int:
         return self.__contentFrameHeight 
+
 
     # Returns the content frames width
     def getContentFrameWidth(self) -> int:

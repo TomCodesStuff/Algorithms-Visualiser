@@ -1,9 +1,9 @@
 from __future__ import annotations
 import tkinter as tk 
-import screens as sc 
 from typing import TYPE_CHECKING, Generic, TypeVar
 from tkinter import ttk
 from algorithms import getAlgorithms
+from screens import ScreenInterface
 
 
 # If this isn't at the top the program breaks :/
@@ -14,7 +14,6 @@ if(__name__ == "__main__"):
 
 
 if TYPE_CHECKING:
-    from app_window import Window 
     from algorithm_base import AlgorithmController, AlgorithmModel, DataStructure 
 
 C = TypeVar("C", bound="AlgorithmController")
@@ -23,8 +22,9 @@ D = TypeVar("D", bound="DataStructure")
 
 # All screens that visualise the algorithms have the same fundamental layout
 # This class delegates the reponsiblity of creating the basic layout
-class AlgorithmScreen(Generic[C, M ,D], sc.Screen):
-    def __init__(self, window : Window) -> None:
+class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
+    def __init__(self, window) -> None:
+        super().__init__(window)
         # Stores reference to Window object
         self.__window = window  
         # Font every widget uses 
@@ -348,7 +348,7 @@ class AlgorithmScreen(Generic[C, M ,D], sc.Screen):
             self.__toggleableWidgets.remove(widget)
 
     # Getters 
-    def getWindow(self) -> Window: return self.__window
+    def getWindow(self): return self.__window
     def getFont(self) -> str: return self.__FONT 
     def getFontSize(self) -> int: return self.__FONTSIZE
     def getOptionsWidgetFrame(self) -> tk.Frame: return self.__optionsWidgetsFrame 

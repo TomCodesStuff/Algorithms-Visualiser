@@ -3,11 +3,13 @@ import time
 from typing import Callable
 from .thread_handler import ThreadHandler
 
+
 class Mediator():
     def __init__(self, delayFunc : Callable, updateScreenFunc : Callable, threadHandler : ThreadHandler): 
         self.__delayFunc = delayFunc
         self.__updateScreenFunc = updateScreenFunc
         self.__threadHandler = threadHandler
+
 
     def getDelay(self) -> None: 
         return self.__delayFunc() 

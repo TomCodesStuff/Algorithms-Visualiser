@@ -1,2 +1,2 @@
-from .introduction_screen import IntroductionScreen
+from .main_menu import MainMenu
 

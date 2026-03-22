@@ -1,20 +1,20 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Type, Tuple 
-import screens as scr 
+from screens import *
+from .screen_enums import ScreenType
 
 # TODO NOT a fan of this wtf 
 
 if TYPE_CHECKING:
     from app_window import Window
-
-    ScreenClass = Type[scr.AlgorithmScreen]
-    ControllerClass = Type[scr.AlgorithmController]
-    ModelClass = Type[scr.AlgorithmModel]
+    ScreenClass = Type[AlgorithmScreen]
+    ControllerClass = Type[AlgorithmController]
+    ModelClass = Type[AlgorithmModel]
 
 
 class ScreenCreator(): 
     @staticmethod
-    def __createScreen(window : Window, mvcClasses : Tuple[ScreenClass, ControllerClass, ModelClass] ) -> scr.AlgorithmScreen: 
+    def __createScreen(window : Window, mvcClasses : Tuple[ScreenClass, ControllerClass, ModelClass] ) -> AlgorithmScreen: 
         screenClass, controllerClass, modelClass, dataModelClass = mvcClasses
         screen = screenClass(window)
         model = modelClass()
@@ -27,14 +27,14 @@ class ScreenCreator():
 
 
     @classmethod
-    def createScreen(cls, window : Window, screenType : scr.ScreenType) -> scr.Screen|None:
+    def createScreen(cls, window : Window, screenType : ScreenType) -> ScreenInterface|None:
         match screenType:
-            case scr.ScreenType.INTRO: return scr.IntroductionScreen(window)  
-            case scr.ScreenType.SEARCH: 
+            case ScreenType.INTRO: return MainMenu(window)  
+            case ScreenType.SEARCH: 
                 return cls.__createScreen(window, (
-                    scr.AlgorithmScreen, 
-                    scr.AlgorithmController, 
-                    scr.AlgorithmModel, 
+                    AlgorithmScreen, 
+                    AlgorithmController, 
+                    AlgorithmModel, 
                     None))
             #case scr.ScreenType.SORT:
             #    return cls.__createScreen(window, (

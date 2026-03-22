@@ -4,21 +4,21 @@ if(__name__ == "__main__"):
     print("This is file shouldn't be run on it's own. \nIt should be imported only.")
     exit()
 
-from screen_creator import ScreenCreator
-import screens as sc
 import tkinter as tk 
+# from screen_creator import ScreenCreator
+from screens import ScreenInterface
 
 # Ideally this should be the first screen the user sees 
-class IntroductionScreen(sc.Screen):
+class MainMenu(ScreenInterface):
     def __init__(self, window):
+        super().__init__(window)
         # Stores reference to Window object
-        self.__window = window
         self.__FONT = "Arial"
 
     # Creates the screen
     def render(self) -> None:
         # Get content Frame to store all widgets
-        self.__contentFrame = self.__window.getContentFrame()
+        self.__contentFrame = self.getWindow().getContentFrame()
         self.__createTitle()
         self.__createIntroParagraph()
         self.__createNavigationButtons()
@@ -49,19 +49,16 @@ class IntroductionScreen(sc.Screen):
         buttonsFrame.pack()
         # Navigate to path finding algorithms screen
         #tk.Button(buttonsFrame, text = "Path Finding", font = (self.__FONT, 12), height = 2, width = 15, relief = "solid", 
-        #          command = lambda : [self.__window.removeScreen(), 
-        #                              self.__window.loadScreen(sc.TraversalScreen(self.__window, self))])\
+        #          command = lambda : [self.getWindow().removeScreen(), 
+        #                              self.getWindow().loadScreen(sc.TraversalScreen(self.getWindow(), self))])\
         #    .pack(pady = (25, 0))  
         # Navigate to array searching screen
-        tk.Button(buttonsFrame, text = "Array Searching",  font = (self.__FONT, 12), height = 2, width = 15, relief = "solid", \
-                command = lambda : [self.__window.removeScreen(), 
-                                    self.__window.loadScreen(ScreenCreator.createScreen(self.__window, sc.ScreenType.SEARCH))])\
-                    .pack(side = "left", pady = 15, padx = (100, 0)) 
+        tk.Button(buttonsFrame, text = "Array Searching",  font = (self.__FONT, 12), height = 2, width = 15, relief = "solid").pack(side = "left", pady = 15, padx = (100, 0)) 
        
         # Navigate to array sorting screen
         #tk.Button(buttonsFrame, text = "Array Sorting",  font = (self.__FONT, 12), height = 2, width = 15, relief = "solid", 
-        #          command = lambda : [self.__window.removeScreen(), 
-        #                              self.__window.loadScreen(sc.SortScreen(self.__window, self))])\
+        #          command = lambda : [self.getWindow().removeScreen(), 
+        #                              self.getWindow().loadScreen(sc.SortScreen(self.getWindow(), self))])\
         #            .pack(side = "left", padx = 100)  
         #
         
