@@ -191,20 +191,14 @@ class ArrayAlgorithmController(AlgorithmController[S, M, D]):
 
     # Guarantees target is in the array
     def __targetIn(self) -> int: 
-       # Randomly chooses index from array and returns integers at that index
-       return self.getDataStructure().getElementAtIndex(random.randint(0, self.getDataStructure().getArraySize() - 1)) 
+       # Randomly chooses element from array
+       return random.choice(self.getDataStructure().getArray())
 
 
+    # TODO Should replace with alternative method
     # Guarantees target is not in array
-    def __targetOut(self) -> int: 
-        # Chooses a number between the range of arrays smallest value - ELEMENT_OFFSET and arrays largest value + ELEMENT_OFFSET
-        target = random.randint(self.getDataStructure().getSmallestElement() - ELEMENT_OFFSET, 
-                                self.getDataStructure().getLargestElement() + ELEMENT_OFFSET)
-        # If generated number in array recall function
-        if self.getDataStructure().isElementInArray(target): self.__targetOut()
-        # If generated number not in array then just return value
-        else: return target  
-
+    def __targetOut(self) -> int:  
+        return max(self.getDataStructure().getArray()) + 1
 
 # Listen to Generator by Foo Fighters 
         
