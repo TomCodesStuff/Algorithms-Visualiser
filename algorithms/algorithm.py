@@ -35,7 +35,6 @@ class Algorithm(ABC):
 
     # Used to check is the algorithm needs to halt
     def __stopCheck(self): 
-
         # Checks if the algorithm needs to stop
         if(self.__dataModel.isStopped()): 
             # Output message confirming thread termination

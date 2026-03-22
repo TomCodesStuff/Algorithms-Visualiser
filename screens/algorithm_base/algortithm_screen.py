@@ -133,16 +133,15 @@ class AlgorithmScreen(Generic[C, M ,D], sc.Screen):
 
 
     # When the slider has changed value a label is added with the relevant speed 
-    # The delay is also changed in the DataModel Object
     def __updateDelay(self, value : str) -> None: 
         self.__speedSlider.config(label = f"Delay: {value} {self.__sliderUnitsText}")  
 
 
     # Sets the delay that pauses algorithms during execution     
     def __setDelay(self) -> None:  
-        if(self.__model.isDelayMilliSeconds()):  
-            self.__model.setDelay(self.__speedSlider.get() // 1000)
-        else: self.__model.setDelay(self.__speedSlider.get())
+        if(self.__model.isDelayMilliSeconds()):   
+            self.__controller.updateAlgorithmDelay(self.__speedSlider.get() // 1000)
+        else: self.__controller.updateAlgorithmDelay(self.__speedSlider.get())
   
 
     # Creates a slider that allows users to adjust an algorithms speed

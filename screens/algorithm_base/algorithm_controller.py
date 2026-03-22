@@ -7,6 +7,7 @@ if(__name__ == "__main__"):
     exit()
  
 from typing import TYPE_CHECKING, TypeVar, Generic
+from .mediator import Mediator
 from .thread_handler import ThreadHandler
 
 if TYPE_CHECKING:
@@ -21,7 +22,12 @@ class AlgorithmController(Generic[S, M]):
         self.__screen = screen
         self.__model = model
         self.__dataModel = dataModel
-        self.__threadHandler = ThreadHandler()
+        self.__threadHandler = ThreadHandler() 
+
+
+        # TODO create some abstract methods to make sure these are defined
+        self.__updateFunc = None
+        self.__dataStructure = None
 
     # TODO unfuck this 
     # Cancels any scheduled function calls left by a terminated thread
@@ -32,7 +38,8 @@ class AlgorithmController(Generic[S, M]):
                 self.__screen.getWindow().cancelScheduledFunctions()   
     
 
-    def startAlgorithmThread(self, algorithmChoice : str, algorithmType : str) -> None: 
+    def startAlgorithmThread(self, algorithmChoice : str, algorithmType : str) -> None:  
+        mediator = Mediator(self.getAlgorithmDelay, self.scheduleScreenUpdate, self.__threadHandler)
         self.__threadHandler.startAlgorithm(algorithmChoice, algorithmType)
 
 
@@ -60,10 +67,21 @@ class AlgorithmController(Generic[S, M]):
     def isAlgorithmRunning(self) -> bool: 
         return self.__threadHandler.isThreadAlive()
 
+
+    def updateAlgorithmDelay(self, value : float) -> None: 
+        self.__threadHandler.acquireDelayLock() 
+        self.__model.setDelay(value)
+        self.__threadHandler.releaseDelayLock() 
+
+
+    def getAlgorithmDelay(self) -> float:
+        self.__threadHandler.acquireDelayLock() 
+        delay = self.__model.getDelay()
+        self.__threadHandler.releaseDelayLock() 
+        return delay
+
+
+    def scheduleScreenUpdate(self) -> None:
+        self.__screen.getWindow().scheduleFunctionExecution(self.__updateFunc, 0)
     
-    # TODO 
-    # Schedule function to redraw array after a certain amount of time 
-    # Prevents the canvas flickering as updating is done by the main GUI thread
-    # def scheduleArrayUpdate(self):
-    #     self.__screen.getWindow().scheduleFunctionExecution(self.displayArray, 0)
     

@@ -51,7 +51,7 @@ class ArrayAlgorithmController(AlgorithmController):
         if(int(value) < len(self.__dataModel.getArray())): 
             self.__deleteElements(int(value))
             self.__increaseBarSize()
-        # Otherwise add elements to the array and check is bar size needs to decrease
+        # Otherwise add elements to the array and check if bar size needs to decrease
         else: 
             self.__addElements(int(value))
             self.__decreaseBarSize()
