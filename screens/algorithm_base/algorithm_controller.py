@@ -18,6 +18,8 @@ S = TypeVar("S", bound="AlgorithmScreen")
 M = TypeVar("M", bound="AlgorithmModel")
 D = TypeVar("D", bound="DataStructure")
 
+EXECUTION_DELAY = 0
+
 class AlgorithmController(Generic[S, M, D]):  
 
     def __init__(self, screen : S, model : M, dataStructure : D):
@@ -30,7 +32,6 @@ class AlgorithmController(Generic[S, M, D]):
         self.__updateFunc = None
 
 
-    # TODO unfuck this 
     # Cancels any scheduled function calls left by a terminated thread
     def cancelScheduledProcesses(self):
         # If there are still processed scheduled from the terminated thread
@@ -88,6 +89,6 @@ class AlgorithmController(Generic[S, M, D]):
 
 
     def scheduleScreenUpdate(self) -> None:
-        self.__screen.getWindow().scheduleFunctionExecution(self.__updateFunc, 0)
+        self.__screen.getWindow().scheduleFunctionExecution(self.__updateFunc, EXECUTION_DELAY)
     
     

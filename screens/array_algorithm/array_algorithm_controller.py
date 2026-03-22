@@ -9,6 +9,9 @@ S = TypeVar("S", bound="ArrayAlgorithmScreen")
 M = TypeVar("M", bound="ArrayAlgorithmModel")
 D = TypeVar("D", bound="Array")
 
+CANVAS_OFFSET = 2
+ELEMENT_OFFSET = 20 
+TARGET_SETTING_COIN_FLIP = 0.5
 
 class ArrayAlgorithmController(AlgorithmController[S, M, D]):
     def __init__(self, screen : S, model : M, dataStructure : D) -> None: 
@@ -29,7 +32,7 @@ class ArrayAlgorithmController(AlgorithmController[S, M, D]):
     # Largest number that can be displayed on screen
     def __calculateMaximumPixels(self) -> int:
         # Two is taken from the canvas' height because the canvas widget has a border where no pixels are drawn   
-        return self.getScreen().getCanvas().winfo_height() - 2 
+        return self.getScreen().getCanvas().winfo_height() - CANVAS_OFFSET
 
 
     # Finds the best distance between the displayed array and the edges of canvas, 
@@ -57,8 +60,9 @@ class ArrayAlgorithmController(AlgorithmController[S, M, D]):
 
     # Calculates the padding to centre the array of a given size
     def __calculatePadding(self) -> int:
-        return ((self.getScreen().getCanvas().winfo_width() - (len(self.getDataStructure().getArray()) * (self.getModel().getBarDistance() 
-                                                                                      + self.getModel().getBarWidth()))) // 2) + self.getModel().getBarDistance()
+        return ((self.getScreen().getCanvas().winfo_width() - (len(self.getDataStructure().getArray()) 
+                                                               * (self.getModel().getBarDistance() + self.getModel().getBarWidth()))) // 2) \
+                                                                + self.getModel().getBarDistance()
 
 
     # Adjusts size of bars so amount of elements can fit on screen and stay in the canvas' centre
@@ -161,6 +165,9 @@ class ArrayAlgorithmController(AlgorithmController[S, M, D]):
         self.adjustArray('1')
     
 
+
+    # TODO Move the search controller
+
     # Gets options user has selected from the slider and calls the paired function
     # Each function returns an integer -> the target 
     # The target is then set in the dataStructure class 
@@ -173,11 +180,11 @@ class ArrayAlgorithmController(AlgorithmController[S, M, D]):
 
 
     # Makes sure that target generated has (almost) equal chance to be in the array or not 
-    def __targetRandom(self) -> int: 
+    def __targetRandom(self) -> int:         
         # Generates decimal between 0 and 1 
         # If decimal is less than or equal to 0.5 make the target in the array 
         # Gives a roughly 50-50 chance for target to be in the array or out the array
-        if(random.random() < 0.5): return self.__targetIn()
+        if(random.random() < TARGET_SETTING_COIN_FLIP): return self.__targetIn()
         # Else call function to generate the target so it is not in the array
         else: return self.__targetOut()
 
@@ -190,8 +197,9 @@ class ArrayAlgorithmController(AlgorithmController[S, M, D]):
 
     # Guarantees target is not in array
     def __targetOut(self) -> int: 
-        # Chooses a number between the range of arrays smallest value - 20 and arrays largest value + 20
-        target = random.randint(self.getDataStructure().getSmallestElement() - 20, self.getDataStructure().getLargestElement() + 20)
+        # Chooses a number between the range of arrays smallest value - ELEMENT_OFFSET and arrays largest value + ELEMENT_OFFSET
+        target = random.randint(self.getDataStructure().getSmallestElement() - ELEMENT_OFFSET, 
+                                self.getDataStructure().getLargestElement() + ELEMENT_OFFSET)
         # If generated number in array recall function
         if self.getDataStructure().isElementInArray(target): self.__targetOut()
         # If generated number not in array then just return value

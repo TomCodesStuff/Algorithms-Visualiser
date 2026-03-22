@@ -67,8 +67,7 @@ class ArrayAlgorithmScreen(AlgorithmScreen[C, M, D]):
 
 
     # Guarantees target is not in array
-    # TODO -> if want target to not be in the array choose a number from 0 to lowest val in array 
-    #      -> or make list of nums from min to max excluding elements and select from there 
+    # TODO replace with max_value + 1 -> recusion not best solution here 
     def targetOut(self) -> int: 
         # Chooses a number between the range of arrays smallest value - 20 and arrays largest value + 20
         target = random.randint(min(self.getdataStructure().getArray()) - self.getModel().getBuffer(), 

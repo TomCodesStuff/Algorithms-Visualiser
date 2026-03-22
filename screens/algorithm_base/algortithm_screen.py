@@ -21,6 +21,9 @@ C = TypeVar("C", bound="AlgorithmController")
 M = TypeVar("M", bound="AlgorithmModel")
 D = TypeVar("D", bound="DataStructure")
 
+SECONDS_TO_MILLISECONDS = 1000
+FRAME_HEIGHT = 50
+
 # All screens that visualise the algorithms have the same fundamental layout
 # This class delegates the reponsiblity of creating the basic layout
 class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
@@ -141,7 +144,7 @@ class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
     # Sets the delay that pauses algorithms during execution     
     def __setDelay(self) -> None:  
         if(self.__model.isDelayMilliSeconds()):   
-            self.__controller.updateAlgorithmDelay(self.__speedSlider.get() // 1000)
+            self.__controller.updateAlgorithmDelay(self.__speedSlider.get() // SECONDS_TO_MILLISECONDS)
         else: self.__controller.updateAlgorithmDelay(self.__speedSlider.get())
   
 
@@ -233,7 +236,7 @@ class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
         # Creates canvas to display the array 
         self.__createCanvas(canvasFrame, canvasFrame.winfo_width(), canvasFrame.winfo_height())
         # This frame will be where information on the algorithm will be displayed 
-        self.__createAlgorithmIntoFrame(borderFrame, algorithmInfoFrameWidth, 50) 
+        self.__createAlgorithmIntoFrame(borderFrame, algorithmInfoFrameWidth, FRAME_HEIGHT) 
         # Create options common across all algorithms
         self.__createBaseAlgorithmOptions()
         # Updates widths

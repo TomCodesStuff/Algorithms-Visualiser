@@ -24,6 +24,7 @@ class SearchModel(ArrayAlgorithmModel):
             2: "Target: Not in array"
         } 
 
+
     # Returns the text to be displayed above the target slider 
     def getSliderText(self, sliderValue : int) -> str: 
         return self.__numbersToText[sliderValue]
