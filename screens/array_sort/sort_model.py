@@ -5,12 +5,14 @@ if(__name__ == "__main__"):
     exit()
 
 from ..array_algorithm import ArrayAlgorithmModel
+from enums import SortDirection
 
 class SortModel(ArrayAlgorithmModel):
 
     def __init__(self):
         super().__init__()
-        self.__buttonWidth = 16
+        self.__buttonWidth = 16 
+        self.__sortDirection = SortDirection.ASCENDING
 
         self.setDelayToMilliseconds()
         self.setResolution(1)
@@ -18,7 +20,16 @@ class SortModel(ArrayAlgorithmModel):
         self.setMaxDelay(1000)
 
 
+    # Toggles the sort setting between and ascending and descending
+    def toggleSortDirection(self):
+        if self.__sortDirection == SortDirection.ASCENDING:
+            self.__sortDirection = SortDirection.DESCENDING
+        else: self.__sortDirection = SortDirection.ASCENDING
+
+
     # Returns the width used for the buttons 
     def getButtonWidth(self) -> int: return self.__buttonWidth 
+    # Returns if the sorting direction is ascending or descending
+    def getSortDirection(self) -> SortDirection: return self.__sortDirection
     
 # Listen to Creep by Radiohead

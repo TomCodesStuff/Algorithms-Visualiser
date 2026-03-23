@@ -8,6 +8,7 @@ if(__name__ == "__main__"):
 import tkinter as tk 
 from typing import TYPE_CHECKING, TypeVar
 from ..array_algorithm import ArrayAlgorithmScreen, Array
+from enums import SortDirection
 
 if TYPE_CHECKING:
     from array_sort import SortController, SortModel 
@@ -47,8 +48,8 @@ class SortScreen(ArrayAlgorithmScreen[C, M, D]):
 
 
     # Disable and enables the sort direction buttons when one is pressed 
-    def disableEnableButtons(self, isAscending: bool): 
-        if(isAscending): 
+    def toggleSortDirection(self): 
+        if(self.getModel().getSortDirection() == SortDirection.ASCENDING): 
             self.__ascendingOption.config(state="disabled")
             self.__descendingOption.config(state="active")  
             self.removeToggleableWidget(self.__ascendingOption)
@@ -58,6 +59,10 @@ class SortScreen(ArrayAlgorithmScreen[C, M, D]):
             self.__descendingOption.config(state="disabled") 
             self.addToggleableWidget(self.__ascendingOption)
             self.removeToggleableWidget(self.__descendingOption)
+
+
+    def prepare(self): 
+        self.getdataStructure().setSortingDirecion(self.getModel().getSortDirection())
 
 
     def render(self) -> None: 

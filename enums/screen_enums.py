@@ -5,3 +5,8 @@ class ScreenType(Enum):
     SEARCH = "search"
     SORT = "sort"
     TRAVERSAL = "traversal"
+
+
+class SortDirection(Enum):
+    ASCENDING = 0
+    DESCENDING = 1

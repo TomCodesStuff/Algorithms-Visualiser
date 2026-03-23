@@ -1,7 +1,8 @@
 from __future__ import annotations
 import tkinter as tk 
-from typing import TYPE_CHECKING, Generic, TypeVar
+from abc import abstractmethod
 from tkinter import ttk
+from typing import TYPE_CHECKING, Generic, TypeVar
 from algorithms import getAlgorithms
 from screens import ScreenInterface
 from enums import ScreenType
@@ -29,10 +30,13 @@ FRAME_HEIGHT = 50
 class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
     def __init__(self, window) -> None:
         super().__init__(window)
+        
         # Font every widget uses 
         # TODO why are these in caps? 
         self.__FONT = "Arial"
         self.__FONTSIZE = 12 
+
+        self.__selectDefaultText = "Select an algorithm."
 
         # References to controller, model and data model        
         self.__controller = None 
@@ -44,11 +48,15 @@ class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
         # Array containing widgets that are disabled when an algorithm runs 
         # and then renabled when an algorithm ends 
         self.__toggleableWidgets = []
-        # For each object in this array 'beforeAlgorithmStart()' method is called before an algorithm is run 
-        self.__algorithmStartObservers = []
 
         self.__isAlgorithmRunning = False 
         self.__isAlgorithmPaused = False 
+
+
+    # Abstract method, child screens will call before running an algorithm
+    @abstractmethod
+    def prepare(self) -> None: pass  
+
 
     # Creates frame to display the border
     def __createBorderFrame(self, root : tk.Frame, frameWidth : int, frameHeight : int) -> tk.Frame:
@@ -129,7 +137,7 @@ class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
         self.__algorithmOptions = ttk.Combobox(self.getOptionsWidgetFrame(), textvariable = tk.StringVar(), state = "readonly", 
                                                font = (self.getFont(), self.getFontSize()),\
              width = self.getOptionsWidgetFrame().winfo_width())
-        self.__algorithmOptions.set('Select an algorithm.')
+        self.__algorithmOptions.set(self.__selectDefaultText)
         # Removes the blue highlighting when something is selected that annoyed me
         self.__algorithmOptions.bind("<<ComboboxSelected>>", lambda _: self.getOptionsWidgetFrame().focus())
         self.__algorithmOptions.pack(pady = (10,0))  
@@ -149,7 +157,7 @@ class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
   
 
     # Creates a slider that allows users to adjust an algorithms speed
-    def __createSpeedAdjuster(self) -> None:
+    def __createSpeedSlider(self) -> None:
         # Creates a slider that goes from the maximum delay to the minmum delay 
         # Every time the sliders value is changed the updateDelay() method is called to update the value seen on screen
         self.__speedSlider = tk.Scale(self.getOptionsWidgetFrame(), from_ = self.__model.getMaxDelay(), to_ = self.__model.getMinDelay(), 
@@ -168,14 +176,14 @@ class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
 
 
     # Creates buttons that lets user execute algorithms or stop them
-    def __createStopSolveButtons(self) -> None:
+    def __createRunButton(self) -> None:
         # Frame to store stop and solve buttons in a grid layout
         algorithmToggleFrame = tk.Frame(self.getOptionsWidgetFrame(), bg = "white")
         algorithmToggleFrame.pack(side = "bottom", pady = (0,5))
         # Allows user to see the algorithm in action
         self.__runButton = tk.Button(algorithmToggleFrame, text = "Solve.", width = 7, relief = "solid", 
                                            font = (self.getFont(), self.getFontSize()), 
-                                           command = lambda: self.__initAlgorithm())
+                                           command = lambda: self.__runAlgorithm())
         self.__runButton.grid(row = 0, column = 0, padx = (0,5)) 
         # Allows user to stop algorithm whilst it's running - button is initially disabled
         self.__stateButton = tk.Button(algorithmToggleFrame, text = "Pause.", width = 7, relief = "solid", 
@@ -187,8 +195,8 @@ class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
     # Creates widgets that all algorithm screens use 
     def __createBaseAlgorithmOptions(self) -> None: 
         self.__createAlgorithmSelect()               
-        self.__createSpeedAdjuster()
-        self.__createStopSolveButtons()
+        self.__createSpeedSlider()
+        self.__createRunButton()
 
     def render(self):
         self.createBaseLayout() 
@@ -254,7 +262,7 @@ class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
         if self.__isAlgorithmRunning:
             self.__runButton.config(text="Stop.", command=self.__stopAlgorithm)
         else: 
-            self.__runButton.config(text="Solve.", command=self.__initAlgorithm)  
+            self.__runButton.config(text="Solve.", command=self.__runAlgorithm)  
 
 
     def __updateToggleWidgets(self) -> None:
@@ -305,21 +313,16 @@ class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
 
 
     # Call algorithm user has selected
-    def __initAlgorithm(self) -> None:  
+    def __runAlgorithm(self) -> None:  
         # Doesn't do anything if user hasn't chosen an algorithm
-        if(not self.__getAlgorithmChoice() == 'Select an algorithm.'): 
+        if(not self.__getAlgorithmChoice() == self.__selectDefaultText): 
             self.__algorithmOptions.config(foreground = "red")
         else:
             self.__isAlgorithmRunning = True 
             self.__isAlgorithmPaused = False
             self.__updateWidgets()
-            
-            for observer in self.__algorithmStartObservers: 
-                try:
-                    observer.beforeAlgorithmStart()
-                except AttributeError: continue
-            
-            self.__controller.startAlgorithmThread(self.__getAlgorithmChoice(), "HELLO")
+            self.prepare()            
+            # self.__controller.startAlgorithmThread(self.__getAlgorithmChoice(), "HELLO")
             
 
     # Forces current running algorithm thread to terminate (safely)
@@ -349,7 +352,6 @@ class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
     def removeToggleableWidget(self, widget : tk.Widget) -> None:  
         if widget in self.__toggleableWidgets: 
             self.__toggleableWidgets.remove(widget)
-
 
     # Getters 
     def getController(self) -> C: return self.__controller

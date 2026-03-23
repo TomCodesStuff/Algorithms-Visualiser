@@ -11,7 +11,7 @@ D = TypeVar("D", bound="Array")
 
 CANVAS_OFFSET = 2
 ELEMENT_OFFSET = 20 
-TARGET_SETTING_COIN_FLIP = 0.5
+
 
 class ArrayAlgorithmController(AlgorithmController[S, M, D]):
     def __init__(self, screen : S, model : M, dataStructure : D) -> None: 
@@ -164,41 +164,6 @@ class ArrayAlgorithmController(AlgorithmController[S, M, D]):
         # Draw the first element on screen
         self.adjustArray('1')
     
-
-
-    # TODO Move the search controller
-
-    # Gets options user has selected from the slider and calls the paired function
-    # Each function returns an integer -> the target 
-    # The target is then set in the dataStructure class 
-    def generateTarget(self, value : int) -> int: 
-        match value:
-            case 0: self.getDataStructure().setTarget(self.__targetRandom())
-            case 1: self.getDataStructure().setTarget(self.__targetIn()) 
-            case 2: self.getDataStructure().setTarget(self.__targetOut())
-            case _: self.getDataStructure().setTarget(self.__targetRandom())
-
-
-    # Makes sure that target generated has (almost) equal chance to be in the array or not 
-    def __targetRandom(self) -> int:         
-        # Generates decimal between 0 and 1 
-        # If decimal is less than or equal to 0.5 make the target in the array 
-        # Gives a roughly 50-50 chance for target to be in the array or out the array
-        if(random.random() < TARGET_SETTING_COIN_FLIP): return self.__targetIn()
-        # Else call function to generate the target so it is not in the array
-        else: return self.__targetOut()
-
-
-    # Guarantees target is in the array
-    def __targetIn(self) -> int: 
-       # Randomly chooses element from array
-       return random.choice(self.getDataStructure().getArray())
-
-
-    # TODO Should replace with alternative method
-    # Guarantees target is not in array
-    def __targetOut(self) -> int:  
-        return max(self.getDataStructure().getArray()) + 1
 
 # Listen to Generator by Foo Fighters 
         

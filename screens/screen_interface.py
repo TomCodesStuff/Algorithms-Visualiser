@@ -20,6 +20,7 @@ class ScreenInterface(ABC):
     @abstractmethod
     def render(self): pass 
 
+
     def getWindow(self) -> Window: return self.__window
 
 # Listen to Runnin' Wild by Airbourne

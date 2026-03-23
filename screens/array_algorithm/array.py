@@ -1,5 +1,7 @@
 import random
 from ..algorithm_base import DataStructure
+from enums import SortDirection
+
 
 class Array(DataStructure): 
     # Constructor
@@ -7,10 +9,14 @@ class Array(DataStructure):
         super().__init__()
         self.__array = []
         self.__barColours = []
-        self.__target = None
-        self.__targetSetting = 0
-        self.__isAscending = True
 
+        # TODO Move to different objects
+        self.__target = None 
+        self.__targetSetting = 0
+        self.__sortDirection = SortDirection.ASCENDING
+
+
+    #TODO rename functions to not have Array in title user already knows it's an array
 
     # Returns the array
     def getArray(self) -> list: 
@@ -123,13 +129,13 @@ class Array(DataStructure):
         return self.__targetSetting
 
 
-    # Toggles the sort setting between and ascending and descending
-    def toggleSortDirection(self):
-        self.__isAscending = not self.__isAscending
+    def setSortingDirecion(self, value : SortDirection) -> None:
+        self.__sortDirection = value 
+    
 
+    def getSortingDirection(self) -> SortDirection:
+        return self.__sortDirection 
 
-    # Returns if the sorting direction is ascending or descending
-    def isAscending(self) -> bool: return self.__isAscending 
 
 # Listen to Everlong By Foo Fighters
         

@@ -106,6 +106,8 @@ class TimSort(Algorithm):
                 self.updateArrayOnScreen()
                 self.delay()
  
+
+    # TODO Fix spelling mistake and remove horrible magic numbers 
     def __calcMinRinSize(self, n : int) -> int:
         # If the length of the array is less than 64, the runsize is set to 4 
         # This is done for visualisation purposes, the actual implementation 

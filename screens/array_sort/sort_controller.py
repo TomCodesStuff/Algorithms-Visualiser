@@ -24,8 +24,8 @@ class SortController(ArrayAlgorithmController[S, M, D]):
     # Changes the sort direction 
     def toggleSortDirection(self):
         # Changes the sort direction
-        self.getDataStructure().toggleSortDirection()  
+        self.getModel().toggleSortDirection()  
         # Disables the button that called the function and enables the currently disabled button
-        self.getScreen().disableEnableButtons(self.getDataStructure().isAscending())
+        self.getScreen().toggleSortDirection()
 
 # Listen to Give Me Novacaine by Green Day
