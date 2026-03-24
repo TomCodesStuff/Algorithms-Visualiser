@@ -91,4 +91,5 @@ class AlgorithmController(Generic[S, M, D]):
     def scheduleScreenUpdate(self) -> None:
         self.__screen.getWindow().scheduleFunctionExecution(self.__updateFunc, EXECUTION_DELAY)
     
-    
+
+# Listen to Catch These Fists by Wet Leg     

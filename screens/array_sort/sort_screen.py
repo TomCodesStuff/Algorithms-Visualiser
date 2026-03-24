@@ -7,17 +7,16 @@ if(__name__ == "__main__"):
 
 import tkinter as tk 
 from typing import TYPE_CHECKING, TypeVar
-from ..array_algorithm import ArrayAlgorithmScreen, Array
+from ..array_algorithm import ArrayAlgorithmScreen
 from enums import SortDirection
 
 if TYPE_CHECKING:
-    from array_sort import SortController, SortModel 
+    from array_sort import SortController, SortModel, SortArray
 
 
 C = TypeVar("C", bound="SortController")
 M = TypeVar("M", bound="SortModel")
-D = TypeVar("D", bound="Array")
-
+D = TypeVar("D", bound="SortArray")
 
 
 class SortScreen(ArrayAlgorithmScreen[C, M, D]): 
@@ -69,4 +68,5 @@ class SortScreen(ArrayAlgorithmScreen[C, M, D]):
         self.createBaseArrayLayout()
         self.__createSortOptionButtons()
 
-# Wretches and Kings by Linkin Park                 
+
+# Listen to Minority by Green Day

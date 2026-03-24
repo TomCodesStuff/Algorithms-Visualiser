@@ -9,12 +9,12 @@ from typing import TYPE_CHECKING, TypeVar
 from ..array_algorithm import ArrayAlgorithmController
 
 if TYPE_CHECKING: 
-    from array_sort import SortScreen, SortModel
+    from array_sort import SortScreen, SortModel, SortArray
     from array_algorithm import Array
 
 S = TypeVar("S", bound="SortScreen")
 M = TypeVar("M", bound="SortModel")
-D = TypeVar("D", bound="Array")
+D = TypeVar("D", bound="SortArray")
 
 
 class SortController(ArrayAlgorithmController[S, M, D]):
@@ -28,4 +28,5 @@ class SortController(ArrayAlgorithmController[S, M, D]):
         # Disables the button that called the function and enables the currently disabled button
         self.getScreen().toggleSortDirection()
 
-# Listen to Give Me Novacaine by Green Day
+
+# Listen to ALICE COOPER'S POOL HOUSE by Hot Milk

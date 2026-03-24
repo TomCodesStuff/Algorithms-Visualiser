@@ -8,11 +8,11 @@ if TYPE_CHECKING:
     Screen = Type[AlgorithmScreen]
     Controller = Type[AlgorithmController]
     Model = Type[AlgorithmModel]
-    Hello = Type[DataStructure]
+    DataStruct = Type[DataStructure]
 
 class ScreenCreator(): 
     @staticmethod
-    def __createAlgorithmScreen(window : Window, mvcClasses :  Tuple[Screen, Controller, Model, Hello]) -> AlgorithmScreen: 
+    def __createAlgorithmScreen(window : Window, mvcClasses :  Tuple[Screen, Controller, Model, DataStruct]) -> AlgorithmScreen: 
         screenClass, controllerClass, modelClass, dataStructureClass = mvcClasses
         screen = screenClass(window)
         model = modelClass()
@@ -34,13 +34,13 @@ class ScreenCreator():
                     SearchScreen, 
                     SearchController, 
                     SearchModel, 
-                    Array))
+                    SearchArray))
             case ScreenType.SORT:
                return cls.__createAlgorithmScreen(window, (
                    SortScreen, 
                    SortController, 
                    SortModel, 
-                   Array))
+                   SortArray))
             #case scr.ScreenType.TRAVERSAL:
             #    return cls.__createAlgorithmScreen(window, (
             #        scr.TraversalScreen, 
@@ -50,3 +50,4 @@ class ScreenCreator():
             #case _: return None
 
 
+# Listen to Tonight, Tonight by The Smashing Pumpkins

@@ -234,4 +234,5 @@ class EdgeHandler():
         # Store reference to node the new edge starts from  
         self.setConnectionStartNode(canvasNode) 
 
-# Listen to Why does it always rain on me by Travis 
+
+# Listen to Why does it always rain on me by Travis  

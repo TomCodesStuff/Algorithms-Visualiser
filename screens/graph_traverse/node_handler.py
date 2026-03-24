@@ -3,6 +3,7 @@ from .traversal_model import TraversalModel
 from .edge_handler import EdgeHandler
 from tkinter import Canvas, Event
 
+
 class NodeHandler():
     def __init__(self, canvas : Canvas, controller, model : TraversalModel, edgeHandler : EdgeHandler) -> None:
         # Store reference to canvas (makes things a lot easier)  

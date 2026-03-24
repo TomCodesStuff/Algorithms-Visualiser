@@ -1,8 +1,11 @@
 from app_window import Window
 from enums import ScreenType
 
+WIDTH = 700
+HEIGHT = 500
+
 if(__name__ == "__main__"):
-    window = Window(750, 500) 
+    window = Window(WIDTH, HEIGHT) 
     window.create()
     window.loadScreen(ScreenType.MAIN_MENU)
     window.show() 

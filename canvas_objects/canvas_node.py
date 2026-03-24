@@ -36,11 +36,10 @@ class CanvasNode():
         self.__isBeingDragged = False 
 
         
-
-
     # Updates the coordinates of the node to be accurate to the coordinates on screen
     def updateCoords(self, coords : tuple) -> None: 
         self.__coords = coords
+
 
     # Getters 
     def getCanvasID(self) -> int: return self.__canvasID 
@@ -52,35 +51,43 @@ class CanvasNode():
     def getHighlightColour(self) -> str: return self.__highlightColour  
     def getConnectionsSet(self) -> set: return self.__edges
 
+
     # Adds a connection between this node and another node
     def addConnection(self, nodeID : int, weight : int) -> None: 
         self.__connectedNodes[nodeID] = weight 
-    
+
+
     # Gets a connection and it's weight given a node
     # Returns -1 if the connection doesn't exist
     def getConnection(self, nodeID: int) -> int:
         if(nodeID not in self.__connectedNodes): return -1 
         return self.__connectedNodes[nodeID] 
-    
+
+
     # Adds a CanvasEdge Object to the list 
     def addConnectionToSet(self, edge) -> None: self.__edges.append(edge) 
+
 
     # Delete a CanvasEdge from the list 
     # (Otherwise errors happen when an edge is deleted)
     def deleteConnectionFromSet(self, egde) -> None:  
         self.__edges.remove(egde)   
 
+
     # Return all edges connected the node 
     def getEdges(self) -> list: return self.__edges
+
 
     # Adjust Force applied in X-axis
     def adjustForceX(self, forceX : int) -> None:
         self.__forceX += forceX 
 
+
     # Adjust Force applied in Y-axis
     def adjustForceY(self, forceY : int) -> None:
         self.__forceY += forceY 
-    
+
+
     # Resets values that apply forces to a node
     def resetForces(self) -> None:
         self.__forceX = 0
@@ -89,6 +96,7 @@ class CanvasNode():
 
     def __roundForce(self, force : float, coord : float) -> float: 
          return math.floor(coord) if force < 0 else math.ceil(coord)
+
 
     def applyForces(self) -> None:  
         
@@ -104,6 +112,7 @@ class CanvasNode():
         self.__coords = (newX0, newY0, newX0 + self.__nodeSize, newY0 + self.__nodeSize)  
     
 
+    # Function for dragging objects
     def isBeingDragged(self) -> bool: return self.__isBeingDragged
     def setDragged(self) -> bool: self.__isBeingDragged = True
     def resetDragged(self) -> bool: self.__isBeingDragged = False

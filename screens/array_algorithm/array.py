@@ -1,6 +1,5 @@
 import random
 from ..algorithm_base import DataStructure
-from enums import SortDirection
 
 
 class Array(DataStructure): 
@@ -9,11 +8,6 @@ class Array(DataStructure):
         super().__init__()
         self.__array = []
         self.__barColours = []
-
-        # TODO Move to different objects
-        self.__target = None 
-        self.__targetSetting = 0
-        self.__sortDirection = SortDirection.ASCENDING
 
 
     #TODO rename functions to not have Array in title user already knows it's an array
@@ -88,18 +82,8 @@ class Array(DataStructure):
     def resetBarColours(self) -> None: 
         self.__barColours = ["black" for _ in range(len(self.__array))] 
     
-
-    # Returns the target (the element being looked for)
-    def getTarget(self) -> int: 
-        return self.__target
     
-
-    # Sets the element being looked for to the passed value
-    def setTarget(self, value : int) -> None:
-        self.__target = value   
-
-
-     # Returns the size of the array
+    # Returns the size of the array
     def getArraySize(self) -> int:
         return len(self.__array)
 
@@ -117,24 +101,6 @@ class Array(DataStructure):
     # Returns true if passed value is in the array, else false
     def isElementInArray(self, value : int) -> bool: 
         return value in self.__array
-
-
-    # Updates the target setting to the passed value
-    def setTargetSetting(self, value : int) -> None:
-        self.__targetSetting = value
-
-
-    # Returns the current value of the target setting 
-    def getTargetSetting(self) -> int:
-        return self.__targetSetting
-
-
-    def setSortingDirecion(self, value : SortDirection) -> None:
-        self.__sortDirection = value 
-    
-
-    def getSortingDirection(self) -> SortDirection:
-        return self.__sortDirection 
 
 
 # Listen to Everlong By Foo Fighters

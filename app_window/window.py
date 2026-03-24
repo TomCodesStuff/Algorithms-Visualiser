@@ -118,4 +118,4 @@ class Window():
     def getContentFrameWidth(self) -> int:
         return self.__contentFrameWidth 
     
-# Listen to Dilemma by Green Day
+# Listen to Killing In The Name by Rage Against The Machine

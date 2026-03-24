@@ -7,16 +7,15 @@ if(__name__ == "__main__"):
 
 import tkinter as tk 
 from typing import TYPE_CHECKING, TypeVar
-from ..array_algorithm import ArrayAlgorithmScreen, Array
+from ..array_algorithm import ArrayAlgorithmScreen
 
 if TYPE_CHECKING:
-    from array_search import SearchController, SearchModel 
+    from array_search import SearchController, SearchModel, SearchArray 
 
 
 C = TypeVar("C", bound="SearchController")
 M = TypeVar("M", bound="SearchModel")
-D = TypeVar("D", bound="Array")
-
+D = TypeVar("D", bound="SearchArray")
 
 
 class SearchScreen(ArrayAlgorithmScreen[C, M, D]): 
@@ -24,16 +23,17 @@ class SearchScreen(ArrayAlgorithmScreen[C, M, D]):
         super().__init__(window) 
 
 
-    # Creates a slider that lets sers decide if the target is in the array, not in the array or randomly generated
+    # Creates a slider that lets users decide if the target is in the array, not in the array or randomly generated
     def __createTargetAdjuster(self) -> None:
         # Creates a slider that goes from 0 to 1 to 2
-        # The three values correlate to the three possible target options
-        # The target can guranteed to be in the array, guaranteed to not be in the array or randomly selected
+        # The three values correlate to the three possible target options -> in the array, not in the array or random
         self.__targetSlider = tk.Scale(self.getOptionsWidgetFrame(), from_ = 0, to_ = 2, length = self.getOptionsWidgetFrame().winfo_width(),\
             orient = "horizontal", bg = "white", highlightbackground = "white", showvalue = False, command = self.updateDisplayedText)
         self.__targetSlider.pack(pady = (10, 0))
+        
+        self.getModel().setTargetSetting(int(self.__targetSlider.get())) 
         # Initially the slider is set at 0, which is the target being randomly selected
-        self.__targetSlider.config(label = "Target: Random") 
+        self.__targetSlider.config(label = self.getController().updateSliderText(self.getModel().getTargetSetting())) 
 
     # When the target slider has changed value a label is added to show the relevant target information 
     def updateDisplayedText(self, value : str) -> None: 
@@ -41,7 +41,7 @@ class SearchScreen(ArrayAlgorithmScreen[C, M, D]):
 
 
     def prepare(self):         
-        self.getController().generateTarget(self.__targetSlider.get())
+        self.getController().generateTarget(self.getModel().getTargetSetting())
 
 
     def render(self) -> None: 
@@ -49,4 +49,5 @@ class SearchScreen(ArrayAlgorithmScreen[C, M, D]):
         self.__createTargetAdjuster()
 
 
-# Wretches and Kings by Linkin Park                 
+# Wretches and Kings by Linkin Park      
+           

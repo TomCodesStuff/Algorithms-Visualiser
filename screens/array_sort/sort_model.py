@@ -32,4 +32,5 @@ class SortModel(ArrayAlgorithmModel):
     # Returns if the sorting direction is ascending or descending
     def getSortDirection(self) -> SortDirection: return self.__sortDirection
     
-# Listen to Creep by Radiohead
+
+# Listen to What You Know by Two Door Cinema 

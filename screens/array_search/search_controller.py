@@ -10,12 +10,11 @@ from typing import TYPE_CHECKING, TypeVar
 from ..array_algorithm import ArrayAlgorithmController
 
 if TYPE_CHECKING: 
-    from array_search import SearchScreen, SearchModel
-    from array_algorithm import Array
+    from array_search import SearchScreen, SearchModel, SearchArray
 
 S = TypeVar("S", bound="SearchScreen")
 M = TypeVar("M", bound="SearchModel")
-D = TypeVar("D", bound="Array")
+D = TypeVar("D", bound="SearchArray")
 
 TARGET_SETTING_COIN_FLIP = 0.5
 
@@ -25,14 +24,9 @@ class SearchController(ArrayAlgorithmController[S, M, D]):
     
 
     # Returns the text to be displayed above the slider
-    def updateSliderText(self, value : str) -> str:
-        self.__updateTargetSetting(value)
+    def updateSliderText(self, value : str) -> str: 
+        self.getModel().setTargetSetting(int(value))
         return self.getModel().getSliderText(int(value))
-
-
-    # Updates the target setting attribute in the dataStructure class 
-    def __updateTargetSetting(self, value : str) -> None:
-        self.getDataStructure().setTargetSetting(int(value)) 
 
 
     # Gets options user has selected from the slider and calls the paired function
@@ -63,5 +57,6 @@ class SearchController(ArrayAlgorithmController[S, M, D]):
     def __targetOut(self) -> int:   
         array = self.getDataStructure().getArray()
         return random.choice(list(set([x for x in range(max(array))]) - set(array)))
+   
                     
 # Listen to Give Me Novacaine by Green Day

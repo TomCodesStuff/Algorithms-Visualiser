@@ -8,12 +8,14 @@ import tkinter as tk
 from screens import ScreenInterface
 from enums import ScreenType
 
+
 # Ideally this should be the first screen the user sees 
 class MainMenu(ScreenInterface):
     def __init__(self, window):
         super().__init__(window)
         # Stores reference to Window object
         self.__FONT = "Arial"
+
 
     # Creates the screen
     def render(self) -> None:
@@ -23,12 +25,14 @@ class MainMenu(ScreenInterface):
         self.__createIntroParagraph()
         self.__createNavigationButtons()
 
+
     # Creates the title displaying the projects name
     def __createTitle(self) -> None:
         # Header label
         tk.Label(self.__contentFrame, text = "Welcome to Algorithms Anonymous.", 
                  font = (self.__FONT, 18, "underline"), bg = "white")\
             .pack(pady = 10) 
+
 
     # Create introduction paragraph
     def __createIntroParagraph(self) -> None:
@@ -41,6 +45,7 @@ class MainMenu(ScreenInterface):
         tk.Label(self.__contentFrame, text = introText, font = (self.__FONT, 14), justify = "center", bg = "white")\
             .pack(pady = 5) 
     
+
     # Creates buttons that allow users to navigate the rest of the project
     def __createNavigationButtons(self) -> None:
         # Adds a frame for the buttons widgets 
@@ -63,5 +68,6 @@ class MainMenu(ScreenInterface):
         
         tk.Label(self.__contentFrame, text = "Created by Thomas Gibson", bg = "white", justify = "left")\
             .pack(side = "bottom", anchor = "w", pady = 5, padx = 5) 
+        
         
 # Listen to 99' Benz by A Story Told

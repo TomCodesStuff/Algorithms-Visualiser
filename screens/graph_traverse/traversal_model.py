@@ -7,6 +7,7 @@ if(__name__ == "__main__"):
 from typing import Set
 from canvas_objects import CanvasNode, CanvasEdge
 
+
 class TraversalModel():
     def __init__(self):  
         # Controller
@@ -58,39 +59,47 @@ class TraversalModel():
         # Time delay when updating the canvas   
         self.__updateDelay = 50
 
+
     # Adds controller         
     def addController(self, controller): 
         self.__controller = controller 
-    
+
+
     # Getters for widgets on screen
     def getMinDelay(self): return self.__minDelay
     def getMaxDelay(self): return self.__maxDelay  
     def getResolution(self): return self.__resolution   
 
+
     # Getters for distances between nodes on screen 
     def getMinScreenDist(self) -> int: return self.__minScreenDist
     def getMaxScreenDist(self) -> int: return self.__maxScreenDist
+
 
     # Getters for node data
     def getInitialCoords(self): return self.__initialNodeCoords    
     def getCircleSize(self): return self.__circleSize
     def getMaxNumNodes(self) -> int: return self.__maxNumNodes
 
+
     # Getters for minimum and maximum bounds of the canvas
     def getCanvasUpperBoundOffset(self) -> int: return self.__canvasUpperBoundOffset
     def getCanvasLowerBoundOffset(self) -> int: return self.__canvasLowerBoundOffset 
     def getSpaceBetweenNodes(self) -> int: return self.__nodesSpacingOffset 
-    
+
+
     # Getters and setters for nodes array
     def getNodes(self) -> list[CanvasNode]: return self.__nodes
     def getNode(self, idx: int) -> CanvasNode: return self.__nodes[idx]
     def addNode(self, canvasNode : CanvasNode) -> None: self.__nodes.append(canvasNode)  
     def deleteNode(self, canvasNode : CanvasNode) -> None: self.__nodes.remove(canvasNode)
-    
+
+
     # Getters and setters for edges set 
     def getEdges(self) -> Set[CanvasEdge]: return self.__edges 
     def addEdge(self, edge : CanvasEdge) -> None: self.__edges.add(edge)
     def deleteEdge(self, edge : CanvasEdge) -> None: self.__edges.discard(edge)
+
 
     # Getters for edge weight 
     def getMinWeight(self) -> int: return self.__minWeight
@@ -98,10 +107,13 @@ class TraversalModel():
     def getDefaultWeight(self) -> int: return self.__defaultWeight
     def getWeightSliderResolution(self) -> int: return self.__weightSliderResolution 
 
+
     # Getter for delay used when updating the canvas
     def getUpdateDelay(self) -> int: return self.__updateDelay 
 
+
     def getEdgeMinScreenLen(self) -> int: return self.__edgeMinScreenLen
     def getEdgeMaxScreenLen(self) -> int: return self.__edgeMaxScreenLen
+
 
 # Listen to Jigsaws Falling Into Place by Radiohead

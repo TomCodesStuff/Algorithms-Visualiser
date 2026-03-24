@@ -16,6 +16,8 @@ class SearchModel(ArrayAlgorithmModel):
         self.setMinDelay(0.1)
         self.setMaxDelay(4)
         
+        self.__targetSetting = 0
+
         # Dictionary pairing numbers to speed 
         # This allows the slider to show text rather than just numbers
         self.__numbersToText = {
@@ -23,6 +25,14 @@ class SearchModel(ArrayAlgorithmModel):
             1: "Target: In array",
             2: "Target: Not in array"
         } 
+
+
+    def setTargetSetting(self, value : int) -> None: 
+        if value in self.__numbersToText: self.__targetSetting = value
+
+
+    def getTargetSetting(self) -> int: 
+        return self.__targetSetting
 
 
     # Returns the text to be displayed above the target slider 

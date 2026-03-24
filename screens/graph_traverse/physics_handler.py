@@ -9,6 +9,7 @@ import math
 from .traversal_model import TraversalModel 
 from canvas_objects import CanvasNode
 
+
 # Handles all physics-based calculations 
 class PhysicsHandler():
     def __init__(self, model : TraversalModel, canvasCentre : tuple) -> None:  
@@ -63,7 +64,6 @@ class PhysicsHandler():
             forceY = dy * self.__gravityConstant 
             self.__updateNodeForces(node, forceX, forceY)
             
-
 
     # Calculates node-node repulsion
     def __calculateNodeRepulsion(self):
@@ -146,5 +146,6 @@ class PhysicsHandler():
         self.__calculateNodeRepulsion()
         self.__calculateEdgeRestoration()
         self.__applyForces()
+
 
 # Listen to Yesterday by The Beatles  

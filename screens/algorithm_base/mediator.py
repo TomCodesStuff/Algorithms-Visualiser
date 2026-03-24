@@ -46,3 +46,6 @@ class Mediator():
             if(self.__threadHandler.isAlgorithmPaused()): self.__pauseAlgorithm()
             time.sleep(interval) 
             i += interval  
+
+
+# Listen to Weak by Skunk Anansie

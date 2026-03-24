@@ -43,6 +43,7 @@ class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
         self.__model = None
         self.__dataStructure = None
 
+        # What data structures on drawn on
         self.__canvas = None
 
         # Array containing widgets that are disabled when an algorithm runs 
@@ -56,6 +57,10 @@ class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
     # Abstract method, child screens will call before running an algorithm
     @abstractmethod
     def prepare(self) -> None: pass  
+
+
+    def render(self):
+        self.createBaseLayout() 
 
 
     # Creates frame to display the border
@@ -198,9 +203,7 @@ class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
         self.__createSpeedSlider()
         self.__createRunButton()
 
-    def render(self):
-        self.createBaseLayout() 
-        
+
     # Creates the layout all algorithms screens use
     def createBaseLayout(self) -> None:
         # Get content Frame to store all widgets
@@ -340,7 +343,6 @@ class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
         if(self.__controller.isAlgorithmRunning()): 
             # Tell the thread to stop
             self.__stopAlgorithm()  
-
         self.getWindow().loadScreen(ScreenType.MAIN_MENU)
 
 
@@ -357,13 +359,10 @@ class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
     def getController(self) -> C: return self.__controller
     def getModel(self) -> M: return self.__model
     def getdataStructure(self) -> D: return self.__dataStructure 
-    
     def getFont(self) -> str: return self.__FONT 
     def getFontSize(self) -> int: return self.__FONTSIZE
     def getOptionsWidgetFrame(self) -> tk.Frame: return self.__optionsWidgetsFrame 
     def getCanvas(self) -> tk.Canvas: return self.__canvas  
-
-
 
 
 # Listen to Under You by Foo Fighters
