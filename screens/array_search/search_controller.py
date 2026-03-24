@@ -50,12 +50,12 @@ class SearchController(ArrayAlgorithmController[S, M, D]):
     # Guarantees target is in the array
     def __targetIn(self) -> int: 
        # Randomly chooses element from array
-       return random.choice(self.getDataStructure().getArray())
+       return random.choice(self.getDataStructure().get())
 
 
     # Guarantees target is not in array
     def __targetOut(self) -> int:   
-        array = self.getDataStructure().getArray()
+        array = self.getDataStructure().get()
         return random.choice(list(set([x for x in range(max(array))]) - set(array)))
    
                     

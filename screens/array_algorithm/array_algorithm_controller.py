@@ -60,7 +60,7 @@ class ArrayAlgorithmController(AlgorithmController[S, M, D]):
 
     # Calculates the padding to centre the array of a given size
     def __calculatePadding(self) -> int:
-        return ((self.getScreen().getCanvas().winfo_width() - (len(self.getDataStructure().getArray()) 
+        return ((self.getScreen().getCanvas().winfo_width() - (len(self.getDataStructure().get()) 
                                                                * (self.getModel().getBarDistance() + self.getModel().getBarWidth()))) // 2) \
                                                                 + self.getModel().getBarDistance()
 
@@ -69,7 +69,7 @@ class ArrayAlgorithmController(AlgorithmController[S, M, D]):
     def adjustArray(self, value : str) -> None:
         # If the value given from the scrollbar is less than the arrays size
         # Delete elements from the array and check if bar size can increase
-        if(int(value) < len(self.getDataStructure().getArray())): 
+        if(int(value) < len(self.getDataStructure().get())): 
             self.__deleteElements(int(value))
             self.__increaseBarSize()
         # Otherwise add elements to the array and check if bar size needs to decrease
@@ -78,14 +78,14 @@ class ArrayAlgorithmController(AlgorithmController[S, M, D]):
             self.__decreaseBarSize()
         # If the array size is less than the maximum number of bars. 
         # Calculate padding 
-        if(len(self.getDataStructure().getArray()) != self.getModel().getMaxBars()): self.__padding = self.__calculatePadding()
+        if(len(self.getDataStructure().get()) != self.getModel().getMaxBars()): self.__padding = self.__calculatePadding()
         # If the array size is now at maximum size, 
         # padding is the value calulated by the calculateBestPadding() method
         else: self.__padding = self.getModel().getMinPadding()
         
         # The amount each elements is stretched along the y-axis 
         # Means the elements are scaled with the largest element
-        self.yStretch = self.getModel().getMaximumPixels() / max(self.getDataStructure().getArray())
+        self.yStretch = self.getModel().getMaximumPixels() / max(self.getDataStructure().get())
         # Draw the actual array with all the adjustments made
         # Since there is no algorithm active, all bars are drawn as black
         self.displayArray()
@@ -96,7 +96,7 @@ class ArrayAlgorithmController(AlgorithmController[S, M, D]):
     def displayArray(self) -> None:
             # Clear displayed array on screen
             self.__clearDisplayedArray()
-            for x, y in enumerate(self.getDataStructure().getArray()):
+            for x, y in enumerate(self.getDataStructure().get()):
                 # Calculate where each bar is placed on screen
                 # Bottom left co-ord
                 x1 = x * self.getModel().getBarDistance() + x * self.getModel().getBarWidth() + self.__padding
@@ -107,7 +107,7 @@ class ArrayAlgorithmController(AlgorithmController[S, M, D]):
                 # Top right coord
                 y2 = self.getScreen().getCanvas().winfo_height() 
                 # Chooses correct colour for bar to be filled in with
-                self.getScreen().getCanvas().create_rectangle(x1, y1, x2, y2, fill = self.getDataStructure().getBarColour(x)) 
+                self.getScreen().getCanvas().create_rectangle(x1, y1, x2, y2, fill = self.getDataStructure().getColourAt(x)) 
             self.getDataStructure().resetBarColours()
             # Updates screen so bars can be seen onscreen
             self.getScreen().getWindow().update_idle_tasks() 
@@ -119,21 +119,21 @@ class ArrayAlgorithmController(AlgorithmController[S, M, D]):
 
     # Adds amount of elements corresponding to the value
     def __addElements(self, value):
-        for _ in range(len(self.getDataStructure().getArray()), value):
+        for _ in range(len(self.getDataStructure().get()), value):
             # Choose random number inbetween upper and lower bounds
-            self.getDataStructure().appendArray(random.randint(self.getModel().getLowerBound(), self.getModel().getHigherBound()))
+            self.getDataStructure().append(random.randint(self.getModel().getLowerBound(), self.getModel().getHigherBound()))
 
 
     # Deletes number of elements corresponding to the value
     def __deleteElements(self, value) -> None:
-        for _ in range(len(self.getDataStructure().getArray()), value, -1):
-            self.getDataStructure().popArray()
+        for _ in range(len(self.getDataStructure().get()), value, -1):
+            self.getDataStructure().pop()
 
 
     # Determines if bars need to shrink in size as array grows
     def __decreaseBarSize(self) -> None:
         for i in range(self.getModel().getBarWidth(), self.getModel().getMinBarWidth(), -1):
-            if(len(self.getDataStructure().getArray()) < round(self.__calculateMaxBars(i, self.getModel().getMaxPadding()))):
+            if(len(self.getDataStructure().get()) < round(self.__calculateMaxBars(i, self.getModel().getMaxPadding()))):
                 self.getModel().setBarWidth(i)
                 return 
         self.getModel().setBarWidth(self.getModel().getMinBarWidth())
@@ -142,7 +142,7 @@ class ArrayAlgorithmController(AlgorithmController[S, M, D]):
     # Determines if bars needs to increase in size as array shrinks
     def __increaseBarSize(self) -> None:
         for i in range(self.getModel().getBarWidth() + 1, self.getModel().getMaxBarWidth() + 1):
-             if(len(self.getDataStructure().getArray()) < round(self.__calculateMaxBars(i, self.getModel().getMaxPadding()))): 
+             if(len(self.getDataStructure().get()) < round(self.__calculateMaxBars(i, self.getModel().getMaxPadding()))): 
                 self.getModel().setBarWidth(i)
 
 

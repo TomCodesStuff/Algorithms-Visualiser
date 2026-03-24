@@ -49,44 +49,16 @@ class ArrayAlgorithmScreen(AlgorithmScreen[C, M, D]):
         self.addToggleableWidget(self.__sortButton)
         self.addToggleableWidget(self.__shuffleButton)
     
-
-    # Makes sure that target generated has (almost) equal chance to be in the array or not 
-    def targetRandom(self) -> int: 
-        # Generates decimal between 0 and 1 
-        # If decimal is less than or equal to 0.5 make the target in the array 
-        # Gives a roughly 50-50 chance for target to be in the array or out the array
-        if(random.random() < 0.5): return self.targetIn()
-        # Else call function to generate the target so it is not in the array
-        else: return self.targetOut()
     
-
-    # Guarantees target is in the array
-    def targetIn(self) -> int: 
-       # Randomly chooses index from array and returns the number at that index
-       return self.getdataStructure().getArray()[random.randint(0, len(self.getdataStructure().getArray()) - 1)] 
-
-
-    # Guarantees target is not in array
-    # TODO replace with max_value + 1 -> recusion not best solution here 
-    def targetOut(self) -> int: 
-        # Chooses a number between the range of arrays smallest value - 20 and arrays largest value + 20
-        target = random.randint(min(self.getdataStructure().getArray()) - self.getModel().getBuffer(), 
-                                max(self.getdataStructure().getArray()) + self.getModel().getBuffer())
-        # If generated number in array re-run function
-        if target in self.getdataStructure().getArray(): self.targetOut()
-        # If generated number not in array then just return value
-        else: return target
-            
-
     # Sorts and displays the array
     def __sortArray(self) -> None:
-        self.getdataStructure().sortArray()
+        self.getdataStructure().sort()
         self.getController().displayArray() 
     
 
     # Shuffles and displays the array
     def __shuffleArray(self) -> None:
-        self.getdataStructure().shuffleArray()
+        self.getdataStructure().shuffle()
         self.getController().displayArray()  
 
 

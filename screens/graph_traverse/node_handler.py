@@ -116,7 +116,7 @@ class NodeHandler():
         circleSize = self.__model.getCircleSize()
         
         # I don't know why but this stops the circles only being partially 
-        # drawn when being moved around (works on windows only)
+        # drawn when being moved around (works on windows only but Linux may not have issue)
         self.__canvas.configure(cursor='arrow')
 
         # Sets the circles colour to Red, makes sure the colour remains 

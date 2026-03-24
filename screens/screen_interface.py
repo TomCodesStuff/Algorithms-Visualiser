@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from app_window import Window
 
 
-# Abstract class - every screen must implement the initScreen method
+# Abstract class - every screen must implement the render method
 class ScreenInterface(ABC):
     def __init__(self, window : Window):
         self.__window = window
@@ -22,7 +22,8 @@ class ScreenInterface(ABC):
     def render(self): pass 
 
 
-    def getWindow(self) -> Window: return self.__window
+    def getWindow(self) -> Window: 
+        return self.__window
 
 
 # Listen to Runnin' Wild by Airbourne
