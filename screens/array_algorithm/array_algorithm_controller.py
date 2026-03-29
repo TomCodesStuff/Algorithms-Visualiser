@@ -91,11 +91,13 @@ class ArrayAlgorithmController(AlgorithmController[S, M, D]):
         elif prevArraySize > self.getDataStructure().size(): 
             self.__increaseBarSize()
 
-
-        # Calculate padding if maximum bar size not reached
-        if(len(self.getDataStructure().get()) != self.getModel().getMaxBars()): self.__padding = self.__calculatePadding()
-        else: self.__padding = self.getModel().getMinPadding()
-        
+        # Only recalculate padding if array size changed
+        if prevArraySize != self.getDataStructure().size():
+            # Calculate padding if maximum bar size not reached
+            if(len(self.getDataStructure().get()) != self.getModel().getMaxBars()): 
+                self.__padding = self.__calculatePadding()
+            else: self.__padding = self.getModel().getMinPadding()
+            
         # The amount each elements is stretched along the y-axis 
         # Means the elements are scaled with the largest element
         self.yStretch = self.getModel().getMaximumPixels() / max(self.getDataStructure().get())
