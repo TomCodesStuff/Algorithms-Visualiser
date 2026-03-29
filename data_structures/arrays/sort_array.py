@@ -1,5 +1,6 @@
-from ..array_algorithm import Array
+from .array import Array
 from enums import SortDirection
+
 
 class SortArray(Array): 
     def __init__(self):

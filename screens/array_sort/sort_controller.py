@@ -7,10 +7,12 @@ if(__name__ == "__main__"):
 
 from typing import TYPE_CHECKING, TypeVar
 from ..array_algorithm import ArrayAlgorithmController
+from data_structures import SortArray
+
 
 if TYPE_CHECKING: 
-    from array_sort import SortScreen, SortModel, SortArray
-    from array_algorithm import Array
+    from array_sort import SortScreen, SortModel
+
 
 S = TypeVar("S", bound="SortScreen")
 M = TypeVar("M", bound="SortModel")

@@ -5,7 +5,8 @@ if(__name__ == "__main__"):
     exit()
 
 
-from ..array_algorithm import Array
+from .array import Array
+
 
 class SearchArray(Array): 
     def __init__(self):

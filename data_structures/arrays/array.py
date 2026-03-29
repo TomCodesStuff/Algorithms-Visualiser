@@ -1,5 +1,5 @@
 import random
-from ..algorithm_base import DataStructure
+from ..data_structure import DataStructure
 
 
 class Array(DataStructure): 

@@ -9,10 +9,10 @@ if(__name__ == "__main__"):
 import tkinter as tk
 from typing import TYPE_CHECKING, TypeVar
 from ..algorithm_base import AlgorithmScreen
-
+from data_structures import Array
 
 if TYPE_CHECKING:
-    from array_algorithm import ArrayAlgorithmController, ArrayAlgorithmModel, Array
+    from array_algorithm import ArrayAlgorithmController, ArrayAlgorithmModel
 
 
 C = TypeVar("C", bound="ArrayAlgorithmController")
@@ -72,4 +72,7 @@ class ArrayAlgorithmScreen(AlgorithmScreen[C, M, D]):
         self.getController().calculateArrayBounds()
         self.createArrayOptions() 
         self.getController().adjustArray(1)
-        
+
+
+# Listen to Almost by Bowling For Soup
+   

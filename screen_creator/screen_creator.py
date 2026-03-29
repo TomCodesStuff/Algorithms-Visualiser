@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Type, Tuple 
+from data_structures import *
 from screens import *
 from enums import ScreenType
 

@@ -8,10 +8,11 @@ if(__name__ == "__main__"):
  
 from typing import TYPE_CHECKING, TypeVar, Generic
 from .mediator import Mediator
-from .thread_handler import ThreadHandler
+from .thread_handler import ThreadHandler 
+from data_structures import DataStructure
 
 if TYPE_CHECKING:
-    from algorithm_base import AlgorithmScreen, AlgorithmModel, DataStructure
+    from algorithm_base import AlgorithmScreen, AlgorithmModel
 
 
 S = TypeVar("S", bound="AlgorithmScreen")

@@ -8,10 +8,12 @@ if(__name__ == "__main__"):
 import tkinter as tk 
 from typing import TYPE_CHECKING, TypeVar
 from ..array_algorithm import ArrayAlgorithmScreen
+from data_structures import SortArray
 from enums import SortDirection, AlgorithmType
 
+
 if TYPE_CHECKING:
-    from array_sort import SortController, SortModel, SortArray
+    from array_sort import SortController, SortModel
 
 
 C = TypeVar("C", bound="SortController")

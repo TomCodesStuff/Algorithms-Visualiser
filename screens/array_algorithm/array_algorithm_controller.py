@@ -1,9 +1,10 @@
 import random
 from typing import TYPE_CHECKING, TypeVar
 from ..algorithm_base import AlgorithmController
+from data_structures import Array
 
 if TYPE_CHECKING: 
-    from array_algorithm import ArrayAlgorithmScreen, ArrayAlgorithmModel, Array
+    from array_algorithm import ArrayAlgorithmScreen, ArrayAlgorithmModel
 
 S = TypeVar("S", bound="ArrayAlgorithmScreen")
 M = TypeVar("M", bound="ArrayAlgorithmModel")

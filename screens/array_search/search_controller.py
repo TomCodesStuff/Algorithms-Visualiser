@@ -8,9 +8,10 @@ if(__name__ == "__main__"):
 import random
 from typing import TYPE_CHECKING, TypeVar
 from ..array_algorithm import ArrayAlgorithmController
+from data_structures import SearchArray
 
 if TYPE_CHECKING: 
-    from array_search import SearchScreen, SearchModel, SearchArray
+    from array_search import SearchScreen, SearchModel
 
 S = TypeVar("S", bound="SearchScreen")
 M = TypeVar("M", bound="SearchModel")

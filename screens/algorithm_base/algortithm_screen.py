@@ -3,6 +3,7 @@ import tkinter as tk
 from abc import abstractmethod
 from tkinter import ttk
 from typing import TYPE_CHECKING, Generic, TypeVar
+from data_structures import DataStructure
 from screens import ScreenInterface
 from enums import ScreenType, AlgorithmType
 
@@ -15,7 +16,7 @@ if(__name__ == "__main__"):
 
 
 if TYPE_CHECKING:
-    from algorithm_base import AlgorithmController, AlgorithmModel, DataStructure 
+    from algorithm_base import AlgorithmController, AlgorithmModel 
 
 C = TypeVar("C", bound="AlgorithmController")
 M = TypeVar("M", bound="AlgorithmModel")

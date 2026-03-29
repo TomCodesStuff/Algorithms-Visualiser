@@ -1,4 +1,3 @@
 from .algortithm_screen import AlgorithmScreen
 from .algorithm_controller import AlgorithmController
 from .algorithm_model import AlgorithmModel
-from .data_structure import DataStructure

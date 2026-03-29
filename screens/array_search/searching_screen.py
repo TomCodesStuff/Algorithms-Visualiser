@@ -9,9 +9,11 @@ import tkinter as tk
 from typing import TYPE_CHECKING, TypeVar 
 from enums import AlgorithmType
 from ..array_algorithm import ArrayAlgorithmScreen
+from data_structures import SearchArray
+
 
 if TYPE_CHECKING:
-    from array_search import SearchController, SearchModel, SearchArray 
+    from array_search import SearchController, SearchModel 
 
 
 C = TypeVar("C", bound="SearchController")
