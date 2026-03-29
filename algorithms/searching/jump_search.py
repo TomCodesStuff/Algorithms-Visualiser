@@ -10,14 +10,16 @@ import math
 
 class JumpSearch(Algorithm):
     # Constructor
-    def __init__(self, dataModel):
-        super().__init__(dataModel)
+    def __init__(self):
+        super().__init__()
+
 
     # Returns algorithms name -> user sees this when selecting algorithm
     def getName(self):
         return "Jump Search" 
 
-    def jumpSearch(self):
+
+    def run(self):
         # Sorts array 
         self.sortArray()
         

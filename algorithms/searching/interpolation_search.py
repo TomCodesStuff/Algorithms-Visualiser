@@ -8,13 +8,15 @@ from ..algorithm import Algorithm
 
 class InterpolationSearch(Algorithm):
     # Constructor
-    def __init__(self, dataModel):
-        super().__init__(dataModel)  
+    def __init__(self):
+        super().__init__()  
+    
     
     def getName(self):
         return "Interpolation Search"
      
-    def interpolationSearch(self): 
+
+    def run(self): 
         self.sortArray()
         array = self.getArray() 
         target = self.getTarget()

@@ -5,17 +5,21 @@ if(__name__ == "__main__"):
     exit()
 
 from ..algorithm import Algorithm
+
+
 class CocktailShakerSort(Algorithm):
     # Constructor
-    def __init__(self, dataModel):
-        super().__init__(dataModel)
+    def __init__(self):
+        super().__init__()
+
 
     # Returns algorithms name -> user sees this when selecting algorithm
     def getName(self) -> str:
         return "Cocktail Shaker Sort" 
-    
+
+
     # Cocktail Shaker Sort Algorithm
-    def cocktailShakerSort(self) -> int: 
+    def run(self) -> int: 
         start = 0 
         end = len(self.getArray()) - 1 
         swapped = True

@@ -7,15 +7,17 @@ if(__name__ == "__main__"):
 from ..algorithm import Algorithm
 class BogoSort(Algorithm):
     # Constructor
-    def __init__(self, dataModel):
-        super().__init__(dataModel)
+    def __init__(self):
+        super().__init__()
+
 
     # Returns algorithms name -> user sees this when selecting algorithm
     def getName(self) -> str:
         return "Bogo Sort" 
     
+
     # Bogo Sort Algorithm
-    def bogoSort(self) -> int: 
+    def run(self) -> int: 
         sortedArray = sorted(self.getArray())
         # Continue until array is sorted
         while(sortedArray != self.getArray()): 

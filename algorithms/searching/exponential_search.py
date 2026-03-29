@@ -7,14 +7,14 @@ if(__name__ == "__main__"):
 from ..algorithm import Algorithm
 
 class ExponentialSearch(Algorithm):
-    def __init__(self, dataModel):
-        super().__init__(dataModel)  
+    def __init__(self):
+        super().__init__()  
     
      # Returns algorithms name -> user sees this when selecting algorithm
     def getName(self):
         return "Exponential Search" 
     
-    def exponentialSearch(self): 
+    def run(self): 
         array = self.getArray()
         target = self.getTarget() 
 

@@ -10,8 +10,6 @@ class Array(DataStructure):
         self.__barColours = []
 
 
-    #TODO rename functions to not have Array in title user already knows it's an array
-
     # Returns the array
     def get(self) -> list: 
         return self.__array  
@@ -40,7 +38,7 @@ class Array(DataStructure):
 
 
     # TODO implement better checking
-    # Swaps the elements at the specified indexed
+    # Swaps the elements at the specified indexes
     def swap(self, i : int, j : int) -> None: 
         if(i >= len(self.__array) or j >= self.size()): return  
         self.__array[i], self.__array[j] =\

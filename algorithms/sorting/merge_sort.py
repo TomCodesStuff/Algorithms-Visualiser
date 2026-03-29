@@ -5,17 +5,21 @@ if(__name__ == "__main__"):
     exit()
 
 from ..algorithm import Algorithm
+
+
 class MergeSort(Algorithm):
     # Constructor
-    def __init__(self, dataModel):
-        super().__init__(dataModel)
+    def __init__(self):
+        super().__init__()
+
 
     # Returns algorithms name -> user sees this when selecting algorithm
     def getName(self) -> str:
         return "Merge Sort" 
     
+
     # (In place) Merge Sort Algorithm
-    def mergeSort(self) -> int: 
+    def run(self) -> int: 
         # Call function to peform splitting into sub arrays 
         self.mergeSortHelper(0, len(self.getArray()) - 1)
         self.coolEndingAnimation() 

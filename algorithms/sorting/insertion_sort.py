@@ -6,17 +6,20 @@ if(__name__ == "__main__"):
 
 
 from ..algorithm import Algorithm
+
+
 class InsertionSort(Algorithm):
     # Constructor
-    def __init__(self, dataModel):
-        super().__init__(dataModel) 
+    def __init__(self):
+        super().__init__() 
 
     # Returns algorithms name -> user sees this when selecting algorithm
     def getName(self) -> str:
         return "Insertion Sort"  
     
+
     # Stable Selection Sort Algorithm
-    def insertionSort(self) -> int: 
+    def run(self) -> int: 
         n = len(self.getArray())
         # Iterate through array, the first element is considered as sorted 
         for i in range(1, n): 

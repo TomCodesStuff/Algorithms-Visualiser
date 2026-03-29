@@ -1,29 +1,33 @@
 import threading
+from algorithms import Algorithm
+
+THREAD_TIMEOUT = 1
 
 
 class ThreadHandler():
     def __init__(self):
         self.__algorithmThread = None 
+        self.__algorithmStarted = threading.Event()
         self.__algorithmStopped = threading.Event()
         self.__algorithmPauseLock = threading.Lock()
         self.__delayLock = threading.Lock() 
 
 
-    def runAlgorithm(self): 
-        # Has algorithm already -> run it via algorithm.run
-        
-        
-        running = True
-        while(running):
-            print("I am Running") 
-            if self.hasAlgorithmStopped(): running = False
-            self.acquirePauseLock()
-            self.releasePauseLock()
+    def runAlgorithm(self, algorithm : Algorithm): 
+        self.__algorithmStarted.set() 
+        algorithm.run()        
+        # running = True
+        # while(running):
+        #     print("I am Running") 
+        #     if self.hasAlgorithmStopped(): running = False
+        #     self.acquirePauseLock()
+        #     self.releasePauseLock()
 
-        print("I have stoppped")
+        # print("I have stoppped")
+
 
     def isThreadAlive(self) -> bool:
-        if self.__algorithmThread is None: return True 
+        if self.__algorithmThread is None: return False 
         return self.__algorithmThread and self.__algorithmThread.is_alive()
 
 
@@ -65,27 +69,30 @@ class ThreadHandler():
         self.setAlgorithmStopFlag() 
 
         if self.__algorithmThread is None: return
-        while(self.isThreadAlive()): 
-            print("Waiting for Thread to halt")
-        
+        if self.isThreadAlive(): self.__algorithmThread.join(timeout=THREAD_TIMEOUT)
+        if self.isThreadAlive(): print("ERROR: Thread did not terminate in time.")        
         print("Thread Terminated :)")
         self.__algorithmThread = None
         return 
 
 
-    def startAlgorithm(self, algorithmChoice : str, algorithmType : str) -> None:  
+    def startAlgorithm(self, algorithm : Algorithm) -> None:  
         if self.__algorithmThread is not None: self.stopAlgorithm() 
-
+        if algorithm is None: return 
+        
         # Ensure various locks are released 
         if(self.hasAlgorithmStopped()): self.clearAlgorithmStopFlag()  
         if(self.isAlgorithmPaused()): self.releasePauseLock() 
         if(self.__delayLock.locked()): self.releaseDelayLock()
+        self.__algorithmStarted.clear()
 
         print("Starting Thread")
         # Call algorithm -> so this program actually has a use
-        self.__algorithmThread = threading.Thread(target=self.runAlgorithm)
+        self.__algorithmThread = threading.Thread(target=self.runAlgorithm, args=(algorithm,))
         # Start Thread
         self.__algorithmThread.start() 
+        # Wait until thread has started
+        self.__algorithmStarted.wait(timeout=THREAD_TIMEOUT)
 
     
 # Listen to Disarm by The Smashing Pumpkins

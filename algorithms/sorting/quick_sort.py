@@ -5,18 +5,22 @@ if(__name__ == "__main__"):
     exit()
 
 from ..algorithm import Algorithm
+
+
 class QuickSort(Algorithm):
     # Constructor
-    def __init__(self, dataModel):
-        super().__init__(dataModel)
+    def __init__(self):
+        super().__init__()
+
 
     # Returns algorithms name -> user sees this when selecting algorithm
     def getName(self) -> str:
         return "Quick Sort"  
     
+
     # Quick Sort Algorithm
     # Pivot selection using median of three 
-    def quickSort(self) -> int:  
+    def run(self) -> int:  
         self.__quickSortHelper(0, len(self.getArray()) - 1)
         self.updateArrayOnScreen() 
         self.delay() 

@@ -68,7 +68,8 @@ class SortScreen(ArrayAlgorithmScreen[C, M, D]):
 
     def render(self) -> None: 
         self.createBaseArrayLayout() 
-        self.displayAlgorithmOptions(AlgorithmType.SORTING)
+        self.setAlgorithmType(AlgorithmType.SORTING)
+        self.displayAlgorithmOptions()
         self.__createSortOptionButtons()
 
 

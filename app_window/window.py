@@ -1,6 +1,7 @@
 import tkinter as tk
-from typing import Callable, Tuple 
+from typing import Callable, Tuple, Type 
 from algorithm_validator import AlgorithmValidator
+from algorithms import Algorithm
 from screen_creator import ScreenCreator
 from enums import ScreenType, AlgorithmType
 
@@ -75,7 +76,6 @@ class Window():
             widget.destroy()
 
 
-
     # Clears current screen and loads new one
     def loadScreen(self, screenType : ScreenType) -> None:  
         # Clear previous screen
@@ -125,6 +125,10 @@ class Window():
 
     def getAlgorithmNames(self, algorithmType : AlgorithmType) -> Tuple:
         return self.__algorithmValidator.getAlgorithmNames(algorithmType)
+
+
+    def getAlgorithmClass(self, algorithmType : AlgorithmType, algorithmName : str) -> Type[Algorithm]: 
+        return self.__algorithmValidator.getAlgorithmClass(algorithmType, algorithmName)
 
 
 # Listen to Killing In The Name by Rage Against The Machine

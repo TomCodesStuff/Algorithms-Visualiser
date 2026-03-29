@@ -9,13 +9,13 @@ class Mediator():
         self.__delayFunc = delayFunc
         self.__updateScreenFunc = updateScreenFunc
         self.__threadHandler = threadHandler
+        
 
-
-    def getDelay(self) -> None: 
+    def getDelay(self) -> float: 
         return self.__delayFunc() 
 
 
-    def updateScreen(self) -> None: 
+    def refreshScreen(self) -> None: 
         self.__updateScreenFunc() 
 
 
@@ -27,7 +27,7 @@ class Mediator():
 
     
     # Used to check is the algorithm needs to halt
-    def __stopCheck(self): 
+    def __hasAlgorithmStopped(self): 
         # Checks if the algorithm needs to stop
         if(self.__threadHandler.hasAlgorithmStopped()): 
             # Output message confirming thread termination
@@ -36,16 +36,23 @@ class Mediator():
             sys.exit(0) 
 
 
-    def haltAlgorithm(self) -> None:  
-        delay = self.getDelay() 
+    def __delayAlgorithm(self, delay : float) -> None:
         interval = delay / 10
         i = 0 
         while(i < delay):
-            self.__stopCheck() 
+            self.__hasAlgorithmStopped() 
             # Checks if the GUI thread is holding the pause lock
             if(self.__threadHandler.isAlgorithmPaused()): self.__pauseAlgorithm()
             time.sleep(interval) 
             i += interval  
+
+
+    def briefDelay(self) -> None: 
+        self.__delayAlgorithm(0.5)
+
+
+    def delay(self) -> None:  
+        self.__delayAlgorithm(self.getDelay()  )
 
 
 # Listen to Weak by Skunk Anansie

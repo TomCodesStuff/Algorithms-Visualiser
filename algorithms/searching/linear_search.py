@@ -7,15 +7,16 @@ if(__name__ == "__main__"):
 from ..algorithm import Algorithm
 class LinearSearch(Algorithm):
     # Constructor
-    def __init__(self, dataModel):
-        super().__init__(dataModel)
+    def __init__(self):
+        super().__init__()
 
     # Returns algorithms name -> user sees this when selecting algorithm
     def getName(self) -> str:
         return "Linear Search" 
     
+
     # Linear Search Algorithm
-    def linearSearch(self) -> int:   
+    def run(self) -> int:   
         self.shuffleArray()     
         # Iterate through array one element at a time
         for index, num in enumerate(self.getArray()):

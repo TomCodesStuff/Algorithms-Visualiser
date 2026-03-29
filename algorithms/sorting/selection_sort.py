@@ -8,15 +8,17 @@
 from ..algorithm import Algorithm
 class SelectionSort(Algorithm):
     # Constructor
-    def __init__(self, dataModel):
-        super().__init__(dataModel) 
+    def __init__(self):
+        super().__init__() 
+
 
     # Returns algorithms name -> user sees this when selecting algorithm
     def getName(self) -> str:
         return "Selection Sort"  
-    
+
+
     # Stable Selection Sort Algorithm
-    def selectionSort(self) -> int: 
+    def run(self) -> int: 
         n = len(self.getArray())   
         # Iterate through each element in the array
         for i in range(n): 

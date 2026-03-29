@@ -7,22 +7,19 @@ if(__name__ == "__main__"):
 from ..algorithm import Algorithm
 
 class BinarySearch(Algorithm):
-    def __init__(self, dataModel):
-        super().__init__(dataModel)
+    def __init__(self):
+        super().__init__()
 
     # Returns algorithms name -> user sees this when selecting algorithm
     def getName(self):
         return "Binary Search" 
     
     # Binary Search algorithm -> see markdown for explanation
-    def binarySearch(self):
+    def run(self):
         # Sorts array 
         self.sortArray()
-
         array = self.getArray()
         target = self.getTarget()
-
-
         # Low and high variables used to adjust mid
         low = 0 
         high = len(array) - 1

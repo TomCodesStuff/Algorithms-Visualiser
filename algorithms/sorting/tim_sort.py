@@ -8,16 +8,18 @@ if(__name__ == "__main__"):
 from ..algorithm import Algorithm
 class TimSort(Algorithm):
     # Constructor
-    def __init__(self, dataModel): 
-        super().__init__(dataModel)  
+    def __init__(self): 
+        super().__init__()  
         self.__minRunSize = 4
+
 
     # Returns algorithms name -> user sees this when selecting algorithm
     def getName(self) -> str:
         return "Tim Sort"  
-    
+
+
     # Tim Sort Algorithm
-    def timSort(self) -> int:    
+    def run(self) -> int:    
         n = len(self.getArray()) 
         # Calculates the size of the run 
         runSize = self.__calcMinRinSize(n)

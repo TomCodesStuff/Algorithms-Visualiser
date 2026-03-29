@@ -7,15 +7,17 @@ if(__name__ == "__main__"):
 from ..algorithm import Algorithm
 class BubbleSort(Algorithm):
     # Constructor
-    def __init__(self, dataModel):
-        super().__init__(dataModel)
+    def __init__(self):
+        super().__init__()
+
 
     # Returns algorithms name -> user sees this when selecting algorithm
     def getName(self) -> str:
         return "Bubble Sort" 
-    
+
+
     # Bubble Sort Algorithm
-    def bubbleSort(self) -> int: 
+    def run(self) -> int: 
         array = self.getArray()  
         n = len(array)
         # Iterate through array

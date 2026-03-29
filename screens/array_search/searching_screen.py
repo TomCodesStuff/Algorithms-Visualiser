@@ -49,7 +49,8 @@ class SearchScreen(ArrayAlgorithmScreen[C, M, D]):
 
     def render(self) -> None: 
         self.createBaseArrayLayout()  
-        self.displayAlgorithmOptions(AlgorithmType.SEARCHING)
+        self.setAlgorithmType(AlgorithmType.SEARCHING)
+        self.displayAlgorithmOptions()
         self.__createTargetAdjuster()
 
 

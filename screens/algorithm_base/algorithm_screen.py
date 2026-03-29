@@ -53,6 +53,8 @@ class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
         self.__isAlgorithmRunning = False 
         self.__isAlgorithmPaused = False 
 
+        self.__algorithmType = None 
+
 
     # Abstract method, child screens will call before running an algorithm
     @abstractmethod
@@ -62,8 +64,8 @@ class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
     def render(self) -> None: pass 
 
 
-    def displayAlgorithmOptions(self, algorithmType : AlgorithmType) -> None: 
-        self.__algorithmOptions["values"] = self.getWindow().getAlgorithmNames(algorithmType) 
+    def displayAlgorithmOptions(self) -> None: 
+        self.__algorithmOptions["values"] = self.getWindow().getAlgorithmNames(self.__algorithmType) 
 
 
     # Creates frame to display the border
@@ -296,10 +298,6 @@ class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
         return self.__algorithmOptions.get()  
     
 
-    def __getAlgorithmType(self) -> str: 
-        return self.__algorithmOptions.get().split(" ")[-1].lower()
-
-
     # Releases the lock, letting the algorithm thread run again
     def __resumeAlgorithm(self) -> None: 
         self.__controller.resumeAlgorithm()
@@ -317,15 +315,23 @@ class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
     # Call algorithm user has selected
     def __runAlgorithm(self) -> None:  
         # Doesn't do anything if user hasn't chosen an algorithm
-        if(not self.__getAlgorithmChoice() == self.__selectDefaultText): 
+        if(self.__getAlgorithmChoice() == self.__selectDefaultText): 
             self.__algorithmOptions.config(foreground = "red")
         else:
+            self.__algorithmOptions.config(foreground = "black")
             self.__isAlgorithmRunning = True 
             self.__isAlgorithmPaused = False
             self.__updateWidgets()
             self.prepare()            
-            # self.__controller.startAlgorithmThread(self.__getAlgorithmChoice(), "HELLO")
+            self.__controller.startAlgorithmThread(self.__algorithmType, self.__getAlgorithmChoice())
             
+
+
+    def algorithmComplete(self) -> None: 
+        self.__stopAlgorithm()
+        # Play cool animation
+        print("Here's where I would play a cool animation. If I had one")
+
 
     # Forces current running algorithm thread to terminate (safely)
     def __stopAlgorithm(self) -> None:
@@ -352,7 +358,9 @@ class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
     def addToggleableWidget(self, widget : tk.Widget) -> None: self.__toggleableWidgets.append(widget)
     def removeToggleableWidget(self, widget : tk.Widget) -> None:  
         if widget in self.__toggleableWidgets: 
-            self.__toggleableWidgets.remove(widget)
+            self.__toggleableWidgets.remove(widget) 
+    def setAlgorithmType(self, algorithmType : AlgorithmType) -> None:
+        self.__algorithmType = algorithmType
 
     # Getters 
     def getController(self) -> C: return self.__controller
@@ -362,6 +370,7 @@ class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
     def getFontSize(self) -> int: return self.__FONTSIZE
     def getOptionsWidgetFrame(self) -> tk.Frame: return self.__optionsWidgetsFrame 
     def getCanvas(self) -> tk.Canvas: return self.__canvas  
+    def getAlgorithmType(self) -> AlgorithmType: return self.__algorithmType
 
 
 # Listen to Under You by Foo Fighters

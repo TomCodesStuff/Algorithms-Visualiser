@@ -96,6 +96,7 @@ class AlgorithmValidator():
             algorithmInstance = algorithmClass("Foo Fighters #1")  
         except Exception as e: 
             print(f"FAILED: Could not create instance of {algorithmClassName}.\nException {e}")
+            return None
 
         if not self.__isGetNameCorrect(algorithmInstance): return None
         return algorithmClass

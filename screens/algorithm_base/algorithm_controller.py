@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Callable
 
 # If this isn't at the top the program breaks :/
 # If the file is run as is message this returned and program exits
@@ -10,7 +11,14 @@ from typing import TYPE_CHECKING, TypeVar, Generic
 from .mediator import Mediator
 from .thread_handler import ThreadHandler 
 from data_structures import DataStructure
+from enums import AlgorithmType
 
+
+# TODO -> make function to repeatedly check when algorithm done (done)
+#      -> when done toggle widgets -> make cool animations clear variables (make abstract method) (do later)
+#      -> add generic type hinting for DataStructure 
+#      -> fix linear search and test running, pausing, stopping, adjusting delay 
+#      -> fix other algorithms
 if TYPE_CHECKING:
     from algorithm_base import AlgorithmScreen, AlgorithmModel
 
@@ -41,9 +49,24 @@ class AlgorithmController(Generic[S, M, D]):
                 self.__screen.getWindow().cancelScheduledFunctions()   
     
 
-    def startAlgorithmThread(self, algorithmChoice : str, algorithmType : str) -> None:  
+    def startAlgorithmThread(self, algorithmType : AlgorithmType, algorithmName : str) -> None: 
+        print(algorithmType, algorithmName)
+        algorithmClass = self.getScreen().getWindow().getAlgorithmClass(algorithmType, algorithmName) 
+        if algorithmClass is None: return 
+
+        algorithmObj = algorithmClass("Filler")
         mediator = Mediator(self.getAlgorithmDelay, self.scheduleScreenUpdate, self.__threadHandler)
-        self.__threadHandler.startAlgorithm(algorithmChoice, algorithmType)
+
+        try:
+            algorithmObj.setDataStructure(self.getDataStructure())
+            algorithmObj.setMediator(mediator)
+        except Exception as e:
+            print(f"ERROR: {e}")
+            return
+        finally:
+            print(algorithmObj.getName())
+            # self.__threadHandler.startAlgorithm(algorithmChoice, algorithmType)
+            self.__isAlgorithmFinished()
 
 
     def stopAlgorithmThread(self) -> None: 
@@ -89,8 +112,20 @@ class AlgorithmController(Generic[S, M, D]):
     def getDataStructure(self) -> D: return self.__dataStructure
 
 
+    def setUpdateFunction(self, updateFunc : Callable) -> None: 
+        self.__updateFunc = updateFunc
+
+
     def scheduleScreenUpdate(self) -> None:
-        self.__screen.getWindow().scheduleFunctionExecution(self.__updateFunc, EXECUTION_DELAY)
+        if self.__updateFunc is None: return
+        self.__screen.getWindow().scheduleFunctionExecution(self.__updateFunc, EXECUTION_DELAY) 
+
+    
+    def __isAlgorithmFinished(self) -> None: 
+        if not self.__threadHandler.isThreadAlive(): 
+            self.getScreen().algorithmComplete()
+        else: 
+            self.getScreen().getWindow().scheduleFunctionExecution(self.__isAlgorithmFinished, EXECUTION_DELAY)
     
 
 # Listen to Catch These Fists by Wet Leg     

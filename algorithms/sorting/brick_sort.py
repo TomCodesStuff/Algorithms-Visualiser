@@ -5,17 +5,21 @@ if(__name__ == "__main__"):
     exit()
 
 from ..algorithm import Algorithm
+
+
 class BrickSort(Algorithm):
     # Constructor
-    def __init__(self, dataModel):
-       super().__init__(dataModel)
+    def __init__(self,):
+       super().__init__()
+
 
     # Returns algorithms name -> user sees this when selecting algorithm
     def getName(self) -> str:
         return "Brick Sort" 
     
+
     # Brick Sort Algorithm
-    def brickSort(self) -> int: 
+    def run(self) -> int: 
         # Length of the array
         n = len(self.getArray())
         swapped = True 

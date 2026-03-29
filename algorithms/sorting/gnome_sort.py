@@ -5,17 +5,21 @@ if(__name__ == "__main__"):
     exit()
 
 from ..algorithm import Algorithm
+
+
 class GnomeSort(Algorithm):
     # Constructor
-    def __init__(self, dataModel):
-        super().__init__(dataModel)
+    def __init__(self):
+        super().__init__()
+
 
     # Returns algorithms name -> user sees this when selecting algorithm
     def getName(self) -> str:
         return "Gnome Sort" 
-    
+
+
     # Gnome Sort Algorithm
-    def gnomeSort(self) -> int: 
+    def run(self) -> int: 
         # Length of the array
         n = len(self.getArray())
         pos = 0  
