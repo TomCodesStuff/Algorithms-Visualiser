@@ -1,1 +1,1 @@
-from .screen_enums import ScreenType, SortDirection
+from .screen_enums import ScreenType, AlgorithmType, SortDirection

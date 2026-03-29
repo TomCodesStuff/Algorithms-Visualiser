@@ -6,7 +6,8 @@ if(__name__ == "__main__"):
 
 
 import tkinter as tk 
-from typing import TYPE_CHECKING, TypeVar
+from typing import TYPE_CHECKING, TypeVar 
+from enums import AlgorithmType
 from ..array_algorithm import ArrayAlgorithmScreen
 
 if TYPE_CHECKING:
@@ -46,6 +47,7 @@ class SearchScreen(ArrayAlgorithmScreen[C, M, D]):
 
     def render(self) -> None: 
         self.createBaseArrayLayout()  
+        self.displayAlgorithmOptions(AlgorithmType.SEARCHING)
         self.__createTargetAdjuster()
 
 

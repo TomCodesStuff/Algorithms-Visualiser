@@ -22,7 +22,7 @@ class BinarySearch(Algorithm):
         array = self.getArray()
         target = self.getTarget()
 
- 
+
         # Low and high variables used to adjust mid
         low = 0 
         high = len(array) - 1

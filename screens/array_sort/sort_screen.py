@@ -8,7 +8,7 @@ if(__name__ == "__main__"):
 import tkinter as tk 
 from typing import TYPE_CHECKING, TypeVar
 from ..array_algorithm import ArrayAlgorithmScreen
-from enums import SortDirection
+from enums import SortDirection, AlgorithmType
 
 if TYPE_CHECKING:
     from array_sort import SortController, SortModel, SortArray
@@ -65,7 +65,8 @@ class SortScreen(ArrayAlgorithmScreen[C, M, D]):
 
 
     def render(self) -> None: 
-        self.createBaseArrayLayout()
+        self.createBaseArrayLayout() 
+        self.displayAlgorithmOptions(AlgorithmType.SORTING)
         self.__createSortOptionButtons()
 
 

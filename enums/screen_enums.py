@@ -7,6 +7,13 @@ class ScreenType(Enum):
     TRAVERSAL = "traversal"
 
 
+class AlgorithmType(Enum): 
+    SEARCHING = "searching"
+    SORTING = "sorting"
+    TRAVERSAL = "traversal"
+
+
+
 class SortDirection(Enum):
     ASCENDING = 0
     DESCENDING = 1 

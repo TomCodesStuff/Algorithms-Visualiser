@@ -5,7 +5,7 @@ from tkinter import ttk
 from typing import TYPE_CHECKING, Generic, TypeVar
 from algorithms import getAlgorithms
 from screens import ScreenInterface
-from enums import ScreenType
+from enums import ScreenType, AlgorithmType
 
 
 # If this isn't at the top the program breaks :/
@@ -58,9 +58,12 @@ class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
     @abstractmethod
     def prepare(self) -> None: pass  
 
+    @abstractmethod
+    def render(self) -> None: pass 
 
-    def render(self):
-        self.createBaseLayout() 
+
+    def displayAlgorithmOptions(self, algorithmType : AlgorithmType) -> None: 
+        self.__algorithmOptions["values"] = self.getWindow().getAlgorithmNames(algorithmType) 
 
 
     # Creates frame to display the border

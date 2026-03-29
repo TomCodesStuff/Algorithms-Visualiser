@@ -1,7 +1,8 @@
 import tkinter as tk
-from typing import Callable
+from typing import Callable, Tuple 
+from algorithm_validator import AlgorithmValidator
 from screen_creator import ScreenCreator
-from enums import ScreenType
+from enums import ScreenType, AlgorithmType
 
 # If the file is run as is message this returned and program exits
 if(__name__ == "__main__"):
@@ -12,6 +13,9 @@ if(__name__ == "__main__"):
 # Window Class - Creates a blank tkinter window
 class Window():
     def __init__(self, width : int, height : int) -> None:
+        self.__algorithmValidator = AlgorithmValidator()
+        self.__algorithmValidator.findValidAlgorithms()
+        
         # Variables to store minimum width and height - means they can be easily changed
         minWidth = 750 
         minHeight = 500
@@ -118,4 +122,9 @@ class Window():
     def getContentFrameWidth(self) -> int:
         return self.__contentFrameWidth 
     
+
+    def getAlgorithmNames(self, algorithmType : AlgorithmType) -> Tuple:
+        return self.__algorithmValidator.getAlgorithmNames(algorithmType)
+
+
 # Listen to Killing In The Name by Rage Against The Machine
