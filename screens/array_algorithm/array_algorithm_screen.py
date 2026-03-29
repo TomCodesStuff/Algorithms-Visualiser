@@ -7,7 +7,6 @@ if(__name__ == "__main__"):
 
 
 import tkinter as tk
-import random 
 from typing import TYPE_CHECKING, TypeVar
 from ..algorithm_base import AlgorithmScreen
 
@@ -30,7 +29,7 @@ class ArrayAlgorithmScreen(AlgorithmScreen[C, M, D]):
     def __createArrayAdjuster(self) -> None:
         self.__arraySizeSlider = tk.Scale(self.getOptionsWidgetFrame(), from_ = 1, to_ = self.getModel().getMaxBars(), 
                                           length = self.getOptionsWidgetFrame().winfo_width(),\
-            orient = "horizontal", bg = "white", highlightbackground = "white", command = self.getController().adjustArray)
+            orient = "horizontal", bg = "white", highlightbackground = "white", command = lambda x: self.getController().adjustArray(int(x)))
         self.__arraySizeSlider.pack(pady = (10, 0))
         self.addToggleableWidget(self.__arraySizeSlider)
 
@@ -72,4 +71,5 @@ class ArrayAlgorithmScreen(AlgorithmScreen[C, M, D]):
         self.createBaseLayout()
         self.getController().calculateArrayBounds()
         self.createArrayOptions() 
+        self.getController().adjustArray(1)
         

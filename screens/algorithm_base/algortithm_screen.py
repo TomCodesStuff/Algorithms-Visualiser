@@ -3,7 +3,6 @@ import tkinter as tk
 from abc import abstractmethod
 from tkinter import ttk
 from typing import TYPE_CHECKING, Generic, TypeVar
-from algorithms import getAlgorithms
 from screens import ScreenInterface
 from enums import ScreenType, AlgorithmType
 
@@ -290,10 +289,6 @@ class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
         self.__updateStateButton() 
         self.__toggleStateButton()
 
-
-    def loadAlgorithmOptions(self, algorithmsType : str) -> None:
-        self.__algorithmOptions['value'] = getAlgorithms(algorithmsType)
-    
 
     # Returns algorithm the user has selected 
     def __getAlgorithmChoice(self) -> str:

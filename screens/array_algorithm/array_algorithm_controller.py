@@ -65,35 +65,48 @@ class ArrayAlgorithmController(AlgorithmController[S, M, D]):
                                                                 + self.getModel().getBarDistance()
 
 
+    def __clampArray(self) -> None:
+        if self.getDataStructure().size() <= self.getModel().getMaxBars(): return 
+        for _ in range(self.getModel().getMaxBars(), self.getDataStructure().size()): 
+            self.getDataStructure().pop()  
+        self.getModel().setArraySize(self.getDataStructure().size())
+
+
+    def adjustArray(self, value : int) -> None: 
+        # Add or remove elements depending on slider value
+        if(value < len(self.getDataStructure().get())): self.__deleteElements(value)
+        else: self.__addElements(value)
+        self.displayArray()
+
+
     # Adjusts size of bars so amount of elements can fit on screen and stay in the canvas' centre
-    def adjustArray(self, value : str) -> None:
-        # If the value given from the scrollbar is less than the arrays size
-        # Delete elements from the array and check if bar size can increase
-        if(int(value) < len(self.getDataStructure().get())): 
-            self.__deleteElements(int(value))
-            self.__increaseBarSize()
-        # Otherwise add elements to the array and check if bar size needs to decrease
-        else: 
-            self.__addElements(int(value))
+    def __adjustBarLayout(self) -> None: 
+        prevArraySize = self.getModel().getArraySize()
+        # Clamp array to Maximum Number bars if too big 
+        self.__clampArray()
+        
+        if prevArraySize < self.getDataStructure().size():
             self.__decreaseBarSize()
-        # If the array size is less than the maximum number of bars. 
-        # Calculate padding 
+        elif prevArraySize > self.getDataStructure().size(): 
+            self.__increaseBarSize()
+
+
+        # Calculate padding if maximum bar size not reached
         if(len(self.getDataStructure().get()) != self.getModel().getMaxBars()): self.__padding = self.__calculatePadding()
-        # If the array size is now at maximum size, 
-        # padding is the value calulated by the calculateBestPadding() method
         else: self.__padding = self.getModel().getMinPadding()
         
         # The amount each elements is stretched along the y-axis 
         # Means the elements are scaled with the largest element
         self.yStretch = self.getModel().getMaximumPixels() / max(self.getDataStructure().get())
-        # Draw the actual array with all the adjustments made
-        # Since there is no algorithm active, all bars are drawn as black
-        self.displayArray()
+        
+        self.getModel().setArraySize(self.getDataStructure().size())
 
 
     # Iterates through array, drawing each bar
-    # The function has two default arguements -> currentIndex and altColour both initialised to None
     def displayArray(self) -> None:
+            # Do Checks with padding here 
+            self.__adjustBarLayout()
+            
             # Clear displayed array on screen
             self.__clearDisplayedArray()
             for x, y in enumerate(self.getDataStructure().get()):
@@ -161,9 +174,7 @@ class ArrayAlgorithmController(AlgorithmController[S, M, D]):
         lowerBound = round((self.getScreen().getCanvas().winfo_height() - self.getModel().getMaximumPixels() + 1) 
                                   / (self.getModel().getMaximumPixels() / self.getModel().getHigherBound()))  
         self.getModel().setLowerBound(lowerBound)
-        # Draw the first element on screen
-        self.adjustArray('1')
-    
+        
 
 # Listen to Generator by Foo Fighters 
         

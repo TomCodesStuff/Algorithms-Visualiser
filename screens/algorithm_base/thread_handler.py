@@ -9,7 +9,10 @@ class ThreadHandler():
         self.__delayLock = threading.Lock() 
 
 
-    def thread_function(self): 
+    def runAlgorithm(self): 
+        # Has algorithm already -> run it via algorithm.run
+        
+        
         running = True
         while(running):
             print("I am Running") 
@@ -80,7 +83,7 @@ class ThreadHandler():
 
         print("Starting Thread")
         # Call algorithm -> so this program actually has a use
-        self.__algorithmThread = threading.Thread(target=self.thread_function)
+        self.__algorithmThread = threading.Thread(target=self.runAlgorithm)
         # Start Thread
         self.__algorithmThread.start() 
 
