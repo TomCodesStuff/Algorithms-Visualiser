@@ -122,8 +122,10 @@ class AlgorithmController(Generic[S, M, D]):
     
     def __isAlgorithmFinished(self) -> None: 
         if not self.__threadHandler.isThreadAlive(): 
+            print("Thread is done")
             self.getScreen().algorithmComplete()
         else: 
+
             self.getScreen().getWindow().scheduleFunctionExecution(self.__isAlgorithmFinished, EXECUTION_DELAY)
     
 
