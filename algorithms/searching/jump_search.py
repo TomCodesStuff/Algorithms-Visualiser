@@ -5,8 +5,9 @@ if(__name__ == "__main__"):
     exit()
 
 
-from ..algorithm import Algorithm
+from algorithms import Algorithm
 import math 
+
 
 class JumpSearch(Algorithm):
     # Constructor

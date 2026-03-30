@@ -4,7 +4,8 @@ if(__name__ == "__main__"):
     print("This is file shouldn't be run on it's own. \nIt should be imported only.")
     exit()
 
-from ..algorithm import Algorithm
+
+from algorithms import Algorithm
 
 
 class MergeSort(Algorithm):

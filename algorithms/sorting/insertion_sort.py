@@ -5,7 +5,7 @@ if(__name__ == "__main__"):
     exit()
 
 
-from ..algorithm import Algorithm
+from algorithms import Algorithm
 
 
 class InsertionSort(Algorithm):
