@@ -9,7 +9,7 @@ import sys
 
 # Abstract class - every algorithm must implement the getName() method
 class Algorithm(ABC):     
-    def __init__(self, x):
+    def __init__(self):
         self.__dataStructure = None 
         self.__mediator = None 
 

@@ -1,5 +1,7 @@
 import threading
 from algorithms import Algorithm
+import time
+
 
 THREAD_TIMEOUT = 1
 
@@ -15,7 +17,8 @@ class ThreadHandler():
 
     def runAlgorithm(self, algorithm : Algorithm): 
         self.__algorithmStarted.set() 
-        algorithm.run()        
+        time.sleep(10)
+        # algorithm.run()        
         # running = True
         # while(running):
         #     print("I am Running") 

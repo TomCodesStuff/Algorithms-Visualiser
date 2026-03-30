@@ -54,7 +54,7 @@ class AlgorithmController(Generic[S, M, D]):
         algorithmClass = self.getScreen().getWindow().getAlgorithmClass(algorithmType, algorithmName) 
         if algorithmClass is None: return 
 
-        algorithmObj = algorithmClass("Filler")
+        algorithmObj = algorithmClass()
         mediator = Mediator(self.getAlgorithmDelay, self.scheduleScreenUpdate, self.__threadHandler)
 
         try:
@@ -64,8 +64,7 @@ class AlgorithmController(Generic[S, M, D]):
             print(f"ERROR: {e}")
             return
         finally:
-            print(algorithmObj.getName())
-            # self.__threadHandler.startAlgorithm(algorithmChoice, algorithmType)
+            self.__threadHandler.startAlgorithm(algorithmObj)
             self.__isAlgorithmFinished()
 
 

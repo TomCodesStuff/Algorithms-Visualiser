@@ -93,7 +93,7 @@ class AlgorithmValidator():
         if not self.__isAlgorithmSubclass(algorithmClassName, algorithmClass): return None  
 
         try:
-            algorithmInstance = algorithmClass("Foo Fighters #1")  
+            algorithmInstance = algorithmClass()  
         except Exception as e: 
             print(f"FAILED: Could not create instance of {algorithmClassName}.\nException {e}")
             return None
@@ -103,7 +103,7 @@ class AlgorithmValidator():
 
 
     def __addValidAlgorithm(self, algorithmType : str, algorithmClass : type[Algorithm]) -> None: 
-        algorithmInstance = algorithmClass("Foo Fighters #1")
+        algorithmInstance = algorithmClass()
         self.__algorithmsByType[algorithmType][algorithmInstance.getName()] = algorithmClass
 
 
