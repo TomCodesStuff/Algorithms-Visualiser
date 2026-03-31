@@ -39,7 +39,7 @@ class MainMenu(ScreenInterface):
         # The introductory text is kept as a string 
         # as it makes it easier to change (and makes code easier to read)
         introText = "AVA (Algorithms Visualised Amazingly) makes algorithms fun!\n" +\
-            "Press one of the buttons to start visualising."
+            "Press a button to start visualising."
         # Label that contains the introduction text
         tk.Label(self.__contentFrame, text = introText, font = (self.__FONT, 14), justify = "center", bg = "white")\
             .pack(pady = 5) 
