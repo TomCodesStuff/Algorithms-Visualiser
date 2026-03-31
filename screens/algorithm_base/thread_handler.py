@@ -1,6 +1,5 @@
 import threading
 from algorithms import Algorithm
-import time
 
 
 THREAD_TIMEOUT = 1
@@ -17,17 +16,11 @@ class ThreadHandler():
 
     def runAlgorithm(self, algorithm : Algorithm): 
         self.__algorithmStarted.set() 
-        time.sleep(10)
-        # algorithm.run()        
-        # running = True
-        # while(running):
-        #     print("I am Running") 
-        #     if self.hasAlgorithmStopped(): running = False
-        #     self.acquirePauseLock()
-        #     self.releasePauseLock()
-
-        # print("I have stoppped")
-
+        try:
+            algorithm.run() 
+        except Exception as e:
+            print(f"ERROR: Algorithm broke at some point :(.\nException: {e}")
+            
 
     def isThreadAlive(self) -> bool:
         if self.__algorithmThread is None: return False 

@@ -13,12 +13,14 @@ from .thread_handler import ThreadHandler
 from data_structures import DataStructure
 from enums import AlgorithmType
 
+SECONDS_TO_MILLISECONDS = 1000
 
 # TODO -> make function to repeatedly check when algorithm done (done)
 #      -> when done toggle widgets -> make cool animations clear variables (make abstract method) (do later)
-#      -> add generic type hinting for DataStructure 
-#      -> fix linear search and test running, pausing, stopping, adjusting delay 
-#      -> fix other algorithms
+#      -> add generic type hinting for DataStructure (done)
+#      -> fix linear search and test running, pausing, stopping, adjusting delay (done)
+#      -> fix other algorithms (in progress)
+
 if TYPE_CHECKING:
     from algorithm_base import AlgorithmScreen, AlgorithmModel
 
@@ -37,6 +39,7 @@ class AlgorithmController(Generic[S, M, D]):
         self.__dataStructure = dataStructure
         self.__threadHandler = ThreadHandler() 
 
+
         # TODO create some abstract methods to make sure these are defined
         self.__updateFunc = None
 
@@ -49,23 +52,28 @@ class AlgorithmController(Generic[S, M, D]):
                 self.__screen.getWindow().cancelScheduledFunctions()   
     
 
-    def startAlgorithmThread(self, algorithmType : AlgorithmType, algorithmName : str) -> None: 
-        print(algorithmType, algorithmName)
+    def startAlgorithmThread(self, algorithmType : AlgorithmType, algorithmName : str) -> None:    
         algorithmClass = self.getScreen().getWindow().getAlgorithmClass(algorithmType, algorithmName) 
         if algorithmClass is None: return 
-
-        algorithmObj = algorithmClass()
         mediator = Mediator(self.getAlgorithmDelay, self.scheduleScreenUpdate, self.__threadHandler)
-
+        
+        try:
+            algorithmObj = algorithmClass()
+        except Exception as e: 
+            print(f"ERROR: Unable to create algorithm object: {e}")
+            self.getScreen().algorithmComplete()
+            return
+        
         try:
             algorithmObj.setDataStructure(self.getDataStructure())
             algorithmObj.setMediator(mediator)
         except Exception as e:
+            self.getScreen().algorithmComplete()
             print(f"ERROR: {e}")
             return
-        finally:
-            self.__threadHandler.startAlgorithm(algorithmObj)
-            self.__isAlgorithmFinished()
+        
+        self.__threadHandler.startAlgorithm(algorithmObj)
+        self.__handleAlgorithmExecution()
 
 
     def stopAlgorithmThread(self) -> None: 
@@ -93,9 +101,10 @@ class AlgorithmController(Generic[S, M, D]):
         return self.__threadHandler.isThreadAlive()
 
 
-    def updateAlgorithmDelay(self, value : float) -> None: 
+    def updateAlgorithmDelay(self, delay : float) -> None: 
+        if(self.__model.isDelayMilliSeconds()): delay //= SECONDS_TO_MILLISECONDS
         self.__threadHandler.acquireDelayLock() 
-        self.__model.setDelay(value)
+        self.__model.setDelay(delay)
         self.__threadHandler.releaseDelayLock() 
 
 
@@ -115,18 +124,25 @@ class AlgorithmController(Generic[S, M, D]):
         self.__updateFunc = updateFunc
 
 
+    def setUpdateFunction(self, updateFunc : Callable) -> None: 
+        self.__updateFunc = updateFunc
+
+
     def scheduleScreenUpdate(self) -> None:
         if self.__updateFunc is None: return
         self.__screen.getWindow().scheduleFunctionExecution(self.__updateFunc, EXECUTION_DELAY) 
 
     
-    def __isAlgorithmFinished(self) -> None: 
+    def __handleAlgorithmExecution(self) -> None: 
         if not self.__threadHandler.isThreadAlive(): 
-            print("Thread is done")
+            self.__updateFunc(refreshColours=False)
             self.getScreen().algorithmComplete()
         else: 
-
-            self.getScreen().getWindow().scheduleFunctionExecution(self.__isAlgorithmFinished, EXECUTION_DELAY)
+            self.__updateFunc(refreshColours=False)
+            self.getScreen().getWindow().scheduleFunctionExecution(self.__handleAlgorithmExecution, EXECUTION_DELAY) 
+       
     
+    def isAlgorithmRunning(self) -> None: 
+        return self.__threadHandler.isThreadAlive()
 
 # Listen to Catch These Fists by Wet Leg     

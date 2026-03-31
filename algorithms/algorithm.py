@@ -4,11 +4,17 @@ if(__name__ == "__main__"):
     exit()
 
 from abc import ABC, abstractmethod
-import time
-import sys
+from data_structures import DataStructure
+from typing import Generic, TypeVar, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from screens import Mediator
+
+
+D = TypeVar("D", bound="DataStructure")
 
 # Abstract class - every algorithm must implement the getName() method
-class Algorithm(ABC):     
+class Algorithm(Generic[D], ABC):     
     def __init__(self):
         self.__dataStructure = None 
         self.__mediator = None 
@@ -22,15 +28,22 @@ class Algorithm(ABC):
     def run(self): pass
 
 
-    def setDataStructure(self, dataStructure) -> None: 
+    def setDataStructure(self, dataStructure : D) -> None: 
         if self.__dataStructure is not None: raise Exception("ERROR: Data Structure has already been set")
         self.__dataStructure = dataStructure 
     
 
-    def setMediator(self, mediator) -> None: 
+    def setMediator(self, mediator : "Mediator") -> None: 
         if self.__mediator is not None: raise Exception("ERROR: Mediator has already been set")
         self.__mediator = mediator 
+    
 
+    def invokeBriefDelay(self) -> None: self.__mediator.briefDelay()
+    def invokeDelay(self) -> None: self.__mediator.delay()
+    
+
+    def getDataStructure(self) -> D: 
+        return self.__dataStructure
 
     # Checks if elements at the specified indexes are equal
     # def areElementsEqual(self, i : int, j : int) -> bool: 

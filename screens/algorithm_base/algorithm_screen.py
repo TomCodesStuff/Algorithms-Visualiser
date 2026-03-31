@@ -22,7 +22,7 @@ C = TypeVar("C", bound="AlgorithmController")
 M = TypeVar("M", bound="AlgorithmModel")
 D = TypeVar("D", bound="DataStructure")
 
-SECONDS_TO_MILLISECONDS = 1000
+
 FRAME_HEIGHT = 50
 
 # All screens that visualise the algorithms have the same fundamental layout
@@ -51,8 +51,7 @@ class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
         self.__toggleableWidgets = []
 
         self.__isAlgorithmRunning = False 
-        self.__isAlgorithmPaused = False 
-
+    
         self.__algorithmType = None 
 
 
@@ -160,11 +159,9 @@ class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
 
 
     # Sets the delay that pauses algorithms during execution     
-    def __setDelay(self) -> None:  
-        if(self.__model.isDelayMilliSeconds()):   
-            self.__controller.updateAlgorithmDelay(self.__speedSlider.get() // SECONDS_TO_MILLISECONDS)
-        else: self.__controller.updateAlgorithmDelay(self.__speedSlider.get())
-  
+    def __setDelay(self) -> None:   
+        self.getController().updateAlgorithmDelay(float(self.__speedSlider.get()))
+
 
     # Creates a slider that allows users to adjust an algorithms speed
     def __createSpeedSlider(self) -> None:
@@ -260,14 +257,14 @@ class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
 
     
     def __updateStateButton(self) -> None:
-        if self.__isAlgorithmPaused:
+        if self.getController().isAlgorithmPaused():
             self.__stateButton.config(text="Resume.", command=self.__resumeAlgorithm) 
         else:
             self.__stateButton.config(text="Pause.", command=self.__pauseAlgorithm)  
 
 
     def __updateRunButton(self) -> None: 
-        if self.__isAlgorithmRunning:
+        if self.__isAlgorithmRunning: 
             self.__runButton.config(text="Stop.", command=self.__stopAlgorithm)
         else: 
             self.__runButton.config(text="Solve.", command=self.__runAlgorithm)  
@@ -281,7 +278,7 @@ class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
     
 
     def __toggleStateButton(self) -> None: 
-        if self.__isAlgorithmRunning: 
+        if self.__isAlgorithmRunning:
             self.__stateButton.config(state="active")
         else: self.__stateButton.config(state="disabled")
 
@@ -301,26 +298,23 @@ class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
     # Releases the lock, letting the algorithm thread run again
     def __resumeAlgorithm(self) -> None: 
         self.__controller.resumeAlgorithm()
-        self.__isAlgorithmPaused = False
         self.__updateStateButton()
 
 
     # Holds the lock, pausing the algorithm Thread
     def __pauseAlgorithm(self) -> None: 
         self.__controller.pauseAlgorithm()
-        self.__isAlgorithmPaused = True 
         self.__updateStateButton() 
 
 
     # Call algorithm user has selected
-    def __runAlgorithm(self) -> None:  
+    def __runAlgorithm(self) -> None:   
         # Doesn't do anything if user hasn't chosen an algorithm
         if(self.__getAlgorithmChoice() == self.__selectDefaultText): 
             self.__algorithmOptions.config(foreground = "red")
         else:
+            self.__isAlgorithmRunning = True
             self.__algorithmOptions.config(foreground = "black")
-            self.__isAlgorithmRunning = True 
-            self.__isAlgorithmPaused = False
             self.__updateWidgets()
             self.prepare()            
             self.__controller.startAlgorithmThread(self.__algorithmType, self.__getAlgorithmChoice())
@@ -333,11 +327,10 @@ class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
         print("Here's where I would play a cool animation. If I had one")
 
 
-    # Forces current running algorithm thread to terminate (safely)
+    # Forces current running algorithm thread to terminate (safely, I hope)
     def __stopAlgorithm(self) -> None:
-        self.__controller.stopAlgorithmThread()
-        self.__isAlgorithmRunning = False
-        self.__isAlgorithmPaused = False 
+        self.__controller.stopAlgorithmThread() 
+        self.__isAlgorithmRunning = False 
         self.__updateWidgets()
 
 

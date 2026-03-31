@@ -14,6 +14,8 @@ class AlgorithmModel():
     def setMaxDelay(self, val : int) -> None:
         if  val > 0 and (self.__minDelay == 0 or val > self.__minDelay): 
             self.__maxDelay = val
+        # Ensures delay is set to an intial value 
+        if self.__delay == 0: self.__delay = self.__maxDelay
     
 
     def setMinDelay(self, val : int) -> None:

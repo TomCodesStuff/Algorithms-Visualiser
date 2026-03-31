@@ -6,9 +6,9 @@ if(__name__ == "__main__"):
 
 
 from algorithms import Algorithm
+from data_structures import SearchArray
 
-
-class LinearSearch(Algorithm):
+class LinearSearch(Algorithm[SearchArray]):
     # Constructor
     def __init__(self):
         super().__init__()
@@ -19,19 +19,19 @@ class LinearSearch(Algorithm):
     
 
     # Linear Search Algorithm
-    def run(self) -> int:   
-        self.shuffleArray()     
+    def run(self) -> int: 
+        array = self.getDataStructure()       
         # Iterate through array one element at a time
-        for index, num in enumerate(self.getArray()):
+        for index, num in enumerate(array.get()):
+            array.resetBarColours()
             # If current element is equal to the target
-            if num == self.getTarget():
-                # Set bar to green as target has been found
-                self.changeBarColour(index, "green") 
-                self.updateArrayOnScreen()
-                return 1
-            self.changeBarColour(index, "red")
-            self.updateArrayOnScreen()
-            self.delay()     
-        return -1
+            if num == array.getTarget():
+                # Set bar to green as target has been found 
+                array.setColourAt(index, "green") 
+                # self.updateArrayOnScreen()
+                return 0
+            else: array.setColourAt(index, "red")
+            self.invokeDelay()     
+        return 1
 
 # Listen to Karma Police By Radiohead

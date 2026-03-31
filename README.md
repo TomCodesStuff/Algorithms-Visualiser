@@ -63,7 +63,7 @@ New sorting algorithms can be added if they meet these requirements:
 ### Imports:
 
 ```python 
-algorithm import Algorithm 
+from algorithms import Algorithm 
 ```
 <i> Import statement needed to import Algorithm parent class </i>
 

@@ -52,7 +52,7 @@ class Mediator():
 
 
     def delay(self) -> None:  
-        self.__delayAlgorithm(self.getDelay()  )
+        self.__delayAlgorithm(self.getDelay())
 
 
 # Listen to Weak by Skunk Anansie

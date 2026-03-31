@@ -17,7 +17,7 @@ ELEMENT_OFFSET = 20
 class ArrayAlgorithmController(AlgorithmController[S, M, D]):
     def __init__(self, screen : S, model : M, dataStructure : D) -> None: 
         super().__init__(screen, model, dataStructure)
-
+        self.setUpdateFunction(self.displayArray)
 
     def calculateArrayBounds(self) -> None:
         # Returns the height of the canvas - maximum number of pixels an element can possibly have
@@ -104,7 +104,7 @@ class ArrayAlgorithmController(AlgorithmController[S, M, D]):
 
 
     # Iterates through array, drawing each bar
-    def displayArray(self) -> None:
+    def displayArray(self, refreshColours : bool=True) -> None:
             # Do Checks with padding here 
             self.__adjustBarLayout()
             
@@ -122,9 +122,12 @@ class ArrayAlgorithmController(AlgorithmController[S, M, D]):
                 y2 = self.getScreen().getCanvas().winfo_height() 
                 # Chooses correct colour for bar to be filled in with
                 self.getScreen().getCanvas().create_rectangle(x1, y1, x2, y2, fill = self.getDataStructure().getColourAt(x)) 
-            self.getDataStructure().resetBarColours()
+            
+            if refreshColours:
+                self.getDataStructure().resetBarColours()
             # Updates screen so bars can be seen onscreen
             self.getScreen().getWindow().update_idle_tasks() 
+            
 
 
     # Wipes everything off the canvas
