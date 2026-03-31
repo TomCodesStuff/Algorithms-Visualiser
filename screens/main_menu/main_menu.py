@@ -29,7 +29,7 @@ class MainMenu(ScreenInterface):
     # Creates the title displaying the projects name
     def __createTitle(self) -> None:
         # Header label
-        tk.Label(self.__contentFrame, text = "Welcome to Algorithms Anonymous.", 
+        tk.Label(self.__contentFrame, text = "Welcome to AVA.", 
                  font = (self.__FONT, 18, "underline"), bg = "white")\
             .pack(pady = 10) 
 
@@ -38,9 +38,8 @@ class MainMenu(ScreenInterface):
     def __createIntroParagraph(self) -> None:
         # The introductory text is kept as a string 
         # as it makes it easier to change (and makes code easier to read)
-        introText = "This program visualises different algorithms in a user friendly way. \n\
-        Including array searching, sorting and tree traversal algorithms. \n\
-        Press one of the buttons to start."
+        introText = "AVA (Algorithms Visualised Amazingly) makes algorithms fun!\n" +\
+            "Press one of the buttons to start visualising."
         # Label that contains the introduction text
         tk.Label(self.__contentFrame, text = introText, font = (self.__FONT, 14), justify = "center", bg = "white")\
             .pack(pady = 5) 
