@@ -6,9 +6,10 @@ if(__name__ == "__main__"):
 
 
 from algorithms import Algorithm
+from data_structures import SearchArray
 
 
-class ExponentialSearch(Algorithm):
+class ExponentialSearch(Algorithm[SearchArray]):
     def __init__(self):
         super().__init__()  
     
@@ -17,21 +18,25 @@ class ExponentialSearch(Algorithm):
         return "Exponential Search" 
     
     def run(self): 
-        array = self.getArray()
-        target = self.getTarget() 
+        array = self.getDataStructure()
+        target = array.getTarget()
 
-        self.sortArray()
+        array.sort() 
+        self.invokeBriefDelay()
+
         # If the target is the first element of the array
-        if(array[0] == target): return 1 
+        if(array.getAt(0) == target): 
+            array.setColourAt(0, "green")
+            return 0
         
         # Start at index 1
         i = 1
-        n = len(array) 
+        n = array.size()
         
         # Find the range the target could be in 
         # While i is less than the length of the array 
         # and the current value is less than or equal to the target
-        while(i < n and array[i] <= target):  
+        while(i < n and array.getAt(i) <= target):  
             # Double the value i
             i = i << 1 
         
@@ -39,33 +44,32 @@ class ExponentialSearch(Algorithm):
         # min(i, n - 1) is needed as i could be larger than the size of the array
         return self.binarySearch(i // 2, min(i, n - 1)) 
     
-    def binarySearch(self, left, right):
-        array = self.getArray()
-        target = self.getTarget()  
+    def binarySearch(self, left : int, right : int) -> int:
+        array = self.getDataStructure()
+        target = array.getTarget()
         upperBound = right 
         lowerBound = left 
 
         # Loop until left pointer is greater than the right pointer
         while(left <= right):  
-            self.changeBarColour(lowerBound, "orange")
-            self.changeBarColour(upperBound, "orange")
+            array.resetBarColours() 
+            array.setColourAt(lowerBound, "orange")
+            array.setColourAt(upperBound, "orange")
             # Calculate new mid
             mid = (left + right) // 2  
             # If value at index mid is the target
-            if(array[mid] == target): 
-                self.changeBarColour(mid, "green")
-                self.updateArrayOnScreen()
-                return 1 
+            if(array.getAt(mid) == target): 
+                array.setColourAt(mid, "green")
+                return 0
             # If the value at index mid is greater than the target, reduce right pointer
-            if(array[mid] > target): right = mid - 1
+            if(array.getAt(mid) > target): right = mid - 1
             # If the value at index mid is less than the target, increase left pointer
-            elif(array[mid] < target): left = mid + 1
+            elif(array.getAt(mid) < target): left = mid + 1
             
-            self.changeBarColour(mid, "red")
-            self.updateArrayOnScreen()
-            self.delay()
+            array.setColourAt(mid, "red")
+            self.invokeDelay()
         
         # Element is not in array
-        return 0
+        return 1
     
 # Listen to Welcome To Paradise By Green Day

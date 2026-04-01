@@ -11,7 +11,8 @@ class Mediator():
         self.__threadHandler = threadHandler
         
 
-    def getDelay(self) -> float: 
+    def getDelay(self) -> float:  
+        print(self.__delayFunc())
         return self.__delayFunc() 
 
 

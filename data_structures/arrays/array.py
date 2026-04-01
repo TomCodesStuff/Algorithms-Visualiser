@@ -10,6 +10,10 @@ class Array(DataStructure):
         self.__barColours = []
 
 
+    def __len__(self)  -> int:
+        return len(self.__array)
+
+
     # Returns the array
     def get(self) -> list: 
         return self.__array  

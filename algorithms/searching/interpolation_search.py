@@ -6,9 +6,10 @@ if(__name__ == "__main__"):
 
 
 from algorithms import Algorithm 
+from data_structures import SearchArray
 
 
-class InterpolationSearch(Algorithm):
+class InterpolationSearch(Algorithm[SearchArray]):
     # Constructor
     def __init__(self):
         super().__init__()  
@@ -19,30 +20,31 @@ class InterpolationSearch(Algorithm):
      
 
     def run(self): 
-        self.sortArray()
-        array = self.getArray() 
-        target = self.getTarget()
+        array = self.getDataStructure()
+        target = array.getTarget()
+
+        array.sort()
+        self.invokeBriefDelay()
 
         # Low and high variables, used to calculate pos
         low = 0
         high = len(array) - 1
 
-        # Iterate whilse conditions are met 
-        while(low <= high and target >= array[low] and target <= array[high]): 
+        # Iterate whilst conditions are met 
+        while(low <= high and target >= array.getAt(low) and target <= array.getAt(high)):  
+            array.resetBarColours()
             # Calculate pos (where algorithm guesses the target is)
-            pos = low + (((target - array[low]) * (high - low)) // (array[high] - array[low]))   
+            pos = low + (((target - array.getAt(low)) * (high - low)) // (array.getAt(high) - array.getAt(low)))   
             # target has been found
-            if(array[pos] == target): 
-                self.changeBarColour(pos, "green")
-                self.updateArrayOnScreen()
-                return 1  
+            if(array.getAt(pos) == target): 
+                array.setColourAt(pos, "green")
+                return 0
             # If element at index pos is greater than target, adjust high
-            if(array[pos] > target): high = pos - 1 
+            if(array.getAt(pos) > target): high = pos - 1 
             # If element at index pos is less than target, adjust low
-            elif(array[pos] < target): low = pos + 1
-            self.changeBarColour(pos, "red")
-            self.updateArrayOnScreen()
-            self.delay()
-        return 0 
+            elif(array.getAt(pos) < target): low = pos + 1
+            array.setColourAt(pos, "red")
+            self.invokeDelay()
+        return 1
 
 # Listen to Under The Cover Of Darkness by The Strokes

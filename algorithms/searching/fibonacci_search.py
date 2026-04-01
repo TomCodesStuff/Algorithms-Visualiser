@@ -6,9 +6,10 @@ if(__name__ == "__main__"):
 
 
 from algorithms import Algorithm
+from data_structures import SearchArray
 
 
-class FibonacciSearch(Algorithm):
+class FibonacciSearch(Algorithm[SearchArray]):
     def __init__(self):
         super().__init__() 
     
@@ -17,52 +18,52 @@ class FibonacciSearch(Algorithm):
         return "Fibonacci Search"  
     
     def run(self): 
-        array =  self.getArray() 
-        target = self.getTarget()
+        array = self.getDataStructure()
+        target = array.getTarget()
+        
         # Starting fibonacci numbers
         fibNMin2, fibNMin1, fibN = self.generateFibNums() 
         # offset, used to calculate index that is compared to target
         offset = -1  
         
         n = len(array)
-        self.sortArray()
+        array.sort()
+        self.invokeBriefDelay()
         
         # Iterate while there are still elements to check
         while(fibN > 1):  
+            array.resetBarColours()
             # Calculate index of element to check
             index = min(offset + fibNMin2, n - 1) 
             # if value at index is less than target
-            if(array[index] < target): 
+            if(array.getAt(index) < target): 
                 # Move all Fibonacci numbers two fibonacci numbers down
                 fibN = fibNMin1 
                 fibNMin1 = fibNMin2 
                 fibNMin2 = fibN - fibNMin1
                 offset = index 
             # if value at index is greater than target
-            elif(array[index] > target): 
+            elif(array.getAt(index) > target): 
                     # Move all Fibonacci numbers one fibonacci number down
                     fibN = fibNMin2  
                     fibNMin1 = fibNMin1 - fibNMin2 
                     fibNMin2 = fibN - fibNMin1  
             # target has been found at index
-            else:
-                self.changeBarColour(index, "green")
-                self.updateArrayOnScreen()
-                return 1  
+            else: 
+                array.setColourAt(index, "green")
+                return 0
 
-            self.changeBarColour(index, "red")
-            self.updateArrayOnScreen()
-            self.delay()
+            array.setColourAt(index, "red")
+            self.invokeDelay()
         
+        array.resetBarColours()
         # Comparing last element to the target 
-        if(fibNMin1 and array[n - 1] == target): 
-            self.changeBarColour(index, "green")
-            self.updateArrayOnScreen()
-            return 1 
+        if(fibNMin1 and array.getAt(n - 1) == target): 
+            array.setColourAt(index, "green")
+            return 0
         else:
-            self.changeBarColour(index, "red")
-            self.updateArrayOnScreen() 
-            return -1 
+            array.setColourAt(index, "red")
+            return 1
 
     # Calculate the starting fibonacci numbers, based on array size
     def generateFibNums(self) -> tuple: 
@@ -70,7 +71,7 @@ class FibonacciSearch(Algorithm):
         fibNMin1 = 1 
         fibN = fibNMin1 + fibNMin2
 
-        n = len(self.getArray())
+        n = len(self.getDataStructure())
         while(fibN < n): 
             fibNMin2 = fibNMin1 
             fibNMin1 = fibN 
