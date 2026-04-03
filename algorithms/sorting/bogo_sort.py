@@ -22,7 +22,6 @@ class BogoSort(Algorithm[SortArray]):
 
     # Bogo Sort Algorithm
     def run(self) -> int: 
-        print("HEllo")
         array = self.getDataStructure() 
         sortedArray = sorted(array.get(), reverse=array.isSortDescending())
         # Continue until array is sorted

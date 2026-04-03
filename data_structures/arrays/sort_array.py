@@ -36,7 +36,6 @@ class SortArray(Array):
     # Swaps the colour values of the two indexes specified
     def swapColoursAt(self, i : int, j : int) -> None:   
         barColoursArray = self.getBarColours()
-
         if i < 0 or j < 0: return 
         if i >= len(barColoursArray) or j >= len(barColoursArray): return 
         barColoursArray[i], barColoursArray[j] =\
@@ -48,5 +47,10 @@ class SortArray(Array):
         if(self.getSortingDirection() == SortDirection.ASCENDING):
             return self.getAt(i) > self.getAt(j) 
         else: return self.getAt(i) < self.getAt(j) 
+    
+
+    def areElementsEqual(self, i : int, j : int) -> bool:
+        return self.getAt(i) == self.getAt(j)
+
 
 # Listen to Snuff by Slipknot

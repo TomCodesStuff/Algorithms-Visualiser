@@ -12,7 +12,6 @@ class Mediator():
         
 
     def getDelay(self) -> float:  
-        print(self.__delayFunc())
         return self.__delayFunc() 
 
 

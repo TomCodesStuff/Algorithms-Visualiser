@@ -6,9 +6,9 @@ if(__name__ == "__main__"):
 
 
 from algorithms import Algorithm
+from data_structures import SortArray
 
-
-class GnomeSort(Algorithm):
+class GnomeSort(Algorithm[SortArray]):
     # Constructor
     def __init__(self):
         super().__init__()
@@ -21,33 +21,31 @@ class GnomeSort(Algorithm):
 
     # Gnome Sort Algorithm
     def run(self) -> int: 
+        array = self.getDataStructure()
         # Length of the array
-        n = len(self.getArray())
+        n = len(array)
         pos = 0  
         # While pos is less than the length of the array
         while(pos < n): 
-            self.changeBarColour(pos, "red")
-            self.updateArrayOnScreen()
-            self.delay()
+            array.resetBarColours()
+            array.setColourAt(pos, "red")
+            self.invokeDelay()
 
             # If pos is at the start of the array, increment pos
             if(pos == 0): pos += 1 
             # If element at pos and pos - 1 need to be swapped
-            if(self.isSwapNeeded(pos - 1, pos)):
-                self.swapElements(pos, pos - 1)
-                self.changeBarColour(pos - 1, "red")
-                self.updateArrayOnScreen()
-                self.delay()
+            if(array.isSwapNeeded(pos - 1, pos)):
+                array.swapAt(pos, pos - 1)
+                array.swapColoursAt(pos, pos - 1)
+                self.invokeDelay()
                 # Decrement pos
                 pos -= 1
             # If elements at pos and pos - 1 are in the right place
             else: 
                 # Increment pos 
                 pos += 1  
-        
-        self.updateArrayOnScreen()
-        self.delay()
-        self.coolEndingAnimation()
-        return 1 
+
+        self.invokeDelay()
+        return 0
         
 # Listen to Smells Like Teen Spirit by Nirvana 

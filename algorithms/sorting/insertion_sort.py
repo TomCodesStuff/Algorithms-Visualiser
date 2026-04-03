@@ -6,9 +6,9 @@ if(__name__ == "__main__"):
 
 
 from algorithms import Algorithm
+from data_structures import SortArray
 
-
-class InsertionSort(Algorithm):
+class InsertionSort(Algorithm[SortArray]):
     # Constructor
     def __init__(self):
         super().__init__() 
@@ -20,13 +20,14 @@ class InsertionSort(Algorithm):
 
     # Stable Selection Sort Algorithm
     def run(self) -> int: 
-        n = len(self.getArray())
+        array = self.getDataStructure()
+        n = len(array)
         # Iterate through array, the first element is considered as sorted 
         for i in range(1, n): 
-            self.changeBarColour(i - 1, "orange")
-            self.changeBarColour(i, "red")
-            self.updateArrayOnScreen()
-            self.delay()
+            array.resetBarColours()
+            array.setColourAt(i - 1, "orange")
+            array.setColourAt(i, "red")
+            self.invokeDelay()
 
             # The left pointer keeps track of sorted element being compared to the sorted element
             leftPtr = i - 1
@@ -34,19 +35,17 @@ class InsertionSort(Algorithm):
             rightPtr = i 
             # Iterate until the start of the sorted array or 
             # the unsorted element is in the right place 
-            while(leftPtr >= 0 and self.isSwapNeeded(leftPtr, rightPtr)): 
+            while(leftPtr >= 0 and array.isSwapNeeded(leftPtr, rightPtr)): 
                 # Swap elements indexes leftPtr, rightPtr
-                self.swapElements(leftPtr, rightPtr)
+                array.swapAt(leftPtr, rightPtr)
                 leftPtr -= 1
                 rightPtr -= 1  
-
-                self.changeBarColour(i, "orange")
-                self.changeBarColour(rightPtr, "red")
-                self.updateArrayOnScreen()
-                self.delay()
+                array.resetBarColours()
+                array.setColourAt(i, "orange")
+                array.setColourAt(rightPtr, "red")
+                self.invokeDelay()
         
-        self.coolEndingAnimation()
-        return 1 
+        return 0 
 
                      
 # Listen to Highway to Hell by ACDC

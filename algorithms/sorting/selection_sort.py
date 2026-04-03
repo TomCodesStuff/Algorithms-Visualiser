@@ -6,9 +6,10 @@ if(__name__ == "__main__"):
 
 
 from algorithms import Algorithm
+from data_structures import SortArray
 
 
-class SelectionSort(Algorithm):
+class SelectionSort(Algorithm[SortArray]):
     # Constructor
     def __init__(self):
         super().__init__() 
@@ -21,38 +22,39 @@ class SelectionSort(Algorithm):
 
     # Stable Selection Sort Algorithm
     def run(self) -> int: 
-        n = len(self.getArray())   
+        array = self.getDataStructure()
+        n = len(array)   
         # Iterate through each element in the array
         for i in range(n): 
+            array.resetBarColours()
             # Index of the current smallest/largest element in the array
             swapIdx = i 
             # Iterate through elements from i + 1 to the end of the current array 
-            for j in range(i + 1, n):  
-                self.changeBarColour(j , "red") 
-                self.updateArrayOnScreen() 
-                self.delay()
+            for j in range(i + 1, n): 
+                array.resetBarColours() 
+                array.setColourAt(i, "orange") 
+                array.setColourAt(j , "red") 
+                self.invokeDelay()
                 # If current element smaller/larger than previous smallest/largest element
-                if(not self.isSwapNeeded(j, swapIdx)): swapIdx = j   
+                if(not array.isSwapNeeded(j, swapIdx)): swapIdx = j   
             # Shift elements right 
             self.__shiftRight(i, swapIdx) 
             
-            self.changeBarColour(i, "orange")
-            self.updateArrayOnScreen() 
-            self.delay()
+            array.setColourAt(i, "orange") 
+            self.invokeDelay()
         
-        self.updateArrayOnScreen()
-        self.delay()
-        self.coolEndingAnimation() 
-        return 1
+        self.invokeDelay() 
+        return 0
     
     # Shifts elements between the specified indexes one place right 
     def __shiftRight(self, start, end): 
+        array = self.getDataStructure()
         index = end 
-        value = self.getElement(end)
+        value = array.getAt(end)
         while(index != start):  
-            self.changeElement(index, self.getElement(index - 1))
+            array.setAt(index, array.getAt(index - 1))
             index-=1  
-        self.changeElement(index, value)
+        array.setAt(index, value)
         
                      
 # Listen to Ain't No Rest For The Wicked by Cage the Elephant
