@@ -6,9 +6,9 @@ if(__name__ == "__main__"):
 
 
 from algorithms import Algorithm
+from data_structures import SortArray
 
-
-class BrickSort(Algorithm):
+class BrickSort(Algorithm[SortArray]):
     # Constructor
     def __init__(self,):
        super().__init__()
@@ -21,29 +21,31 @@ class BrickSort(Algorithm):
 
     # Brick Sort Algorithm
     def run(self) -> int: 
+        array = self.getDataStructure()
+
         # Length of the array
-        n = len(self.getArray())
+        n = len(array)
         swapped = True 
+        
         # While swapped is true
         while(swapped):
             swapped = False
             # Iterate through odd indexes of the array
-            for i in range(1, n - 1, 2): 
-                self.changeBarColour(i, "red") 
-                self.updateArrayOnScreen() 
-                self.delay()
+            for i in range(1, n - 1, 2):
+                array.resetBarColours()  
+                array.setColourAt(i, "red") 
+                self.invokeDelay()
                 # If elements are in the wrong the order
-                if(self.isSwapNeeded(i, i + 1)):
+                if(array.isSwapNeeded(i, i + 1)):
                     # Swap elements
-                    self.swapElements(i, i + 1)
-                    self.changeBarColour(i, "red") 
-                    self.updateArrayOnScreen() 
-                    self.delay()
+                    array.swapAt(i, i + 1)
+                    array.swapColoursAt(i, i + 1)
+                    self.invokeDelay()
                     swapped = True
             
-            self.changeBarColour(i, "red") 
-            self.updateArrayOnScreen() 
-            self.delay()
+            array.resetBarColours()
+            array.setColourAt(i, "red")  
+            self.invokeDelay()
             
             # If no swaps are performed
             if(not swapped): break
@@ -51,20 +53,18 @@ class BrickSort(Algorithm):
             swapped = False
             # Iterate through even indexes of the array
             for i in range(0, n - 1, 2):
-                self.changeBarColour(i, "red") 
-                self.updateArrayOnScreen() 
-                self.delay()
+                array.resetBarColours()
+                array.setColourAt(i, "red")  
+                self.invokeBriefDelay
                 # If elements are in the wrong the order
-                if(self.isSwapNeeded(i, i + 1)):
+                if(array.isSwapNeeded(i, i + 1)):
                     # Swap elements
-                    self.swapElements(i, i + 1)
-                    self.changeBarColour(i, "red") 
-                    self.updateArrayOnScreen() 
-                    self.delay()
+                    array.swapAt(i, i + 1)
+                    array.swapColoursAt(i, i + 1)  
+                    self.invokeDelay()
                     swapped = True  
-        self.updateArrayOnScreen()
-        self.delay() 
-        self.coolEndingAnimation()
-        return 1
+        
+        self.invokeDelay() 
+        return 0
 
 # Listen to Lithium by Nirvana 

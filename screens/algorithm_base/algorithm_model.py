@@ -1,3 +1,6 @@
+MILLISECONDS_TO_SECONDS = 1000
+
+
 class AlgorithmModel(): 
     def __init__(self):
         self.__delay = 0
@@ -8,14 +11,16 @@ class AlgorithmModel():
 
 
     def setDelay(self, val : float) -> None:
-        if val > 0: self.__delay = val 
+        if val < 0: return 
+        if self.__isDelayMilliseconds: self.__delay = val / MILLISECONDS_TO_SECONDS 
+        else: self.__delay = val  
 
     
     def setMaxDelay(self, val : int) -> None:
         if  val > 0 and (self.__minDelay == 0 or val > self.__minDelay): 
             self.__maxDelay = val
         # Ensures delay is set to an intial value 
-        if self.__delay == 0: self.__delay = self.__maxDelay
+        if self.__delay == 0: self.setDelay(self.__maxDelay)
     
 
     def setMinDelay(self, val : int) -> None:

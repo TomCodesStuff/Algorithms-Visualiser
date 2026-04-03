@@ -17,6 +17,10 @@ class Array(DataStructure):
     # Returns the array
     def get(self) -> list: 
         return self.__array  
+
+
+    def getBarColours(self) -> list:
+        return self.__barColours
     
     
     # Appends passed value to the array
@@ -41,25 +45,9 @@ class Array(DataStructure):
         random.shuffle(self.__array)
 
 
-    # TODO implement better checking
-    # Swaps the elements at the specified indexes
-    def swap(self, i : int, j : int) -> None: 
-        if(i >= len(self.__array) or j >= self.size()): return  
-        self.__array[i], self.__array[j] =\
-            self.__array[i], self.__array[j]
-    
-
-    # TODO implement better checking
-    # Swaps the colour values of the two indexes specified
-    def swapColours(self, i : int, j : int) -> None: 
-        if(i >= len(self.__barColours) or j >= self.size()): return  
-        self.__barColours[i], self.__barColours[j] =\
-            self.__barColours[i], self.__barColours[j]
-    
-
     # Changes the element at the specified index to the passed value
     def setAt(self, index : int, value : int) -> None: 
-        if(index >= self.getArraySize()): return
+        if(index >= self.size()): return
         self.__array[index] = value
     
 

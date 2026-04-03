@@ -13,8 +13,6 @@ from .thread_handler import ThreadHandler
 from data_structures import DataStructure
 from enums import AlgorithmType
 
-SECONDS_TO_MILLISECONDS = 1000
-
 # TODO -> make function to repeatedly check when algorithm done (done)
 #      -> when done toggle widgets -> make cool animations clear variables (make abstract method) (do later)
 #      -> add generic type hinting for DataStructure (done)
@@ -102,7 +100,6 @@ class AlgorithmController(Generic[S, M, D]):
 
 
     def updateAlgorithmDelay(self, delay : float) -> None: 
-        if(self.__model.isDelayMilliSeconds()): delay //= SECONDS_TO_MILLISECONDS
         self.__threadHandler.acquireDelayLock() 
         self.__model.setDelay(delay)
         self.__threadHandler.releaseDelayLock() 

@@ -101,7 +101,6 @@ class ArrayAlgorithmController(AlgorithmController[S, M, D]):
         # The amount each elements is stretched along the y-axis 
         # Means the elements are scaled with the largest element
         self.yStretch = self.getModel().getMaximumPixels() / max(self.getDataStructure().get())
-        
         self.getModel().setArraySize(self.getDataStructure().size())
 
 
@@ -110,6 +109,9 @@ class ArrayAlgorithmController(AlgorithmController[S, M, D]):
             # Do Checks with padding here 
             self.__adjustBarLayout()
             
+            if refreshColours:
+                self.getDataStructure().resetBarColours()
+
             # Clear displayed array on screen
             self.__clearDisplayedArray()
             for x, y in enumerate(self.getDataStructure().get()):
@@ -125,12 +127,9 @@ class ArrayAlgorithmController(AlgorithmController[S, M, D]):
                 # Chooses correct colour for bar to be filled in with
                 self.getScreen().getCanvas().create_rectangle(x1, y1, x2, y2, fill = self.getDataStructure().getColourAt(x)) 
             
-            if refreshColours:
-                self.getDataStructure().resetBarColours()
             # Updates screen so bars can be seen onscreen
             self.getScreen().getWindow().update_idle_tasks() 
             
-
 
     # Wipes everything off the canvas
     def __clearDisplayedArray(self) -> None:

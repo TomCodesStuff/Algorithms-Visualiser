@@ -6,9 +6,10 @@ if(__name__ == "__main__"):
 
 
 from algorithms import Algorithm
+from data_structures import SortArray
 
 
-class BogoSort(Algorithm):
+class BogoSort(Algorithm[SortArray]):
     # Constructor
     def __init__(self):
         super().__init__()
@@ -21,14 +22,14 @@ class BogoSort(Algorithm):
 
     # Bogo Sort Algorithm
     def run(self) -> int: 
-        sortedArray = sorted(self.getArray())
+        print("HEllo")
+        array = self.getDataStructure() 
+        sortedArray = sorted(array.get(), reverse=array.isSortDescending())
         # Continue until array is sorted
-        while(sortedArray != self.getArray()): 
+        while(sortedArray != array.get()): 
             # Randomly shuffle array
-            self.shuffleArray(delay=False)
-            self.delay() 
-        
-        self.coolEndingAnimation()
-        return 1
+            array.shuffle()
+            self.invokeDelay()
+        return 0
 
 # Listen to Times like these by the Foo Fighters
