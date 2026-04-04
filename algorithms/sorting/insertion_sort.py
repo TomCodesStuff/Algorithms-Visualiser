@@ -18,7 +18,7 @@ class InsertionSort(Algorithm[SortArray]):
         return "Insertion Sort"  
     
 
-    # Stable Selection Sort Algorithm
+    # Stable Insertion Sort Algorithm
     def run(self) -> int: 
         array = self.getDataStructure()
         n = len(array)
