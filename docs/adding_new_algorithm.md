@@ -6,7 +6,7 @@
 | [2. Class Formatting](#2-class-formatting)                |
 | [3. Algorithm Parent Class](#3-algorithm-parent-class)    |
 | [4. Method Implementation](#4-method-implementation)      |
-| [5. Data Structure Class]                                 | 
+| [5. Data Structure Class](#5-data-structure-class)        | 
 
 ## 1. File Formatting
 
@@ -17,8 +17,7 @@ When creating a new algorithm file, it must be found in the correct directory an
 The directory the new algorithm must be found will differ per algorithm type and are listed below:
 
 - Searching Algorithms -> <b> /algorithms/searching/ </b> <br>
-- Sorting Algorithms -> <b> /algorithms/sorting/ </b> <br>
-
+- Sorting Algorithms -> <b> /algorithms/sorting/ </b> 
 
 ### 1.2 File Name 
 
@@ -98,4 +97,15 @@ def run(self) -> int:
 <i> Correctly creating the `run()` method. </i>
 
 
-## 5. 
+## 5. Data Structure Class. 
+
+Algorithms interact with the project through a data structure class. <br> 
+The data structure class and its helper methods  differ depending on the algorithm type. <br>
+The specific data structure for each algorithm type are outlined below:
+
+- Searching Algorithms -> <b> [Search Array.](./search_array.md) </b> <br> 
+- Sorting Algorithms -> <b> [Sort Array.](./sort_array.md) </b> 
+
+---
+
+Go to [README.md](../README.md)
