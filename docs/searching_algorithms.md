@@ -24,11 +24,14 @@ For each algorithm, instructional steps are provided which can be followed to pr
 3. Set variable `high = array.length() - 1` 
 4. While low <= high: 
 5. Set variable `mid = (low + high) / 2`
-6. If `array[mid] == target`. Target has been found, return 0
-7. If array[mid] > target: `low = mid + 1` 
-8. If array[mid] < target: `high = mid - 1` 
+6. If `array[mid] == target`. <br>
+    Target has been found, return 0
+7. If array[mid] > target: <br>
+    \- Set `low = mid + 1` 
+8. If array[mid] < target: <br>
+    \- Set `high = mid - 1` 
 9. Go to Step 3.
-10. If target is not in array, return 1 
+10. Target is not in the array, return 1. 
 
 #### Time-Space Complexities: 
 
@@ -44,11 +47,12 @@ $$mid = {(low + high) \div 2}$$
 
 ### Algorithm Steps:
 
-1. If array[0] == target: Target has been found. Return 0. 
+1. If array[0] == target: <br>
+    \- Target has been found, return 0. 
 2. Set variable `i = 1` 
 3. Set variable `n = array.length()` 
 4. While i < n AND array[i] <= target:
-5. `i = i * 2` 
+5. Set `i = i * 2` 
 6. Go to Step 4.
 7. Perform a [binary search](#binary-search) where `low = i / 2` and `high = min(i, n - 1)`.
 
@@ -78,12 +82,22 @@ $$high = {\min(i,\;n-1)}$$
 5. Set variable `n = array.length()` 
 6. While fibN > 1: 
 7. Set variable `index = min(offset + fibMin2, n - 1)`
-8. If array[index] < target:  `offset = index`, `fibN = fibMin1`, `fibMin1 = fibMin2`, `fibMin2 = fibN - fibMin1`.   
-9. If array[index] > target: `fibN = fibMin2`,  `fibMin1 = fibMin1 - fibMin2`, `fibMin2 = fibN - fibMin1`   
-10. Else: Target has been found, return 0 
-11. Gi to Step 6.
-12. If fibMin1 > 0 AND array[array.length() -1] == target: Target found, return 0 
-13. Return 1
+8. If array[index] < target:  <br>
+    \- Set `offset = index`<br> 
+    \- Set `fibN = fibMin1` <br> 
+    \- Set `fibMin1 = fibMin2` <br> 
+    \- Set `fibMin2 = fibN - fibMin1`.   
+9. If array[index] > target: <br>
+    \- Set `fibN = fibMin2` <br>
+    \- Set `fibMin1 = fibMin1 - fibMin2` <br> 
+    \- Set `fibMin2 = fibN - fibMin1`   
+10. Else: <br>
+    \- Target has been found, return 0 
+11. Go to Step 6.
+12. If fibMin1 > 0 AND array[array.length() -1] == target: <br> 
+    \- Target found, return 0 
+13. Else: <br>
+    \- Target is not in the array, return 1.
 
 #### Time-Space Complexities:
 
@@ -103,11 +117,14 @@ $$index = {\min(offset + fibMin2,\;n-1)}$$
 2. Set a variable `high = array.length() - 1 ` 
 3. While low <= to high AND target >= array[low] AND target <= array[high] 
 4. Set variable `pos = (See Position Formula)` 
-5. If array[pos] == target. Target is found, return 0 
-6. If array[pos] > target: `high = pos - 1` 
-7. If array[pos] < target: `low = pos + 1` 
+5. If array[pos] == target. <br>
+    \- Target is found, return 0 
+6. If array[pos] > target: <br> 
+    \- Set `high = pos - 1` 
+7. If array[pos] < target: <br> 
+    \- Set `low = pos + 1` 
 8. Go to step 7. 
-9. Target not found, return 1
+9. Target could not be found, return 1. 
 
 #### Time-Space Complexities:
 
@@ -126,13 +143,17 @@ $$pos = {low+{(target-array[low])\times(high - low)\over(array[high]-array[low])
 1. Set variable `step = sqrt(array.length())`
 2. Set variable `prev = 0` 
 3. While step < array.length() AND array[min(step, array.length()) -1] < target:  
-4. `prev = step`, `step = step + sqrt(array.length())`. 
-5. If prev >= array.length(): Target can not be found, return 1.  
-6. Go to step 3. 
-7. for each index `i` from `prev` to `prev + sqrt(array.length())` 
-8. If array[i] == target: Target has been found, return 0
-9. if array[i] > target: Target can not be found, return 1. 
-10. Go to Step 7.
+4. Set `prev = step`
+5. Set `step = step + sqrt(array.length())`. 
+6. If prev >= array.length(): <br> 
+    \- Target can not be found, return 1.  
+7. Go to step 3. 
+8. for each index `i` from `prev` to `prev + sqrt(array.length())` 
+9. If array[i] == target: <br> 
+    \- Target has been found, return 0
+10. if array[i] > target: <br> 
+    \- Target can not be found, return 1. 
+11. Go to Step 7.
 
 #### Time-Space Complexities:
 
@@ -145,9 +166,9 @@ Space Complexity: O(1)
 #### Algorithm Steps:<br>
 
 1. For each index `i` in array.
-2. If array[i] == target: Target has been found, return 0
-3. Go to Step 1.
-4. Target has not been found, return 1.
+2. If array[i] == target: <br> 
+    \- Target has been found, return 0
+3. Target has not been found, return 1.
 
 #### Time-Space Complexities:
 
@@ -164,10 +185,15 @@ Space Complexity: O(1)
 3. While left <= right: 
 4. Set variable `mid1 = left + (right - left) / 3`
 5. Set variable `mid2 = right - (right - left) / 3`
-6. If array[mid1] == target OR array[mid2] == target: Target has been found, return 0 
-7. If array[mid1] < target: `right = mid1 - 1` 
-8. Else If array[mid2] > target: `left = mid2 + 1`
-9. Else: `left = mid1 + 1`, `right = mid2 - 1` 
+6. If array[mid1] == target OR array[mid2] == target: <br> 
+    \- Target has been found, return 0 
+7. If array[mid1] < target: <br> 
+    \- Set `right = mid1 - 1` 
+8. Else If array[mid2] > target: <br> 
+    \- Set `left = mid2 + 1`
+9. Else: <br>
+    \- Set `left = mid1 + 1` <br> 
+    \- Set `right = mid2 - 1` 
 10. Go to Step 3.
 11. Target can not be found, return 1 
 

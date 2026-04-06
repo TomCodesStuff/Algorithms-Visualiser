@@ -23,7 +23,8 @@ Algorithm Steps:
 
 1. While array is not sorted:
 2. Randomly shuffle array 
-3. If array is sorted: Array is sorted, return 0.
+3. If array is sorted: <br> 
+    \- Stop Algorithm.
 4. Go to Step one. 
 
 #### Time-Space Complexities: 
