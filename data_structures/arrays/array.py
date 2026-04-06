@@ -72,6 +72,10 @@ class Array(DataStructure):
     def resetBarColours(self) -> None: 
         self.__barColours = ["black" for _ in range(len(self.__array))] 
     
+
+    def setAllColours(self, colour : str) -> None: 
+        for i in range(len(self.__barColours)): 
+            self.__barColours[i] = colour
     
     # Returns the size of the array
     def size(self) -> int:

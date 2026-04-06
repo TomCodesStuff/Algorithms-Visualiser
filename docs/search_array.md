@@ -12,3 +12,5 @@ Below are the helper functions provided by the `SearchArray` class. <br>
 ---
 
 Go to [README.md](../README.md)
+
+<!-- Listen to Why Does It Always Rain On Me by Travis  -->

@@ -17,7 +17,6 @@ ELEMENT_OFFSET = 20
 class ArrayAlgorithmController(AlgorithmController[S, M, D]):
     def __init__(self, screen : S, model : M, dataStructure : D) -> None: 
         super().__init__(screen, model, dataStructure)
-        self.setUpdateFunction(self.displayArray)
 
     def calculateArrayBounds(self) -> None:
         # Returns the height of the canvas - maximum number of pixels an element can possibly have
@@ -77,7 +76,7 @@ class ArrayAlgorithmController(AlgorithmController[S, M, D]):
         # Add or remove elements depending on slider value
         if(value < len(self.getDataStructure().get())): self.__deleteElements(value)
         else: self.__addElements(value)
-        self.displayArray()
+        self.refreshCanvas()
 
 
     # Adjusts size of bars so amount of elements can fit on screen and stay in the canvas' centre
@@ -105,7 +104,7 @@ class ArrayAlgorithmController(AlgorithmController[S, M, D]):
 
 
     # Iterates through array, drawing each bar
-    def displayArray(self, refreshColours : bool=True) -> None:
+    def refreshCanvas(self, refreshColours : bool=True) -> None:
             # Do Checks with padding here 
             self.__adjustBarLayout()
             

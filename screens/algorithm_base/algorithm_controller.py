@@ -6,18 +6,14 @@ from typing import Callable
 if(__name__ == "__main__"):
     print("This is file shouldn't be run on it's own. \nIt should be imported only.")
     exit()
- 
+
+from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, TypeVar, Generic
 from .mediator import Mediator
 from .thread_handler import ThreadHandler 
 from data_structures import DataStructure
 from enums import AlgorithmType
 
-# TODO -> make function to repeatedly check when algorithm done (done)
-#      -> when done toggle widgets -> make cool animations clear variables (make abstract method) (do later)
-#      -> add generic type hinting for DataStructure (done)
-#      -> fix linear search and test running, pausing, stopping, adjusting delay (done)
-#      -> fix other algorithms (in progress)
 
 if TYPE_CHECKING:
     from algorithm_base import AlgorithmScreen, AlgorithmModel
@@ -29,17 +25,16 @@ D = TypeVar("D", bound="DataStructure")
 
 EXECUTION_DELAY = 0
 
-class AlgorithmController(Generic[S, M, D]):  
+class AlgorithmController(ABC, Generic[S, M, D]):  
 
     def __init__(self, screen : S, model : M, dataStructure : D):
         self.__screen = screen
         self.__model = model
         self.__dataStructure = dataStructure
         self.__threadHandler = ThreadHandler() 
-
-
-        # TODO create some abstract methods to make sure these are defined
-        self.__updateFunc = None
+    
+    @abstractmethod
+    def refreshCanvas(self, refreshColours:bool=False) -> None: pass
 
 
     # Cancels any scheduled function calls left by a terminated thread
@@ -70,6 +65,8 @@ class AlgorithmController(Generic[S, M, D]):
             print(f"ERROR: {e}")
             return
         
+        # Pass reference to ending animation so it can be called
+        self.__threadHandler.setEndingAnimationFunc(self.getScreen().runCoolEndingAnimation)
         self.__threadHandler.startAlgorithm(algorithmObj)
         self.__handleAlgorithmExecution()
 
@@ -115,31 +112,22 @@ class AlgorithmController(Generic[S, M, D]):
     def getScreen(self) -> S: return self.__screen 
     def getModel(self) -> M: return self.__model
     def getDataStructure(self) -> D: return self.__dataStructure
-
-
-    def setUpdateFunction(self, updateFunc : Callable) -> None: 
-        self.__updateFunc = updateFunc
-
-
-    def setUpdateFunction(self, updateFunc : Callable) -> None: 
-        self.__updateFunc = updateFunc
-
+    
 
     def scheduleScreenUpdate(self) -> None:
-        if self.__updateFunc is None: return
-        self.__screen.getWindow().scheduleFunctionExecution(self.__updateFunc, EXECUTION_DELAY) 
+        self.__screen.getWindow().scheduleFunctionExecution(self.refreshCanvas, EXECUTION_DELAY) 
 
     
     def __handleAlgorithmExecution(self) -> None: 
         if not self.__threadHandler.isThreadAlive(): 
-            self.__updateFunc(refreshColours=False)
+            self.refreshCanvas(refreshColours=False)
             self.getScreen().algorithmComplete()
         else: 
-            self.__updateFunc(refreshColours=False)
+            self.refreshCanvas(refreshColours=False)
             self.getScreen().getWindow().scheduleFunctionExecution(self.__handleAlgorithmExecution, EXECUTION_DELAY) 
        
     
     def isAlgorithmRunning(self) -> None: 
         return self.__threadHandler.isThreadAlive()
-
+    
 # Listen to Catch These Fists by Wet Leg     

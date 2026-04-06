@@ -244,9 +244,8 @@ Further details on how run size is officially calculated can be found [here.](ht
 For the purposes of visulisation this project calculates the run size such that the number of runs is approximately <b>16</b>. <br>
 For arrays shorter than 16 elements, only insertion sort is performed.
 
-
-
-
 --- 
 
 Go to [README.md](../README.md)
+
+<!-- Listen to Dear Maria, Count Me In by All Time Low  -->

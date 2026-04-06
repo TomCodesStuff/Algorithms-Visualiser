@@ -62,6 +62,24 @@ class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
     @abstractmethod
     def render(self) -> None: pass 
 
+    @abstractmethod 
+    def coolEndingAnimation(self) -> None: pass  
+
+    def __animationStarting(self) -> None:
+        self.__runButton.config(state="disabled")
+        self.__stateButton.config(state="disabled")
+        self.__homeButton.config(state="disabled")
+
+    def __animationEnding(self) -> None:
+        self.__runButton.config(state="active")
+        self.__stateButton.config(state="active")
+        self.__homeButton.config(state="active")
+    
+
+    def runCoolEndingAnimation(self) -> None:
+        self.__animationStarting() 
+        self.coolEndingAnimation() 
+        self.__animationEnding()
 
     def displayAlgorithmOptions(self) -> None: 
         self.__algorithmOptions["values"] = self.getWindow().getAlgorithmNames(self.__algorithmType) 
@@ -320,17 +338,14 @@ class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
             self.__controller.startAlgorithmThread(self.__algorithmType, self.__getAlgorithmChoice())
             
     # TODO add flag to play animation if algorithm terminated successfully
-
-    def algorithmComplete(self) -> None: 
+    def algorithmComplete(self) -> None:
         self.__stopAlgorithm()
-        # Play cool animation
-        print("Here's where I would play a cool animation. If I had one")
 
 
     # Forces current running algorithm thread to terminate (safely, I hope)
     def __stopAlgorithm(self) -> None:
         self.__controller.stopAlgorithmThread() 
-        self.__isAlgorithmRunning = False 
+        self.__isAlgorithmRunning = False  
         self.__updateWidgets()
 
 
@@ -358,7 +373,7 @@ class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
     # Getters 
     def getController(self) -> C: return self.__controller
     def getModel(self) -> M: return self.__model
-    def getdataStructure(self) -> D: return self.__dataStructure 
+    def getDataStructure(self) -> D: return self.__dataStructure 
     def getFont(self) -> str: return self.__FONT 
     def getFontSize(self) -> int: return self.__FONTSIZE
     def getOptionsWidgetFrame(self) -> tk.Frame: return self.__optionsWidgetsFrame 

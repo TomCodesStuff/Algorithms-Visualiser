@@ -64,7 +64,7 @@ class SortScreen(ArrayAlgorithmScreen[C, M, D]):
 
 
     def prepare(self): 
-        self.getdataStructure().setSortingDirecion(self.getModel().getSortDirection())
+        self.getDataStructure().setSortingDirecion(self.getModel().getSortDirection())
 
 
     def render(self) -> None: 

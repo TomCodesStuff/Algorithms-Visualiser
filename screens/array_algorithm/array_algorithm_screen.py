@@ -5,11 +5,12 @@ if(__name__ == "__main__"):
     print("This is file shouldn't be run on it's own. \nIt should be imported only.")
     exit()
 
-
+import time 
 import tkinter as tk
 from typing import TYPE_CHECKING, TypeVar
 from ..algorithm_base import AlgorithmScreen
 from data_structures import Array
+
 
 if TYPE_CHECKING:
     from array_algorithm import ArrayAlgorithmController, ArrayAlgorithmModel
@@ -18,6 +19,10 @@ if TYPE_CHECKING:
 C = TypeVar("C", bound="ArrayAlgorithmController")
 M = TypeVar("M", bound="ArrayAlgorithmModel")
 D = TypeVar("D", bound="Array")
+
+BRIEF_DELAY = 0.5
+TINY_DELAY = 0.1
+NUM_BAR_FLASHES = 3
 
 
 class ArrayAlgorithmScreen(AlgorithmScreen[C, M, D]):
@@ -51,13 +56,13 @@ class ArrayAlgorithmScreen(AlgorithmScreen[C, M, D]):
     
     # Sorts and displays the array
     def __sortArray(self) -> None:
-        self.getdataStructure().sort()
+        self.getDataStructure().sort()
         self.getController().displayArray() 
     
 
     # Shuffles and displays the array
     def __shuffleArray(self) -> None:
-        self.getdataStructure().shuffle()
+        self.getDataStructure().shuffle()
         self.getController().displayArray()  
 
 
@@ -72,7 +77,31 @@ class ArrayAlgorithmScreen(AlgorithmScreen[C, M, D]):
         self.getController().calculateArrayBounds()
         self.createArrayOptions() 
         self.getController().adjustArray(1)
+    
 
+    def coolEndingAnimation(self) -> None: 
+        array = self.getDataStructure()
+        array.resetBarColours() 
+        self.getController().refreshCanvas()
+        time.sleep(TINY_DELAY)
+        
+        for i in range(len(array)): 
+            array.resetBarColours()
+            array.setColourAt(i, "green")
+            self.getController().refreshCanvas(refreshColours=False)
+            time.sleep(0.01)
+        
+        for _ in range(NUM_BAR_FLASHES): 
+            array.resetBarColours() 
+            self.getController().refreshCanvas(refreshColours=False)
+            time.sleep(TINY_DELAY)
+            array.setAllColours("green")
+            self.getController().refreshCanvas(refreshColours=False)
+            time.sleep(TINY_DELAY) 
+        
+        array.resetBarColours()
+        self.getController().refreshCanvas()
+   
 
 # Listen to Almost by Bowling For Soup
    

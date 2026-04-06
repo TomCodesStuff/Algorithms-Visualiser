@@ -1,4 +1,5 @@
 import threading
+from typing import Callable
 from algorithms import Algorithm
 
 
@@ -12,12 +13,14 @@ class ThreadHandler():
         self.__algorithmStopped = threading.Event()
         self.__algorithmPauseLock = threading.Lock()
         self.__delayLock = threading.Lock() 
+        self.__coolEndingAnimationFunc = None 
 
 
     def runAlgorithm(self, algorithm : Algorithm): 
         self.__algorithmStarted.set() 
         try:
-            algorithm.run() 
+            algorithm.run()  
+            if self.__coolEndingAnimationFunc: self.__coolEndingAnimationFunc()
         except Exception as e:
             print(f"ERROR: Algorithm broke at some point :(.\nException: {e}")
             
@@ -57,6 +60,10 @@ class ThreadHandler():
 
     def releaseDelayLock(self) -> None: 
         self.__delayLock.release()
+
+
+    def setEndingAnimationFunc(self, endingAnimationFunc : Callable) -> None: 
+        self.__coolEndingAnimationFunc = endingAnimationFunc
 
 
     def stopAlgorithm(self) -> None: 
