@@ -1,0 +1,101 @@
+# Adding A New Algorithm. 
+
+| Table Of Contents                                         |
+| --------------------------------------------------------- |
+| [1. File Formatting](#1-file-formatting)                  |
+| [2. Class Formatting](#2-class-formatting)                |
+| [3. Algorithm Parent Class](#3-algorithm-parent-class)    |
+| [4. Method Implementation](#4-method-implementation)      |
+| [5. Data Structure Class]                                 | 
+
+## 1. File Formatting
+
+When creating a new algorithm file, it must be found in the correct directory and follow the specified naming convention to be recognised.  
+
+### 1.1 File Location 
+
+The directory the new algorithm must be found will differ per algorithm type and are listed below:
+
+- Searching Algorithms -> <b> /algorithms/searching/ </b> <br>
+- Sorting Algorithms -> <b> /algorithms/sorting/ </b> <br>
+
+
+### 1.2 File Name 
+
+New algorithm files must follow the naming convention as defined by algorithm type:
+
+- Searching Algorithms -> <b> algorithm_name_search.py. </b> <br>
+    \- (e.g. linear_search.py, binary_search.py, etc.) 
+- Sorting Algorithms -> <b> algorithm_name_sort.py. </b> <br> 
+    \- (e.g. bubble_sort.py, insertion_sort.py, etc.) 
+
+
+## 2. Class Formatting 
+
+This project follows the Object Oriented Programming Paradigm. <br>
+As such new algorithms must be implemented as a class. 
+
+### 2.1 Class Naming 
+
+New algorithm classes must follow the class naming convention as defined by algorithm type:
+
+- Searching Algorithms -> <b> AlgorithmNameSearch. </b> <br>
+    \- (e.g. LinearSearch, BinarySearch, etc.) 
+- Sorting Algorithms -> <b> AlgorithmNameSort. </b> <br> 
+    \- (e.g. BubbleSort, InsertionSort, etc.)   
+
+
+## 3. Algorithm Parent Class. 
+
+Each new algorithm class must inherit from the `Algorithm` parent class. <br>
+The `Algorithm` class provides several helper methods required for each algorithm 
+to interface correctly with the project. <br>
+Documentation for the `Algorithm` class can be found here.  
+
+Once the `Algorithm` class has correctly been imported and inherited, it's constructor must be called. 
+The steps for importing, inheriting and calling the constructor are outlined below via code snippet.
+
+
+### 3.1 Importing The Algorithm Class 
+
+```python 
+from algorithms import Algorithm 
+```
+<i> Import statement needed to use the Algorithm parent class </i>
+
+### 3.2 Inheriting The Algorithm Class
+
+```python 
+class BogoSort(Algorithm):
+```
+<i> Inheriting the Algorithm parent class correctly. <br> 
+BogoSort is used as an example here. </i>
+
+### 3.3 Constructor 
+
+```python 
+def __init__(self):
+    super().__init__()
+```
+<i> Correct implementation of the constructor. </i>
+
+## 4. Method Implementation 
+
+The project executes algorithms by calling the `run()` method. <br>
+Therefore, new algorithms must implement the `run()` method in order to be recognised by the project. <br>
+If a new algorithm succesfully inherits from the `Algorithm` base class, this method is defined as abstract. <br> 
+As such the algorithm class can not be instantiated until the `run()` method is implemented.
+
+The Code Snippet to create the `run()` method is provided below.
+
+
+### 4.1 Creating The run() Method 
+```python 
+def run(self) -> int:
+    return 0
+```
+
+<i> Correctly creating the `run()` method. </i>
+
+
+## 5. 

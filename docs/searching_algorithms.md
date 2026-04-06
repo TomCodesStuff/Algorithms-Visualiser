@@ -30,7 +30,7 @@ For each algorithm, instructional steps are provided which can be followed to pr
     \- Set `low = mid + 1` 
 8. If array[mid] < target: <br>
     \- Set `high = mid - 1` 
-9. Go to Step 3.
+9. End While Loop.
 10. Target is not in the array, return 1. 
 
 #### Time-Space Complexities: 
@@ -53,7 +53,7 @@ $$mid = {(low + high) \div 2}$$
 3. Set variable `n = array.length()` 
 4. While i < n AND array[i] <= target:
 5. Set `i = i * 2` 
-6. Go to Step 4.
+6. End While Loop. 
 7. Perform a [binary search](#binary-search) where `low = i / 2` and `high = min(i, n - 1)`.
 
 #### Time-Space Complexities:
@@ -98,6 +98,7 @@ $$high = {\min(i,\;n-1)}$$
     \- Target found, return 0 
 13. Else: <br>
     \- Target is not in the array, return 1.
+14. End While Loop 
 
 #### Time-Space Complexities:
 
@@ -123,7 +124,7 @@ $$index = {\min(offset + fibMin2,\;n-1)}$$
     \- Set `high = pos - 1` 
 7. If array[pos] < target: <br> 
     \- Set `low = pos + 1` 
-8. Go to step 7. 
+8. End While Loop. 
 9. Target could not be found, return 1. 
 
 #### Time-Space Complexities:
@@ -153,7 +154,7 @@ $$pos = {low+{(target-array[low])\times(high - low)\over(array[high]-array[low])
     \- Target has been found, return 0
 10. if array[i] > target: <br> 
     \- Target can not be found, return 1. 
-11. Go to Step 7.
+11. End While Loop. 
 
 #### Time-Space Complexities:
 
@@ -168,7 +169,8 @@ Space Complexity: O(1)
 1. For each index `i` in array.
 2. If array[i] == target: <br> 
     \- Target has been found, return 0
-3. Target has not been found, return 1.
+3. End For Loop
+4. Target has not been found, return 1.
 
 #### Time-Space Complexities:
 
@@ -194,7 +196,7 @@ Space Complexity: O(1)
 9. Else: <br>
     \- Set `left = mid1 + 1` <br> 
     \- Set `right = mid2 - 1` 
-10. Go to Step 3.
+10. End While Loop. 
 11. Target can not be found, return 1 
 
 #### Time-Space Complexities:

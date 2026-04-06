@@ -76,19 +76,10 @@ class TimSort(Algorithm[SortArray]):
             else: 
                 start += 1
 
-
-    def __mergeSort(self, leftPtr : int, rightPtr : int) -> None:
-        if leftPtr >= rightPtr: return
-        mid = leftPtr + (rightPtr - leftPtr) // 2 
-        self.__mergeSort(leftPtr, mid)
-        self.__mergeSort(mid + 1, rightPtr)
-        self.__mergeSubArrays(leftPtr, mid, rightPtr)
-
         
     # Tim Sort Algorithm
     def run(self) -> int:    
         array = self.getDataStructure()
-        sortedArr = sorted(array.get(), reverse=True)
         n = len(array)
         runSize = self.__calculateRunSize(n)
         for i in range(0, n, runSize):
@@ -101,7 +92,7 @@ class TimSort(Algorithm[SortArray]):
                 right = min(n - 1, left + (2 * mergeSize) - 1)
                 if mid < right: 
                     self.__mergeSubArrays(left, mid, right) 
-            mergeSize *= 2  
+            mergeSize << 1  
         return 0 
 
         

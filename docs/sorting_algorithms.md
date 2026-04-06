@@ -3,6 +3,11 @@
 This table below shows the searching algorithms visualised by AVA. <br>
 For each algorithm, instructional steps are provided which can be followed to produce working implementations.
 
+Two helper functions `isSwapNeeded()` and `swap()` are defined which represent fundamental operations performed by each algorithm. <br> 
+The specifics of their implementation are left to the reader.  
+
+---
+
 | Algorithm                                     |
 | --------------------------------------------- |
 | [Bogo Sort](#bogo-sort)                       |
@@ -19,13 +24,13 @@ For each algorithm, instructional steps are provided which can be followed to pr
 ---
 ### Bogo Sort:
 
-Algorithm Steps: 
+#### Algorithm Steps: 
 
 1. While array is not sorted:
 2. Randomly shuffle array 
 3. If array is sorted: <br> 
     \- Stop Algorithm.
-4. Go to Step one. 
+4. End While. 
 
 #### Time-Space Complexities: 
 
@@ -35,7 +40,7 @@ Space Complexity: O(1)
 ---
 ### Brick Sort 
 
-Algorithm steps:
+#### Algorithm steps:
 
 1. Set a variable `swapped = True`  
 2. While swapped is True: 
@@ -46,7 +51,7 @@ Algorithm steps:
     \- Set `swapped = True `
 6.  for i in range(0, array.length() - 1, 2) 
 7. If isSwapNeeded(array[i], array[i + 1]): swap(array[i], array[i + 1]). Set `swapped = True`
-8. Go to Step 2.
+8. End While Loop.
 
 #### Time-Space Complexities: 
 
@@ -56,7 +61,7 @@ Space Complexity: O(1)
 ---
 ### Bubble Sort:
 
-Algorithm steps: 
+#### Algorithm steps: 
 
 1. for i in range(0, array.length())
 2. Set a variable `swapped = False`
@@ -65,6 +70,7 @@ Algorithm steps:
     \- swap(array[j], array[j + 1]). <br> 
     \- Set `swapped = True`
 6. if swapped == False: Array is sorted, return 0
+7. End For Loop.
 
 #### Time-Space Complexities: 
 
@@ -81,7 +87,7 @@ i -> index of current element
 ---
 ### Cocktail Shaker Sort 
 
-Algorithm steps:
+#### Algorithm steps:
 
 1. Set a variable `swapped = True` 
 2. While swapped = True: 
@@ -96,6 +102,7 @@ Algorithm steps:
     \- swap(array[i], array[i - 1]). <br>
     \- Set `swapped = True`
 9. If swapped = False. Array is sorted, return 0. 
+10. End While Loop. 
 
 #### Time-Space Complexities: 
 
@@ -105,7 +112,7 @@ Space Complexity: O(1)
 ---
 ### Gnome Sort 
 
-Algorithm steps:
+#### Algorithm steps:
 
 1. Set a variable `pos = 0` 
 2. While pos < array.length(): 
@@ -114,6 +121,7 @@ Algorithm steps:
     \- swap(array[pos], array[pos - 1]). <br>
     \- Set `pos = pos - 1`
 5. Else: Set `pos = pos + 1` 
+6. End While Loop. 
 
 #### Time-Space Complexities: 
 
@@ -123,14 +131,14 @@ Space Complexity: O(1)
 ---
 ### Insertion Sort:
 
-Algorithm Steps: 
+#### Algorithm Steps: 
 
 1. for i in range(1, array.length()):
 2. Set variable `j = i`
 3. while j > 0 AND isSwapNeeded(array[j - 1], array[j]): <br> 
     \- swap(array[j - 1], array[j]).<br> 
     \- Set `j = j - 1`
-4. Go to Step 3.
+4. End While Loop. 
 
 #### Time-Space Complexities: 
 
@@ -140,7 +148,7 @@ Space Complexity: O(1)
 ---
 ### Merge Sort:
 
-Algorithm Steps:
+#### Algorithm Steps:
 
 1. Repeatedly split the array into sub-arrays containing only one element 
 2. Take pairs of sub-arrays
@@ -154,56 +162,55 @@ Time Complexity: O(n log n) <br>
 Space Complexity: O(n)
 
 
-#### A note on the Space Complexity 
+#### A Note On Space Complexity 
 
 An O(1) space complexity can be achieved by merging the sub arrays in-place. 
 
 ---
 ### Quick Sort:
 
-Algorithm Steps: 
+#### Algorithm Steps: 
 
-1. Set a variable `low = 0`  
-2. Set a variable `high = array.length() - 1`
-3. Set a variable `pivot = medianOfThree(array, low, high)` [(See Median Of Three)](#median-of-three) 
-4. for each element in the array:
-5. If element < array[pivot]: Shift element to the left of the pivot
-6. if element > array[pivot]: Shift element to the right of the pivot
-7. Select two new pivots: <br>
-    \- `Pivot One = medianOfThree(array, low, pivot - 1)` <br>
-    \- `Pivot Two = medianOfThree(array, pivot + 1, high)`
-8. If low > pivot - 1 AND pivot + 1 > high. Array is sorted, return 0 
-9. Else: Go to Step 4. Using Pivot One and Pivot Two. 
+1. Set a variable `pivot = selectPivot()`
+2. All elements < pivot: 
+    \- Shifted to the left of the pivot 
+3. All elementd > pivot: 
+    \- Shifted to the right of the pivot 
+4. Repeat the process on the left sub-array (elements to the left of the pivot)
+5. Repeat the process on the right sub-array (elements to the right of the pivot)
+6. Recurively repeat process until sub-arrays contain only a single element 
+
 
 #### Time-Space Complexities: 
 
 Time Complexity: O(n log n) <br>
 Space Complexity: O(1)  
 
-#### A note on the Time Complexity 
+#### Pivot Selection 
+
+Multiple different methods can be used to determine the pivot. <br> 
+This project uses the <b>Median Of Three</b>; an explanation of this method and other pivot selection methods can be found [here.](https://dev.to/pineapples/writing-a-median-of-three-pivot-helper-for-quicksort-289m) 
+
+
+#### A Note On Time Complexity 
 
 If the pivot is not chosen efficiently, the worst case time complexity becomes O(n<sup>2</sup>)
-
-#### Median of three
-
-function medianOfThree(array, low, high): 
-1. Set variable `mid = (low + high) // 2` 
-2. Set variable `pivotValues = [array[low], array[mid], array[high]]` 
-3. sort(pivotValues) 
-4. Set variable `median = pivotValues[1]` 
-5. return median
 
 ---
 ### Selection Sort:
 
-Algorithm Steps: 
+#### Algorithm Steps: 
 
-1. Iterate through the array
-2. Set a variable called minIdx to the current index
-3. In a nested loop from the current index plus one to the end of the array
-4. Find the index of the smallest element and store it in minIdx 
-5. Shift all elements between the current index and the smallest element index one place right 
-6. Place the smallest element into the current index
+1. for i in range(0, array.length()): 
+2. Set variable `minIdx = i`
+3. for j in range(i + 1, array.length()):
+4. If isSwapNeeded(minIdx, j): <br>
+    \- minIdx = j 
+5. Set variable `value = array[minIdx]`
+6. Shift all elements between `i` and `minIdx` one place to the right  
+7. Set `array[i] = value`
+8. End For Loop 
+9. End For Loop
 
 #### Time-Space Complexities: 
 
@@ -213,7 +220,7 @@ Space Complexity: O(1)
 ---
 ### Tim Sort:
 
-Algorithm Steps: 
+#### Algorithm Steps: 
 
 1. Set variable `runSize = calculateRunSize()`  
 2. Perform Insertion Sort on each run 
@@ -224,15 +231,21 @@ Algorithm Steps:
 Time Complexity: O(n log n)<br>
 Space Complexity: O(n) 
 
-#### A note on the Space Complexity 
+#### A Note On Space Complexity 
 
 An O(1) space complexity can be achieved by merging the sub arrays in-place. 
 
-#### Calculating run size 
+#### Run Size Calculation
 
-Tim sort calculated the run size between the rangge of 32 - 64 (inclusive). <br>
-For arrays that are smaller than 64, the algorithm just performs an insersion sort on the whole array. <br>
-The process Tim Sort uses to calculate the run size can be found [here.](https://en.wikipedia.org/wiki/Timsort)
+The official Tim Sort implementation uses run sizes in the range 32 - 64 (inclusive). <br>
+For arrays that are smaller than 64 elements only an insertion sort is performed. <br> 
+Further details on how run size is officially calculated can be found [here.](https://en.wikipedia.org/wiki/Timsort)
+
+For the purposes of visulisation this project calculates the run size such that the number of runs is approximately <b>16</b>. <br>
+For arrays shorter than 16 elements, only insertion sort is performed.
+
+
+
 
 --- 
 
