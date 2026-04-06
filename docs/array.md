@@ -16,6 +16,7 @@ Below are the helper functions provided by the `Array` base class.
 | setColourAt         | index : int <br> value : str  |                                        | Replaces the colour at the passed index with the passed colour.                     |
 | getColourAt         | index : int                   | A String.                              | Returns the colour at the passed index.                                             |
 | resetBarColours     |                               |                                        | Sets all bar colours to Black                                                       |
+| setAllColours       | colour : str                  |                                        | Sets all bar colours to the specified colour                                        |
 | size                |                               | An Integer                             | Returns the arrays length. NOTE: Pythons len() function is also supported.          |
 | getMin              |                               | An Integer                             | Returns the smallest element in the array                                           |
 | getMax              |                               | An Integer                             | Returns the biggest element in the array                                            |
