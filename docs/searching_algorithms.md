@@ -4,8 +4,6 @@ This table below shows the searching algorithms visualised by AVA. <br>
 For each algorithm, instructional steps are provided which can be followed to produce working implementations.
 
 
-
-
 | Algorithm:                                    |
 | --------------------------------------------- |
 | [Binary Search](#binary-search)               | 

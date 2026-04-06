@@ -28,6 +28,7 @@ class QuickSort(Algorithm[SortArray]):
         self.invokeDelay()
         return 0
     
+    
     # Recusive implementation of quick sort 
     def __quickSortHelper(self, start, end):   
         if(start >= end): return
@@ -36,12 +37,13 @@ class QuickSort(Algorithm[SortArray]):
         self.__quickSortHelper(start, pivotIndex - 1) 
         self.__quickSortHelper(pivotIndex + 1, end)
       
+
     def __partition(self, start, end):  
         array = self.getDataStructure()
         # Middle of the array 
         mid = (start + end) // 2
         # Pivot is median of the elements at indexes start, mid, end 
-        pivot, startPivotIdx = sorted([(array.getAt(start), start), (array.getAt(mid), mid), (array.getAt(end), end)])[1]   
+        _, startPivotIdx = sorted([(array.getAt(start), start), (array.getAt(mid), mid), (array.getAt(end), end)])[1]   
         # The pivots index can change when elements are moved left/right of it
         pivotIdx = startPivotIdx
         

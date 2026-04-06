@@ -8,6 +8,7 @@ if(__name__ == "__main__"):
 from algorithms import Algorithm
 from data_structures import SortArray
 
+
 class InsertionSort(Algorithm[SortArray]):
     # Constructor
     def __init__(self):
