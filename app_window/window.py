@@ -1,4 +1,9 @@
 import tkinter as tk
+from typing import Callable, Tuple, Type 
+from algorithm_validator import AlgorithmValidator
+from algorithms import Algorithm
+from screen_creator import ScreenCreator
+from enums import ScreenType, AlgorithmType
 
 # If the file is run as is message this returned and program exits
 if(__name__ == "__main__"):
@@ -9,6 +14,9 @@ if(__name__ == "__main__"):
 # Window Class - Creates a blank tkinter window
 class Window():
     def __init__(self, width : int, height : int) -> None:
+        self.__algorithmValidator = AlgorithmValidator()
+        self.__algorithmValidator.findValidAlgorithms()
+        
         # Variables to store minimum width and height - means they can be easily changed
         minWidth = 750 
         minHeight = 500
@@ -56,45 +64,71 @@ class Window():
         # Stops frame resizing to same size as widgets inside it 
         self.__contentFrame.pack_propagate(False) 
 
+
     # Draws window
     def show(self) -> None:
         self.__window.mainloop() 
- 
-    # Takes in a new object (the new screen) and calls the relevant function
-    def loadScreen(self, newScreen ) -> None:
-        newScreen.initScreen()
 
+    
     # Removes every widget from the passed frame
     def removeScreen(self) -> None: 
         for widget in self.__contentFrame.winfo_children():
             widget.destroy()
 
+
+    # Clears current screen and loads new one
+    def loadScreen(self, screenType : ScreenType) -> None:  
+        # Clear previous screen
+        self.removeScreen() 
+        newScreen = ScreenCreator.createScreen(self, screenType)
+        if newScreen is not None: newScreen.render()
+
+
     # Refreshes the screen, so any changes can be displayed
     def update(self) -> None:
         self.__window.update() 
     
+    
+    def update_idle_tasks(self) -> None:
+        self.__window.update_idletasks()
+    
+
     # Schedule the passed function to be executed after the passed amount of time
     # Assumes function has no parameters
-    def scheduleFunctionExecution(self, function, delay : int) -> None:
+    def scheduleFunctionExecution(self, function : Callable, delay : int) -> None:
         self.__window.after(int(delay), function)
     
+
     def getNumScheduledFunctions(self) -> int:
         return len(self.__window.tk.call('after', 'info'))
+
 
     def cancelScheduledFunctions(self) -> None:
         for functionID in self.__window.tk.call('after', 'info'): 
             self.__window.after_cancel(functionID)
 
+
     # Returns the frame widgets are displayed in
     def getContentFrame(self) -> tk.Frame:
         return self.__contentFrame
-    
+
+
     # Returns the content frames height
     def getContentFrameHeight(self) -> int:
         return self.__contentFrameHeight 
+
 
     # Returns the content frames width
     def getContentFrameWidth(self) -> int:
         return self.__contentFrameWidth 
     
-# Listen to Dilemma by Green Day
+
+    def getAlgorithmNames(self, algorithmType : AlgorithmType) -> Tuple:
+        return self.__algorithmValidator.getAlgorithmNames(algorithmType)
+
+
+    def getAlgorithmClass(self, algorithmType : AlgorithmType, algorithmName : str) -> Type[Algorithm]: 
+        return self.__algorithmValidator.getAlgorithmClass(algorithmType, algorithmName)
+
+
+# Listen to Killing In The Name by Rage Against The Machine

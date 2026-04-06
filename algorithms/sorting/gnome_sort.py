@@ -4,45 +4,48 @@ if(__name__ == "__main__"):
     print("This is file shouldn't be run on it's own. \nIt should be imported only.")
     exit()
 
-from ..algorithm import Algorithm
-class GnomeSort(Algorithm):
+
+from algorithms import Algorithm
+from data_structures import SortArray
+
+class GnomeSort(Algorithm[SortArray]):
     # Constructor
-    def __init__(self, dataModel):
-        super().__init__(dataModel)
+    def __init__(self):
+        super().__init__()
+
 
     # Returns algorithms name -> user sees this when selecting algorithm
     def getName(self) -> str:
         return "Gnome Sort" 
-    
+
+
     # Gnome Sort Algorithm
-    def gnomeSort(self) -> int: 
+    def run(self) -> int: 
+        array = self.getDataStructure()
         # Length of the array
-        n = len(self.getArray())
+        n = len(array)
         pos = 0  
         # While pos is less than the length of the array
         while(pos < n): 
-            self.changeBarColour(pos, "red")
-            self.updateArrayOnScreen()
-            self.delay()
+            array.resetBarColours()
+            array.setColourAt(pos, "red")
+            self.invokeDelay()
 
             # If pos is at the start of the array, increment pos
             if(pos == 0): pos += 1 
             # If element at pos and pos - 1 need to be swapped
-            if(self.isSwapNeeded(pos - 1, pos)):
-                self.swapElements(pos, pos - 1)
-                self.changeBarColour(pos - 1, "red")
-                self.updateArrayOnScreen()
-                self.delay()
+            if(array.isSwapNeeded(pos - 1, pos)):
+                array.swapAt(pos, pos - 1)
+                array.swapColoursAt(pos, pos - 1)
+                self.invokeDelay()
                 # Decrement pos
                 pos -= 1
             # If elements at pos and pos - 1 are in the right place
             else: 
                 # Increment pos 
                 pos += 1  
-        
-        self.updateArrayOnScreen()
-        self.delay()
-        self.coolEndingAnimation()
-        return 1 
+
+        self.invokeDelay()
+        return 0
         
 # Listen to Smells Like Teen Spirit by Nirvana 

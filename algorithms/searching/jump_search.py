@@ -5,25 +5,29 @@ if(__name__ == "__main__"):
     exit()
 
 
-from ..algorithm import Algorithm
 import math 
+from algorithms import Algorithm
+from data_structures import SearchArray
 
-class JumpSearch(Algorithm):
+
+class JumpSearch(Algorithm[SearchArray]):
     # Constructor
-    def __init__(self, dataModel):
-        super().__init__(dataModel)
+    def __init__(self):
+        super().__init__()
+
 
     # Returns algorithms name -> user sees this when selecting algorithm
     def getName(self):
         return "Jump Search" 
 
-    def jumpSearch(self):
-        # Sorts array 
-        self.sortArray()
-        
-        array = self.getArray()
-        target = self.getTarget()
+
+    def run(self):        
+        array = self.getDataStructure()
+        target = array.getTarget()
     
+        array.sort()
+        self.invokeBriefDelay()
+
         # length of array
         n = len(array)
         # Square root length of array to find jump size
@@ -31,30 +35,27 @@ class JumpSearch(Algorithm):
         # Store index of last jump
         prev = 0
         # Find block closest to target -> if it exists
-        while(array[min(step, n) - 1] < target):
-            prev = step
-            self.changeBarColour(prev, "red")
-            self.updateArrayOnScreen()
-            if prev >= n: 
-                return 0
+        while(array.getAt(min(step, n) - 1) < target): 
+            array.resetBarColours()
+            prev = step 
+            array.setColourAt(prev, "red")
+            if prev >= n: return 1
             step += int(math.sqrt(n))
-            self.delay()  
+            self.invokeBriefDelay()
         
         # Linear search to find target
         # Start at index of last jump and stops at index of next jump 
-        for i in range(prev, prev + int(math.sqrt(n))):
-            self.changeBarColour(i, "red")
+        for i in range(prev, prev + int(math.sqrt(n))): 
+            array.resetBarColours()
+            array.setColourAt(i, "red")
             # If current elment > target then target not in array
-            if array[i] > target:
-                self.updateArrayOnScreen()
-                return 1 
+            if array.getAt(i) > target:
+                return 0
             # If current element is equal to target
-            if array[i] == target:
-                self.changeBarColour(i, "green")
-                self.updateArrayOnScreen()
-                return 1  
-            self.updateArrayOnScreen()
-            self.delay()  
-        return -1
+            if array.getAt(i) == target:#
+                array.setColourAt(i, "green")
+                return 0
+            self.invokeDelay()  
+        return 1
     
 # Listen to Waiting For The End by Linkin Park

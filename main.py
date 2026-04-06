@@ -1,13 +1,16 @@
 from app_window import Window
-from screens import IntroductionScreen
+from enums import ScreenType
+
+WIDTH = 700
+HEIGHT = 500
 
 if(__name__ == "__main__"):
-    window = Window(750, 500) 
+    window = Window(WIDTH, HEIGHT) 
     window.create()
-    window.loadScreen(IntroductionScreen(window))
+    window.loadScreen(ScreenType.MAIN_MENU)
     window.show() 
 else:
-    print("This file has no functions to import")
-
-# Listen to Walk by foo fighters  
+    print("This file has no functions to import :(")
+    
+# Listen to Walk by Foo Fighters  
 # Seriously listen to it, it means a lot to me

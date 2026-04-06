@@ -4,20 +4,27 @@ if(__name__ == "__main__"):
     print("This is file shouldn't be run on it's own. \nIt should be imported only.")
     exit()
 
-from ..algorithm import Algorithm 
 
-class TenarySearch(Algorithm): 
+from algorithms import Algorithm 
+from data_structures import SearchArray
+
+
+class TenarySearch(Algorithm[SearchArray]): 
     # Constructor
-    def __init__(self, dataModel):
-        super().__init__(dataModel)
+    def __init__(self):
+        super().__init__()
     
+
     def getName(self):
         return "Tenary Search"
     
-    def tenarySearch(self): 
-        self.sortArray()
-        array = self.getArray()
-        target = self.getTarget() 
+
+    def run(self): 
+        array = self.getDataStructure()
+        target = array.getTarget() 
+
+        array.sort()
+        self.invokeBriefDelay()
 
         # Left and right variables, used to adjust mid1 and mid2
         left = 0 
@@ -25,36 +32,35 @@ class TenarySearch(Algorithm):
 
         # loop while left variable is less than or equal to the right variable 
         while(left <= right):  
+            array.resetBarColours()
             # Calculate mid1 and mid2 values
             mid1 = left + (right - left) // 3 
             mid2 = right - (right - left) // 3  
+            
             # Sets bar colours
-            self.changeBarColour(mid1, "red")
-            self.changeBarColour(mid2, "red")
+            array.setColourAt(mid1, "red")
+            array.setColourAt(mid2, "red")
 
             # If value at mid1 is the target
-            if(array[mid1] == target): 
-                self.changeBarColour(mid1, "green") 
-                self.changeBarColour(mid2, "black") 
-                self.updateArrayOnScreen()
-                return 1 
+            if(array.getAt(mid1) == target): 
+                array.setColourAt(mid1, "green")
+                array.setColourAt(mid2, "black")
+                return 0
             # If value at mid2 is the target
-            if(array[mid2] == target): 
-                self.changeBarColour(mid1, "black") 
-                self.changeBarColour(mid2, "green") 
-                self.updateArrayOnScreen()
-                return 1  
+            if(array.getAt(mid2) == target): 
+                array.setColourAt(mid1, "black")
+                array.setColourAt(mid2, "green")
+                return 0
 
             # If target is less than value at mid1, adjust right variable
-            if(target < array[mid1]): right = mid1 - 1 
+            if(target < array.getAt(mid1)): right = mid1 - 1 
             # If target is greater than value at mid2, adjust left variable
-            elif(target > array[mid2]): left = mid2 + 1  
+            elif(target > array.getAt(mid2)): left = mid2 + 1  
             # If target is somewhere inbetween mid1 and mid2, adjust left and right variables 
             else: 
                 left = mid1 + 1 
                 right = mid2 - 1 
-            self.updateArrayOnScreen()
-            self.delay()
-        return -1 
+            self.invokeDelay()
+        return 1
 
 # Listen to Times Like These By Foo Fighters 

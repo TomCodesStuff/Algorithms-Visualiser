@@ -4,26 +4,31 @@ if(__name__ == "__main__"):
     print("This is file shouldn't be run on it's own. \nIt should be imported only.")
     exit()
 
-from ..algorithm import Algorithm
-class BogoSort(Algorithm):
+
+from algorithms import Algorithm
+from data_structures import SortArray
+
+
+class BogoSort(Algorithm[SortArray]):
     # Constructor
-    def __init__(self, dataModel):
-        super().__init__(dataModel)
+    def __init__(self):
+        super().__init__()
+
 
     # Returns algorithms name -> user sees this when selecting algorithm
     def getName(self) -> str:
         return "Bogo Sort" 
     
+
     # Bogo Sort Algorithm
-    def bogoSort(self) -> int: 
-        sortedArray = sorted(self.getArray())
+    def run(self) -> int: 
+        array = self.getDataStructure() 
+        sortedArray = sorted(array.get(), reverse=array.isSortDescending())
         # Continue until array is sorted
-        while(sortedArray != self.getArray()): 
+        while(sortedArray != array.get()): 
             # Randomly shuffle array
-            self.shuffleArray(delay=False)
-            self.delay() 
-        
-        self.coolEndingAnimation()
-        return 1
+            array.shuffle()
+            self.invokeDelay()
+        return 0
 
 # Listen to Times like these by the Foo Fighters
