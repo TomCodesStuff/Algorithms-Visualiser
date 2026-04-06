@@ -80,6 +80,7 @@ class ArrayAlgorithmScreen(AlgorithmScreen[C, M, D]):
     
 
     def coolEndingAnimation(self) -> None: 
+        time.sleep(BRIEF_DELAY)
         array = self.getDataStructure()
         array.resetBarColours() 
         self.getController().refreshCanvas()

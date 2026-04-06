@@ -1,7 +1,7 @@
 import sys
 import time
 from typing import Callable
-from .thread_handler import ThreadHandler
+from thread_handler import ThreadHandler
 
 
 class Mediator():
