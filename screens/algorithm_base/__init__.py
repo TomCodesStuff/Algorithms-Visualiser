@@ -1,4 +1,3 @@
 from .algorithm_screen import AlgorithmScreen
 from .algorithm_controller import AlgorithmController
 from .algorithm_model import AlgorithmModel
-from .mediator import Mediator

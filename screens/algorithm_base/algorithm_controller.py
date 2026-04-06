@@ -9,7 +9,7 @@ if(__name__ == "__main__"):
 
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, TypeVar, Generic
-from .mediator import Mediator
+from mediator import Mediator
 from thread_handler import ThreadHandler
 from data_structures import DataStructure
 from enums import AlgorithmType
