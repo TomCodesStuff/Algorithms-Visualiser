@@ -319,7 +319,7 @@ class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
             self.prepare()            
             self.__controller.startAlgorithmThread(self.__algorithmType, self.__getAlgorithmChoice())
             
-
+    # TODO add flag to play animation if algorithm terminated successfully
 
     def algorithmComplete(self) -> None: 
         self.__stopAlgorithm()
