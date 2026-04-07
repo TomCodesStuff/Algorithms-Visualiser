@@ -57,13 +57,13 @@ class ArrayAlgorithmScreen(AlgorithmScreen[C, M, D]):
     # Sorts and displays the array
     def __sortArray(self) -> None:
         self.getDataStructure().sort()
-        self.getController().displayArray() 
+        self.getController().refreshCanvas()
     
 
     # Shuffles and displays the array
     def __shuffleArray(self) -> None:
         self.getDataStructure().shuffle()
-        self.getController().displayArray()  
+        self.getController().refreshCanvas() 
 
 
     # This functions handles creating and displaying the options the user is presented with
