@@ -5,18 +5,17 @@ if(__name__ == "__main__"):
     exit()
 
 from typing import Set
+from ..algorithm_base import AlgorithmModel
 from canvas_objects import CanvasNode, CanvasEdge
 
 
-class TraversalModel():
-    def __init__(self):  
-        # Controller
-        self.__controller = None   
+class TraversalModel(AlgorithmModel):
+    def __init__(self): 
+        super().__init__() 
 
-        # Slider bar
-        self.__minDelay = 1 
-        self.__maxDelay = 1000
-        self.__resolution = 1
+        self.setResolution(1)
+        self.setMinDelay(1)
+        self.setMaxDelay(1000)
         
         # Initial node coordinates an size 
         self.__initialX = 5
@@ -58,17 +57,6 @@ class TraversalModel():
 
         # Time delay when updating the canvas   
         self.__updateDelay = 50
-
-
-    # Adds controller         
-    def addController(self, controller): 
-        self.__controller = controller 
-
-
-    # Getters for widgets on screen
-    def getMinDelay(self): return self.__minDelay
-    def getMaxDelay(self): return self.__maxDelay  
-    def getResolution(self): return self.__resolution   
 
 
     # Getters for distances between nodes on screen 

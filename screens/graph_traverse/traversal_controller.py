@@ -4,30 +4,39 @@ if(__name__ == "__main__"):
     print("This is file shouldn't be run on it's own. \nIt should be imported only.")
     exit()
 
+
+from typing import TYPE_CHECKING, TypeVar
+from tkinter import Event, BOTH 
 from canvas_objects import CanvasNode, CanvasEdge
-from .traversal_model import TraversalModel 
+from data_structures import Array
+from ..algorithm_base import AlgorithmController
 from .node_handler import NodeHandler
 from .edge_handler import EdgeHandler 
 from .physics_handler import PhysicsHandler
-from tkinter import Event, BOTH 
+
+if TYPE_CHECKING: 
+    from graph_traverse import TraversalScreen, TraversalModel
 
 
-class TraversalController():
-    def __init__(self, screen, model : TraversalModel): 
-        # Screen and Model Object References 
-        self.__screen = screen 
-        self.__model = model    
+S = TypeVar("S", bound="TraversalScreen")
+M = TypeVar("M", bound="TraversalModel")
+D = TypeVar("D", bound="Array")
 
-        # Handles creation and deletion of edges 
-        self.__edgeHandler = EdgeHandler(self.__screen.getCanvas(), self, model) 
-        # Handles creation and deletion of nodes 
-        self.__nodeHandler = NodeHandler(self.__screen.getCanvas(), self, 
-                                         model, self.__edgeHandler)   
-        # Handles 'physics based' calculations 
-        self.__physicsHandler = PhysicsHandler(self.__model, self.__getCanvasCentreCoords())  
-        # Refreshes canvas periodically   
-        self.__updateCanvas()
+class TraversalController(AlgorithmController[S, M, D]):
+    def __init__(self, screen : S, model : M, dataStructure : D):
+        super().__init__(screen, model, dataStructure)
 
+        # # Handles creation and deletion of edges 
+        # self.__edgeHandler = EdgeHandler(self.__screen.getCanvas(), self, model) 
+        # # Handles creation and deletion of nodes 
+        # self.__nodeHandler = NodeHandler(self.__screen.getCanvas(), self, 
+        #                                  model, self.__edgeHandler)   
+        # # Handles 'physics based' calculations 
+        # self.__physicsHandler = PhysicsHandler(self.__model, self.__getCanvasCentreCoords())  
+        # # Refreshes canvas periodically   
+        # self.__updateCanvas()
+
+    def refreshCanvas() -> None: pass
 
     # Calculates and returns coords of the centre of the canvas  
     def __getCanvasCentreCoords(self) -> tuple: 

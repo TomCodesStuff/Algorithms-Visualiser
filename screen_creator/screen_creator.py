@@ -42,13 +42,13 @@ class ScreenCreator():
                    SortController, 
                    SortModel, 
                    SortArray))
-            #case scr.ScreenType.TRAVERSAL:
-            #    return cls.__createAlgorithmScreen(window, (
-            #        scr.TraversalScreen, 
-            #        scr.TraversalController, 
-            #        scr.TraversalModel, 
-            #        scr.ShareddataStructure))
-            #case _: return None
+            case ScreenType.TRAVERSAL:
+               return cls.__createAlgorithmScreen(window, (
+                   TraversalScreen, 
+                   TraversalController, 
+                   TraversalModel, 
+                   Array))
+            case _: return None
 
 
 # Listen to Tonight, Tonight by The Smashing Pumpkins

@@ -52,10 +52,8 @@ class MainMenu(ScreenInterface):
         buttonsFrame = tk.Frame(self.__contentFrame, bg = "white")
         buttonsFrame.pack()
         # Navigate to path finding algorithms screen
-        #tk.Button(buttonsFrame, text = "Path Finding", font = (self.__FONT, 12), height = 2, width = 15, relief = "solid", 
-        #          command = lambda : [self.getWindow().removeScreen(), 
-        #                              self.getWindow().loadScreen(sc.TraversalScreen(self.getWindow(), self))])\
-        #    .pack(pady = (25, 0))  
+        tk.Button(buttonsFrame, text = "Path Finding", font = (self.__FONT, 12), height = 2, width = 15, relief = "solid",\
+                  command = lambda: self.getWindow().loadScreen(ScreenType.TRAVERSAL)).pack(pady=15)  
         # Navigate to array searching screen
         tk.Button(buttonsFrame, text = "Array Searching",  font = (self.__FONT, 12), height = 2, width = 15, relief = "solid",\
                   command=lambda: self.getWindow().loadScreen(ScreenType.SEARCH)).pack(side = "left", pady = 15, padx = (100, 0)) 

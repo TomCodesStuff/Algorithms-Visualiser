@@ -6,74 +6,27 @@ if(__name__ == "__main__"):
 
 import tkinter as tk 
 from tkinter import ttk 
+from typing import TYPE_CHECKING, TypeVar
 from canvas_objects import CanvasEdge
+from ..algorithm_base import AlgorithmScreen
+from data_structures import Array
+
+if TYPE_CHECKING: 
+    from graph_traverse import TraversalController, TraversalModel
+
+C = TypeVar("C", bound="TraversalController")
+M = TypeVar("M", bound="TraversalModel")
+D = TypeVar("D", bound="Array")
 
 
-class TraversalScreen(): 
-    def initScreen(self) -> None:
-        self.createTemplate() 
-
-        # Create model class
-        self.__model = None
-        # Create controller class and add referencces to screen and model
-        self.__controller = None
-        # Add reference to controller to the model object
-        self.__model.addController(self.__controller)
-        # Add event handlers to the canvas
-        self.__controller.addCanvasEvents() 
-        # Create the options users can interact with 
-        self.__createOptions()    
-        # Override default behaviour of home button 
-        self.__overrideHomeButtonCommand()
-        
-
-    # Creates the widgets that allows users to toggle the visualisers settings
-    def __createOptions(self) -> None: 
-        self.__createAlgorithmOptions() 
-        self.__createSpeedAdjuster()
-        self.__createAddNodeButton()
-        self.__createAddEdgeOption()
-        self.__createStopSolveButtons()
-
-
-    # Create the combo box that displays the algorithms users can see visualised 
-    def __createAlgorithmOptions(self) -> None:
-        # combo box, allows the user to choose what algorithm they want
-        self.__algorithmOptions = ttk.Combobox(self.getOptionsWidgetFrame(), textvariable = tk.StringVar(), 
-                                               state = "readonly", font = (self.getFont(), self.getFontSize()),\
-             width = self.getOptionsWidgetFrame().winfo_width())
-        self.__algorithmOptions.set('Select an algorithm.')
-        # Removes the blue highlighting when something is selected that annoyed me
-        self.__algorithmOptions.bind("<<ComboboxSelected>>", lambda _: self.getOptionsWidgetFrame().focus())
-        self.__algorithmOptions.pack(pady = (10,0)) 
-
-
-    # Creates a slider that allows users to adjust an algorithms speed
-    def __createSpeedAdjuster(self) -> None:
-        # Creates a slider that goes from the maximum delay to the minmum delay 
-        # Every time the sliders value is changed the updatetDelay() method is called to update the value seen on screen
-        self.__speedSlider = tk.Scale(self.getOptionsWidgetFrame(), from_=self.__model.getMaxDelay(), 
-                                      to_=self.__model.getMinDelay(), resolution=self.__model.getResolution(), 
-                                      length=self.getOptionsWidgetFrame().winfo_width(), orient="horizontal", showvalue=False, 
-                                      bg="white", highlightbackground="white", command=self.__updateDelay)
-        self.__speedSlider.pack(pady = (10, 0))  
-        self.__speedSlider.set(self.__model.getMaxDelay())
-        # When the user stops moving the slider the slider is updated in the DataModel class 
-        self.__speedSlider.bind("<ButtonRelease-1>", lambda _ : self.__setDelay()) 
-
-
-    def __updateDelay(self, value : str) -> None:
-        self.__speedSlider.config(label = f"Delay: {value} Milliseconds")  
-
-
-    def __setDelay(self) -> None:
-        pass   
-
+class TraversalScreen(AlgorithmScreen[C, M, D]):  
+    def __init__(self, window):
+        super().__init__(window)
 
     # Creates the button that lets users add nodes to the canvas 
     def __createAddNodeButton(self) -> None: 
         self.__addNodeButton = tk.Button(self.getOptionsWidgetFrame(), text="Add Node.", width=10, relief="solid", 
-                  font = (self.getFont(), self.getFontSize()), command=self.__controller.spawnNode)
+                  font = (self.getFont(), self.getFontSize()), command=self.getController().spawnNode)
         self.__addNodeButton.pack(pady = (10, 0)) 
 
 
@@ -101,8 +54,8 @@ class TraversalScreen():
         # Frame to store entry widget to let users to choose an edges weight
         self.__edgeWeightFrame = tk.Frame(self.__edgeNodesFrame, background="white") 
         self.__edgeWeightFrame.pack(pady=(10,0))
-        self.__weightSlider = tk.Scale(self.__edgeWeightFrame, from_ = self.__model.getMinWeight(), 
-                                       to_=self.__model.getMaxWeight(), resolution=self.__model.getWeightSliderResolution(), 
+        self.__weightSlider = tk.Scale(self.__edgeWeightFrame, from_ = self.getModel().getMinWeight(), 
+                                       to_=self.getModel().getMaxWeight(), resolution=self.getModel().getWeightSliderResolution(), 
                                        length = self.getOptionsWidgetFrame().winfo_width(), orient="horizontal", showvalue=False, 
                                        bg = "white", highlightbackground="white", command=self.__updateWeight)
         
@@ -175,26 +128,26 @@ class TraversalScreen():
 
     def __saveEdge(self) -> None:     
         # Updates egdes weight 
-        self.__controller.saveEdge(self.__weightSlider.get())
+        self.getController().saveEdge(self.__weightSlider.get())
         # Hides options to edit edge from view
-        self.disableWeightOptions()   
+        # self.disableWeightOptions()   
 
 
     def __deleteEdge(self) -> None:  
         # Deletes newly drawn weight or pre-existing weight 
         # TODO RE-implement this btw 
-        self.__controller.deleteEdge()
+        self.getController().deleteEdge()
         # Hides options to edit edge from view 
-        self.disableWeightOptions()
+        # self.disableWeightOptions()
   
 
     # Updates weight displayed in the slider bar 
     def updateWeightOnScreen(self, edgeWeight : int) -> None: 
         self.__weightSlider.set(edgeWeight)
         # If edges weight is the minimum weight
-        if(edgeWeight == self.__model.getMinWeight()):  
+        if(edgeWeight == self.getModel().getMinWeight()):  
             # Need to manually change text above the slider 
-            self.__updateWeight(str(self.__model.getMinWeight()))
+            self.__updateWeight(str(self.getModel().getMinWeight()))
 
     
     # Resets position and disables weight slider 
@@ -218,44 +171,20 @@ class TraversalScreen():
 
         # Show edge options 
         self.__showEdgeOptions()
+
+
+    # Creates the widgets that allows users to toggle the visualisers settings
+    def __createOptions(self) -> None: 
+        self.__createAddNodeButton()
+        self.__createAddEdgeOption()    
+
+    def render(self) -> None: 
+        self.createBaseLayout()
+        self.__createOptions() 
     
 
-    # Disables edge options and resets weight slider 
-    def disableWeightOptions(self) -> None:  
-        # Disables buttons
-        self.__saveEdgeButton.config(state="disabled")
-        self.__deleteEdgeButton.config(state="disabled") 
-        # Disable and reset weight slider 
-        self.resetWeightSlider()
-        # Makes edge Options invisible 
-        self.__hideEdgeOptions()
+    def prepare() -> None: pass 
+    def coolEndingAnimation(self) -> None: pass 
 
 
-    # Creates buttons that lets user execute algorithms or stop them
-    def __createStopSolveButtons(self) -> None:
-        # Frame to store stop and solve buttons in a grid layout
-        algorithmToggleFrame = tk.Frame(self.getOptionsWidgetFrame(), bg = "white")
-        algorithmToggleFrame.pack(side = "bottom", pady = (0,5))
-        # Allows user to see the algorithm in action
-        self.__solveStopButton = tk.Button(algorithmToggleFrame, text = "Solve.", width = 7, relief = "solid", 
-                                           font = (self.getFont(), self.getFontSize()))
-        self.__solveStopButton.grid(row = 0, column = 0, padx = (0,5)) 
-        # Allows user to stop algorithm whilst it's running - button is initially disabled
-        self.__pauseResumeButton = tk.Button(algorithmToggleFrame, text = "Pause.", width = 7, relief = "solid", 
-                                             font = (self.getFont(), self.getFontSize()), state = "disabled")
-        self.__pauseResumeButton.grid(row = 0, column = 1)    
-    
-
-    # Cancels any functions schedules to run 
-    def __loadHomeScreen(self) -> None:   
-        # Cancel any pending functions -> most likely refereshing canvas 
-        self.getWindow().cancelScheduledFunctions() 
-        # Load the homescreen
-        self.loadHomeScreen()
-        
-    # Override default function of the home screen button
-    def  __overrideHomeButtonCommand(self) -> None: 
-        self.getHomeButton().config(command=self.__loadHomeScreen) 
-    
-
-# Listen Glass Spider by Hot Milk
+# Listen Glass Spiders by Hot Milk
