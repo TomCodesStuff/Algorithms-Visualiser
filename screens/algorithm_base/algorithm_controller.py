@@ -48,7 +48,7 @@ class AlgorithmController(ABC, Generic[S, M, D]):
     def startAlgorithmThread(self, algorithmType : AlgorithmType, algorithmName : str) -> None:    
         algorithmClass = self.getScreen().getWindow().getAlgorithmClass(algorithmType, algorithmName) 
         if algorithmClass is None: return 
-        mediator = Mediator(self.getAlgorithmDelay, self.scheduleScreenUpdate, self.__threadHandler)
+        mediator = Mediator(self.getAlgorithmDelay, self.__threadHandler)
         
         try:
             algorithmObj = algorithmClass()

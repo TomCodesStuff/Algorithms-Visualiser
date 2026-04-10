@@ -5,14 +5,12 @@ if(__name__ == "__main__"):
     exit()
 
 
-from typing import TYPE_CHECKING, TypeVar
+from typing import TYPE_CHECKING, TypeVar, Tuple
 from tkinter import Event, BOTH 
 from canvas_objects import CanvasNode, CanvasEdge
-from data_structures import Array
 from ..algorithm_base import AlgorithmController
-from .node_handler import NodeHandler
-from .edge_handler import EdgeHandler 
-from .physics_handler import PhysicsHandler
+
+from data_structures import Array
 
 if TYPE_CHECKING: 
     from graph_traverse import TraversalScreen, TraversalModel
@@ -61,14 +59,17 @@ class TraversalController(AlgorithmController[S, M, D]):
 
 
     # Draws a circle (node) on the canvas 
-    def spawnNode(self, coords = None):
+    def spawnNode(self, coords: tuple=None):
         if(coords == None): coords = self.__model.getInitialCoords()    
+        
+        
         if(self.__nodeHandler.spawnNode(coords) > 0):
             # Change the "Add Node" button's text to black 
             self.__screen.changeNodeButtonColour("black") 
         else:
             # Change the "Add Node" button's text to red 
             self.__screen.changeNodeButtonColour("red")  
+        
         # Refresh screen to show changes  
         self.__screen.getWindow().update()  
     

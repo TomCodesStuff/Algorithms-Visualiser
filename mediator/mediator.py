@@ -5,18 +5,13 @@ from thread_handler import ThreadHandler
 
 
 class Mediator():
-    def __init__(self, delayFunc : Callable, updateScreenFunc : Callable, threadHandler : ThreadHandler): 
+    def __init__(self, delayFunc : Callable, threadHandler : ThreadHandler): 
         self.__delayFunc = delayFunc
-        self.__updateScreenFunc = updateScreenFunc
         self.__threadHandler = threadHandler
         
 
     def getDelay(self) -> float:  
         return self.__delayFunc() 
-
-
-    def refreshScreen(self) -> None: 
-        self.__updateScreenFunc() 
 
 
     def __pauseAlgorithm(self):

@@ -20,6 +20,7 @@ C = TypeVar("C", bound="ArrayAlgorithmController")
 M = TypeVar("M", bound="ArrayAlgorithmModel")
 D = TypeVar("D", bound="Array")
 
+
 BRIEF_DELAY = 0.5
 TINY_DELAY = 0.1
 NUM_BAR_FLASHES = 3
