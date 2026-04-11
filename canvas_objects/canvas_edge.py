@@ -42,7 +42,7 @@ class CanvasEdge():
     
     def getScreenLen(self) -> int: return self.__screenLen
     
-    # TODO error hanlding and adjustment for screen size
+    # TODO error handling and adjustment for screen size
     def setscreenLen(self, val : int): self.__screenLen = val
 
 # Listen to Live Forever by Oasis 

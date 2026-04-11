@@ -5,9 +5,7 @@ if(__name__ == "__main__"):
     exit()
 
 import tkinter as tk 
-from tkinter import ttk 
 from typing import TYPE_CHECKING, TypeVar
-from canvas_objects import CanvasEdge
 from ..algorithm_base import AlgorithmScreen
 from data_structures import Array
 
@@ -31,7 +29,7 @@ class TraversalScreen(AlgorithmScreen[C, M, D]):
 
 
     # Changes the text colour of the add nodes button to the passed colour
-    def changeNodeButtonColour(self, colour : str) -> None: 
+    def setAddNodeButtonColour(self, colour : str) -> None: 
         self.__addNodeButton.config(fg = colour)
 
 
@@ -159,7 +157,7 @@ class TraversalScreen(AlgorithmScreen[C, M, D]):
     
 
     # Enables egde options so users can toggle them
-    def enableWeightOptions(self, canvasEdge : CanvasEdge) -> None: 
+    def enableWeightOptions(self, canvasEdge) -> None: 
         # Update weight slider 
         self.__updateWeight(canvasEdge.getWeight())  
         # Enables buttons and slider (so they work lol)
@@ -178,11 +176,14 @@ class TraversalScreen(AlgorithmScreen[C, M, D]):
         self.__createAddNodeButton()
         self.__createAddEdgeOption()    
 
+
     def render(self) -> None: 
         self.createBaseLayout()
-        self.__createOptions() 
+        self.__createOptions()  
+        self.getController().createEventHandler(self.getCanvas())
     
 
+    # TODO cancel any running functions before algorithm runs 
     def prepare() -> None: pass 
     def coolEndingAnimation(self) -> None: pass 
 

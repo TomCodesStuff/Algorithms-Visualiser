@@ -122,7 +122,7 @@ class AlgorithmValidator():
 
     def getAlgorithmClass(self, algorithmType : AlgorithmType, algorithmName : str) -> Algorithm:  
         if algorithmType.value not in self.__algorithmsByType: return None 
-        if algorithmName not in  self.__algorithmsByType[algorithmType.value]: return None 
+        if algorithmName not in self.__algorithmsByType[algorithmType.value]: return None 
         return self.__algorithmsByType[algorithmType.value][algorithmName]
 
 

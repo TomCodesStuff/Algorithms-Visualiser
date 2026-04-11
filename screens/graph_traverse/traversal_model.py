@@ -13,21 +13,16 @@ class TraversalModel(AlgorithmModel):
     def __init__(self): 
         super().__init__() 
 
+        self.setDelayToMilliseconds()
         self.setResolution(1)
         self.setMinDelay(1)
         self.setMaxDelay(1000)
-        
-        # Initial node coordinates an size 
-        self.__initialX = 5
-        self.__intialY = 5
-        self.__circleSize = 15
-        self.__initialNodeCoords = (self.__initialX, self.__intialY, 
-                                    self.__initialX + self.__circleSize, 
-                                    self.__intialY + self.__circleSize)
-        
+
+
         # Canvas upper and lower bounds
         self.__canvasUpperBoundOffset = 4
         self.__canvasLowerBoundOffset = 2 
+        
         # Minimum space between nodes 
         self.__nodesSpacingOffset = 20  
         # Number of nodes that can be on screen at once
@@ -64,9 +59,6 @@ class TraversalModel(AlgorithmModel):
     def getMaxScreenDist(self) -> int: return self.__maxScreenDist
 
 
-    # Getters for node data
-    def getInitialCoords(self): return self.__initialNodeCoords    
-    def getCircleSize(self): return self.__circleSize
     def getMaxNumNodes(self) -> int: return self.__maxNumNodes
 
 

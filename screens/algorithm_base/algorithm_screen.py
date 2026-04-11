@@ -355,7 +355,10 @@ class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
         # If a thread exists and it is still running
         if(self.__controller.isAlgorithmRunning()): 
             # Tell the thread to stop
-            self.__stopAlgorithm()  
+            self.__stopAlgorithm()   
+        
+        # Cancel any scheduled function (mostly for traversal screen)
+        self.getWindow().cancelScheduledFunctions()
         self.getWindow().loadScreen(ScreenType.MAIN_MENU)
 
 

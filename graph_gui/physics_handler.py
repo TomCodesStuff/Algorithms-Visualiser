@@ -6,7 +6,7 @@ if(__name__ == "__main__"):
 
     
 import math
-from .traversal_model import TraversalModel 
+from ..screens.graph_traverse.traversal_model import TraversalModel 
 from canvas_objects import CanvasNode
 
 

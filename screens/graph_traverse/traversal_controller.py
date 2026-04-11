@@ -5,10 +5,10 @@ if(__name__ == "__main__"):
     exit()
 
 
-from typing import TYPE_CHECKING, TypeVar, Tuple
-from tkinter import Event, BOTH 
-from canvas_objects import CanvasNode, CanvasEdge
+from typing import TYPE_CHECKING, TypeVar
+from tkinter import Canvas, Event, BOTH 
 from ..algorithm_base import AlgorithmController
+from graph_gui import EventHandler
 
 from data_structures import Array
 
@@ -24,6 +24,8 @@ class TraversalController(AlgorithmController[S, M, D]):
     def __init__(self, screen : S, model : M, dataStructure : D):
         super().__init__(screen, model, dataStructure)
 
+        self.__eventHandler = None
+
         # # Handles creation and deletion of edges 
         # self.__edgeHandler = EdgeHandler(self.__screen.getCanvas(), self, model) 
         # # Handles creation and deletion of nodes 
@@ -36,12 +38,30 @@ class TraversalController(AlgorithmController[S, M, D]):
 
     def refreshCanvas() -> None: pass
 
+
+    def createEventHandler(self, canvas : Canvas) -> None: 
+        self.__eventHandler = EventHandler(canvas)
+
+
+    # Draws a circle (node) on the canvas 
+    def spawnNode(self, coords: tuple=None): 
+        if self.__eventHandler is None: return
+
+        res = self.__eventHandler.spawnNode(coords)        
+        print(res) 
+        if res == 0: self.getScreen().setAddNodeButtonColour("black")
+        else: self.getScreen().setAddNodeButtonColour("red")
+
+
     # Calculates and returns coords of the centre of the canvas  
     def __getCanvasCentreCoords(self) -> tuple: 
         canvas = self.__screen.getCanvas() 
         return (canvas.winfo_width() // 2, 
                 canvas.winfo_height() // 2)
  
+        
+        # Refresh screen to show changes  
+        self.__screen.getWindow().update()  
 
     # Returns True if an edge is being edited by a user 
     def isEdgeBeingEdited(self) -> bool: 
@@ -58,23 +78,7 @@ class TraversalController(AlgorithmController[S, M, D]):
         self.__screen.disableWeightOptions()
 
 
-    # Draws a circle (node) on the canvas 
-    def spawnNode(self, coords: tuple=None):
-        if(coords == None): coords = self.__model.getInitialCoords()    
-        
-        
-        if(self.__nodeHandler.spawnNode(coords) > 0):
-            # Change the "Add Node" button's text to black 
-            self.__screen.changeNodeButtonColour("black") 
-        else:
-            # Change the "Add Node" button's text to red 
-            self.__screen.changeNodeButtonColour("red")  
-        
-        # Refresh screen to show changes  
-        self.__screen.getWindow().update()  
-    
-
-    def handleNodeClickEvent(self, canvasNode : CanvasNode) -> None: 
+    def handleNodeClickEvent(self, canvasNode) -> None: 
          # If an edge is being edited, prevent a new one from being created
         if(self.__edgeHandler.isEdgeBeingEdited()): return
 
@@ -91,7 +95,7 @@ class TraversalController(AlgorithmController[S, M, D]):
 
 
     # Enables canvas events and sets boolean variable to true 
-    def __createMovingEdge(self, canvasNode : CanvasNode) -> None:
+    def __createMovingEdge(self, canvasNode) -> None:
         # Adds canvas event to draw lines
         self.__addMovingEdgeEvent(canvasNode)
         # Sets variable to True
@@ -126,7 +130,7 @@ class TraversalController(AlgorithmController[S, M, D]):
 
     
     # Returns the Edge Canvas object
-    def __getCanvasEdge(self) -> CanvasEdge: 
+    def __getCanvasEdge(self): 
         connectedEdges = (self.__edgeHandler.getEdgeStartNode(), self.__edgeHandler.getEdgeEndNode())
         if(connectedEdges in self.__model.getEdges()): 
             return self.__model.getEdge(connectedEdges)
@@ -148,7 +152,7 @@ class TraversalController(AlgorithmController[S, M, D]):
         return coords 
 
 
-    def __drawEdge(self, event : Event, canvasNode : CanvasNode) -> None:  
+    def __drawEdge(self, event : Event, canvasNode) -> None:  
         canvas = self.__screen.getCanvas()   
         circleOffset = self.__model.getCircleSize() // 2
         x0, y0, _, _ = canvasNode.getCoords() 
@@ -176,7 +180,7 @@ class TraversalController(AlgorithmController[S, M, D]):
 
             
     # Add event to draw a line representing an edge
-    def __addMovingEdgeEvent(self, canvasNode : CanvasNode): 
+    def __addMovingEdgeEvent(self, canvasNode): 
         self.__screen.getCanvas().bind("<Motion>", lambda event: self.__drawEdge(event, canvasNode))
 
 
