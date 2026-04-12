@@ -1,5 +1,6 @@
 from typing import Set
 from .canvas_node import CanvasNode
+from .canvas_edge import CanvasEdge
 from data_structures import Graph
 
 class CanvasGraph():
@@ -19,5 +20,16 @@ class CanvasGraph():
             self.__nodes.remove(canvasNode)
     
     
-    def getNodes(self) -> Set[CanvasNode]: 
-        return self.__nodes 
+    
+
+    def addCanvasEdge(self, canvasEdge) -> None: 
+        self.__edges.add(canvasEdge)
+    
+
+    def deleteCanvasEdge(self, canvasEdge : CanvasEdge) -> None: 
+        if canvasEdge in self.__edges:
+            self.__edges.remove(canvasEdge)
+    
+
+    def getNodes(self) -> Set[CanvasNode]: return self.__nodes  
+    def getEdges(self) -> Set[CanvasEdge]: return self.__edges

@@ -1,5 +1,5 @@
 from ..events_model import EventsModel
-from ..graph_components import CanvasNode
+from ..graph_components import CanvasNode, CanvasEdge
 
 
 class MovementTool(): 
@@ -38,4 +38,11 @@ class MovementTool():
     def moveNode(self, canvasNode : CanvasNode, eventCoords : tuple) -> None: 
         eventX, eventY = eventCoords
         newCoords = self.__calculateCoords(eventX, eventY)
-        canvasNode.updateCoords(newCoords)
+        canvasNode.updateCoords(newCoords) 
+
+
+    def moveEdge(self, canvasEdge : CanvasEdge, eventCoords : tuple) -> None:
+        nodeOffset = self.__eventsModel.getNodeOffset()
+        x0, y0, _, _ = canvasEdge.getStartNode().getCoords()
+        event_x, event_y = eventCoords
+        canvasEdge.updateCoords((x0 + nodeOffset, y0 + nodeOffset, event_x, event_y)) 

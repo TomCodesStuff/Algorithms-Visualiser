@@ -50,7 +50,12 @@ class TraversalController(AlgorithmController[S, M, D]):
             x0, y0, _, _ = canvasNode.getCoords()
             self.getScreen().getCanvas().moveto(canvasNode.getCanvasID(), round(x0), round(y0))
             self.getScreen().getCanvas().itemconfig(canvasNode.getCanvasID(), fill=canvasNode.getColour())
-        self.getScreen().getWindow().update_idle_tasks() 
+        
+        for canvasEdge in self.__canvasGraph.getEdges(): 
+            self.getScreen().getCanvas().coords(canvasEdge.getCanvasID(), canvasEdge.getCoords())
+        
+        self.getScreen().getWindow().update_idle_tasks()  
+
         
 
     def createEventHandler(self, canvas : Canvas) -> None: 
@@ -175,7 +180,7 @@ class TraversalController(AlgorithmController[S, M, D]):
         if(self.__edgeHandler.getCurrentEdgeID() is None): 
             # Create a new edge on screen
             edgeID = canvas.create_line(x0 + circleOffset, y0 + circleOffset, 
-                                                    event.x, event.y, width = "3", arrow=BOTH)   
+                                                    event.x, event.y, width = "3")   
             self.__edgeHandler.setCurrentEdgeID(edgeID)
             # Lowers the priority of the edge, so it appears below nodes 
             canvas.tag_lower(edgeID) 

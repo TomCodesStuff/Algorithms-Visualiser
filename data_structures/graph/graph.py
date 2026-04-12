@@ -3,11 +3,13 @@ from ..data_structure import DataStructure
 
 # Algorithms only need to see 
 class Node(): 
-    def __init__(self):
-        self.__colour = "blue"
+    def __init__(self, colour : str):
+        self.__colour = colour
     
 
     def getColour(self) -> str: return self.__colour
+    
+    
     def setColour(self, colour : str) -> None: 
         self.__colour = colour 
 

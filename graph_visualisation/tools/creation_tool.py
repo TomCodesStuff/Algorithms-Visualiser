@@ -1,7 +1,7 @@
-from tkinter import Canvas
+from tkinter import Canvas, BOTH
 from data_structures import Node
 from ..events_model import EventsModel
-from ..graph_components import CanvasGraph, CanvasNode
+from ..graph_components import CanvasGraph, CanvasNode, CanvasEdge
 
 
 class CreationTool(): 
@@ -27,11 +27,34 @@ class CreationTool():
 
     def createNode(self, canvasGraph : CanvasGraph, coords : tuple) -> CanvasNode:
         if coords == (): coords = self.__eventsModel.getDefaultNodeCoords()
-        canvasNode = CanvasNode(Node(), coords, self.__eventsModel.getDefaultNodeSize()) 
+        canvasNode = CanvasNode(Node(self.__eventsModel.getDefaultNodeColour()), 
+                                coords, self.__eventsModel.getDefaultNodeSize()) 
         canvasGraph.addCanvasNode(canvasNode)
         return canvasNode
 
 
     def deleteNode(self, canvasGraph : CanvasGraph, canvasNode : CanvasNode):
-        canvasGraph.deleteCanvasNode(canvasNode)
+        canvasGraph.deleteCanvasNode(canvasNode) 
+
+
+    def renderEdge(self, canvas : Canvas, canvasEdge : CanvasEdge) -> None: 
+        x0, y0, x1, y1 = canvasEdge.getCoords() 
+        canvasID = canvas.create_line(x0, y0, x1, y1, fill=canvasEdge.getColour(), 
+                                      width = self.__eventsModel.getDefaultEdgeSize(), arrow=BOTH)
+        canvasEdge.setCanvasID(canvasID)
+        canvas.tag_lower(canvasID)
+            
+
+    def createEdge(self, canvasNode : CanvasNode) -> CanvasEdge:
+        nodeOffset = self.__eventsModel.getNodeOffset()  
+        x0, y0, _, _ = canvasNode.getCoords()
+        canvasEdge = CanvasEdge((x0 + nodeOffset, y0 + nodeOffset, x0 + nodeOffset, y0 + nodeOffset), 
+                                self.__eventsModel.getDefaultEdgeWeight(), 
+                                self.__eventsModel.getDefaultEdgeColour()) 
+        canvasEdge.setStartNode(canvasNode)  
+        return canvasEdge  
+
+    def deleteEdge(self, canvasGraph : CanvasGraph, canvasEdge : CanvasEdge) -> None: 
+        canvasGraph.deleteCanvasEdge(canvasEdge)
+
         

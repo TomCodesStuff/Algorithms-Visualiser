@@ -1,6 +1,6 @@
 from tkinter import Canvas, Event
 from ..events_model import EventsModel
-from ..graph_components import CanvasGraph, CanvasNode 
+from ..graph_components import CanvasGraph, CanvasNode, CanvasEdge
 from ..tools import * 
 
 
@@ -21,7 +21,9 @@ class EventsHandler():
         self.__isNodeBeingDeleted = False 
         self.__isEdgeBeingDrawn = False 
         self.__isEdgeBeingEdited = False  
-        self.__isEdgeBeingDeleted = False 
+        self.__isEdgeBeingDeleted = False  
+
+        self.__edgeBeingDrawn = None 
 
         self.__addCanvasEvents()
 
@@ -47,10 +49,25 @@ class EventsHandler():
         self.spawnNode((x0, y0, x1, y1)) 
 
 
+    def __deleteEdgeOnClick(self, event : Event) -> None: 
+        if self.__isEdgeBeingEdited: return 
+        if self.__edgeBeingDrawn is None: return 
+
+        object_collisions = self.__canvas.find_overlapping(event.x, event.y , event.x, event.y) 
+        if(len(object_collisions) == 1 and self.__edgeBeingDrawn.getCanvasID() in object_collisions): 
+            self.__removeCanvasMotionEvent()
+            self.__isEdgeBeingDrawn = False
+
+            self.__canvas.delete(self.__edgeBeingDrawn.getCanvasID())
+            self.__creationTool.deleteEdge(self.__canvasGraph, self.__edgeBeingDrawn) 
+            self.__edgeBeingDrawn = None 
+            print(self.__canvasGraph.getEdges())
+ 
+
     def __addCanvasEvents(self) -> None: 
         if self.__canvas is None: return 
         # Add event to delete current edge being drawn when the canvas is clicked
-        # self.__canvas.bind("<Button-1>", lambda event: self.__edgeHandler.deleteEdgeOnClick(event))
+        self.__canvas.bind("<Button-1>", lambda event: self.__deleteEdgeOnClick(event))
         self.__canvas.bind("<Double-Button-1>", lambda event: self.__spawnNodeDoubleClick(event))
 
 
@@ -76,7 +93,47 @@ class EventsHandler():
         self.__canvas.delete(canvasNode.getCanvasID())
         self.__creationTool.deleteNode(self.__canvasGraph, canvasNode)
         # print(self.__canvasGraph.getNodes()) 
+
+
+    def __drawEdge(self, eventCoords : tuple, canvasEdge : CanvasEdge) -> None: 
+        eventX, eventY = eventCoords
+        print(eventX, eventY)
+        object_collisions = self.__canvas.find_overlapping(eventX, eventY, eventX, eventY)
+        if canvasEdge.getStartNode().getCanvasID() in object_collisions: return 
+        self.__movementTool.moveEdge(canvasEdge, eventCoords)
+        if canvasEdge.getCanvasID() == -1: 
+            self.__creationTool.renderEdge(self.__canvas, canvasEdge) 
+            self.__canvasGraph.addCanvasEdge(canvasEdge)
+
+
+    def __removeCanvasMotionEvent(self) -> None: 
+        self.__canvas.unbind("<Motion>")
+
+
+    def __addCanvasMotionEvent(self, canvasEdge : CanvasEdge) -> None:
+        self.__canvas.bind("<Motion>", lambda event: self.__drawEdge((event.x, event.y), canvasEdge))
         
+
+    def __nodeOnClick(self, canvasNode : CanvasNode) -> None: 
+         # If an edge is being edited, prevent a new one from being created
+        if(self.__isEdgeBeingEdited): return
+
+        # If an edge is already being drawn on screen
+        if(self.__isEdgeBeingDrawn):
+            print("Hello")
+            self.__removeCanvasMotionEvent() 
+            self.__isEdgeBeingDrawn = False 
+            self.__edgeBeingDrawn = None 
+            # TODO reimplement establishing connection 
+            # If edge successfully created 
+            #  self.__edgeHandler.handleNodeConnection(canvasNode) 
+        else:
+            self.__isEdgeBeingDrawn = True 
+            canvasEdge = self.__creationTool.createEdge(canvasNode)
+            self.__edgeBeingDrawn = canvasEdge
+            self.__addCanvasMotionEvent(canvasEdge) 
+            # canvasEdge = self.__creationTool.renderEdge(canvasEdge)
+
 
     # Add event handlers to the newly created node
     def __addNodeEvents(self, canvasNode : CanvasNode) -> None:     
@@ -86,11 +143,12 @@ class EventsHandler():
         self.__canvas.tag_bind(canvasNode.getCanvasID(), "<Leave>", lambda _: self.__hoverTool.nodeOnLeave(canvasNode)) 
         # Add event listener to move node when it's dragged by the mouse 
         self.__canvas.tag_bind(canvasNode.getCanvasID(), "<B1-Motion>", lambda event: self.__moveNode(event, canvasNode))    
+        
         # Add event listener to detect when mouse button released 
         # self.__canvas.tag_bind(canvasNode.getCanvasID(), "<ButtonRelease-1>", lambda _: self.__resetDragged(canvasNode))
         
         # Add event listener to add an edge when a node is clicked 
-        # self.__canvas.tag_bind(circle, "<Button-1>", lambda _: self.__controller.handleNodeClickEvent(canvasNode))
+        self.__canvas.tag_bind(canvasNode.getCanvasID(), "<Button-1>", lambda _: self.__nodeOnClick(canvasNode))
         # Add event to delete a node when it is double clicked 
         self.__canvas.tag_bind(canvasNode.getCanvasID(), "<Double-Button-1>", lambda _: self.__deleteNode(canvasNode)) 
 
