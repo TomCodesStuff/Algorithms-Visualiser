@@ -28,13 +28,13 @@ class EventsHandler():
 
     def __canSpawnEventTrigger(self) -> bool: 
         if self.__isNodeBeingDeleted: 
-            self.__isEdgeBeingDeleted = False
+            self.__isNodeBeingDeleted = False
             return False
         if self.__isEdgeBeingDeleted: 
             self.__isEdgeBeingDeleted = False
             return False
         if self.__isEdgeBeingDrawn: 
-            self.__isEdgeBeingDeleted = False 
+            self.__isEdgeBeingDrawn = False 
             return False
         return True 
 
@@ -64,6 +64,20 @@ class EventsHandler():
         self.__movementTool.moveNode(canvasNode, (event.x, event.y))
 
 
+    def __deleteNode(self, canvasNode : CanvasNode) -> None:  
+        if self.__isEdgeBeingEdited: return
+        self.__isNodeBeingDeleted = True  
+
+        # TODO stop edge being drawn 
+        # The event to draw an edge can still trigger 
+        # so it needs to be deleted
+        # self.__edgeHandler.deleteEdgeBeingDrawn()
+        
+        self.__canvas.delete(canvasNode.getCanvasID())
+        self.__creationTool.deleteNode(self.__canvasGraph, canvasNode)
+        # print(self.__canvasGraph.getNodes()) 
+        
+
     # Add event handlers to the newly created node
     def __addNodeEvents(self, canvasNode : CanvasNode) -> None:     
         # Add event to change nodes colour when the mouse hovers over it
@@ -75,25 +89,25 @@ class EventsHandler():
         # Add event listener to detect when mouse button released 
         # self.__canvas.tag_bind(canvasNode.getCanvasID(), "<ButtonRelease-1>", lambda _: self.__resetDragged(canvasNode))
         
-        # # Add event listener to add an edge when a node is clicked 
+        # Add event listener to add an edge when a node is clicked 
         # self.__canvas.tag_bind(circle, "<Button-1>", lambda _: self.__controller.handleNodeClickEvent(canvasNode))
         # Add event to delete a node when it is double clicked 
-        # self.__canvas.tag_bind(circle, "<Double-Button-1>", lambda _: self.__deleteNodeOnDoubleClick(canvasNode)) 
+        self.__canvas.tag_bind(canvasNode.getCanvasID(), "<Double-Button-1>", lambda _: self.__deleteNode(canvasNode)) 
 
 
 
     def spawnNode(self, coords : tuple) -> bool: 
-        if self.__isEdgeBeingDeleted: 
-            self.__isEdgeBeingDeleted = False 
+        if self.__isNodeBeingDeleted: 
+            self.__isNodeBeingDeleted = False 
             return False
 
         if not self.__creationTool.canNodeBeSpawned(self.__canvas, coords): 
             return False 
         
-        canvasNode = self.__creationTool.createNode(coords)
+        canvasNode = self.__creationTool.createNode(self.__canvasGraph, coords)
         self.__creationTool.renderNode(self.__canvas, canvasNode)
         self.__addNodeEvents(canvasNode) 
-        self.__canvasGraph.addCanvasNode(canvasNode)
+        # print(self.__canvasGraph.getNodes())
         return True 
 
 

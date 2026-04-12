@@ -1,7 +1,7 @@
 from tkinter import Canvas
 from data_structures import Node
 from ..events_model import EventsModel
-from ..graph_components import CanvasNode
+from ..graph_components import CanvasGraph, CanvasNode
 
 
 class CreationTool(): 
@@ -25,7 +25,13 @@ class CreationTool():
         canvasNode.setCanvasID(canvasID)
 
 
-    def createNode(self, coords : tuple) -> CanvasNode:
+    def createNode(self, canvasGraph : CanvasGraph, coords : tuple) -> CanvasNode:
         if coords == (): coords = self.__eventsModel.getDefaultNodeCoords()
-        return CanvasNode(Node(), coords, self.__eventsModel.getDefaultNodeSize())
+        canvasNode = CanvasNode(Node(), coords, self.__eventsModel.getDefaultNodeSize()) 
+        canvasGraph.addCanvasNode(canvasNode)
+        return canvasNode
+
+
+    def deleteNode(self, canvasGraph : CanvasGraph, canvasNode : CanvasNode):
+        canvasGraph.deleteCanvasNode(canvasNode)
         

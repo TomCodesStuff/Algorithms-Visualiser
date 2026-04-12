@@ -13,6 +13,11 @@ class CanvasGraph():
     def addCanvasNode(self, canvasNode : CanvasNode) -> None: 
         self.__nodes.add(canvasNode) 
 
+
+    def deleteCanvasNode(self, canvasNode : CanvasNode) -> None: 
+        if canvasNode in self.__nodes:
+            self.__nodes.remove(canvasNode)
+    
     
     def getNodes(self) -> Set[CanvasNode]: 
-        return self.__nodes
+        return self.__nodes 
