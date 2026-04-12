@@ -6,7 +6,7 @@ if(__name__ == "__main__"):
 
 from typing import Set
 from ..algorithm_base import AlgorithmModel
-from canvas_objects import CanvasNode, CanvasEdge
+from graph_visualisation.graph_components import CanvasNode, CanvasEdge
 
 
 class TraversalModel(AlgorithmModel):

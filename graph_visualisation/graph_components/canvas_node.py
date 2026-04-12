@@ -3,33 +3,31 @@ if(__name__ == "__main__"):
     print("This is file shouldn't be run on it's own. \nIt should be imported only.")
     exit()
 
-import math 
+
+from data_structures import Node 
+
 
 class CanvasNode():
     # Static variable shared between each instance 
     nodeID = 1
 
-    def __init__(self, coords : tuple) -> None: 
+    def __init__(self, node : Node, coords : tuple, nodeSize : int) -> None: 
+        # Reference to abstracted node object
+        self.__node = node
         # X-Y Coordindates of the node on screen
         self.__coords = coords
+        # Size of the node 
+        self.__nodeSize = nodeSize
         
         self.__ID = CanvasNode.nodeID 
         CanvasNode.nodeID += 1 
         
         # ID of the node on the canvas
         self.__canvasID = -1  
-        # Node ID
-        # Size of the node 
-        self.__nodeSize = 5
         
         # Dictionary mapping nodes connected by edges 
         # Keys are the node objects with the values being the weight of the connection
         self.__connectedNodes = {} 
-        
-        # Main colour of the node
-        self.__colour = "Blue"
-        # Colour of the node when it is hovered over 
-        self.__highlightColour = "Red"
         
         # A List containing references to edges that connects nodes to eachother 
         self.__edges = []
@@ -51,14 +49,13 @@ class CanvasNode():
     def getYCoord(self) -> int: return self.__coords[1]
     def getCoords(self) -> tuple: return self.__coords
     def getID(self) -> int: return self.__ID    
-    def getMainColour(self) -> str: return self.__colour 
-    def getHighlightColour(self) -> str: return self.__highlightColour  
+    def getColour(self) -> str: return self.__node.getColour()
     def getConnectionsSet(self) -> set: return self.__edges 
 
 
     # Setters 
-    def setCanvasID(self, canvasID : int) -> None: 
-        self.__canvasID = canvasID
+    def setCanvasID(self, canvasID : int) -> None:  self.__canvasID = canvasID
+    def setColour(self, colour : str) -> None: self.__node.setColour(colour) 
 
 
     # Adds a connection between this node and another node
@@ -103,12 +100,7 @@ class CanvasNode():
         self.__forceY = 0
     
 
-    def __roundForce(self, force : float, coord : float) -> float: 
-         return math.floor(coord) if force < 0 else math.ceil(coord)
-
-
     def applyForces(self) -> None:  
-        
         # Get top-left coordinates of the node 
         x0, y0, _, _ = self.__coords 
         

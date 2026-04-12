@@ -47,7 +47,7 @@ class ScreenCreator():
                    TraversalScreen, 
                    TraversalController, 
                    TraversalModel, 
-                   Array))
+                   Graph))
             case _: return None
 
 

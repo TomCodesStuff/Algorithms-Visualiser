@@ -1,5 +1,5 @@
-from canvas_objects import CanvasNode, CanvasEdge
-from ..screens.graph_traverse.traversal_model import TraversalModel
+from graph_visualisation.graph_components import CanvasNode, CanvasEdge
+from ...screens.graph_traverse.traversal_model import TraversalModel
 from tkinter import Canvas, Event
 
 

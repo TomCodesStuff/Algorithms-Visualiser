@@ -1,0 +1,41 @@
+from ..events_model import EventsModel
+from ..graph_components import CanvasNode
+
+
+class MovementTool(): 
+    def __init__(self, eventsModel : EventsModel):
+        self.__eventsModel = eventsModel
+    
+
+    # This prevents nodes from being dragged off canvas 
+    # Could likely do wiht some refactoring but it just works 
+    def __calculateCoords(self, x : int, y : int) -> tuple:  
+        # Values needed for calculations
+        nodeSize = self.__eventsModel.getDefaultNodeSize()
+        nodeoffset = self.__eventsModel.getNodeOffset() 
+        canvasWidth = self.__eventsModel.getCanvasWidth()
+        canvasHeight = self.__eventsModel.getCanvasHeight()
+
+        # Checks if mouse has gone out of bounds to the left 
+        # Stops the node from moving off the canvas
+        x0 = max(x - nodeoffset, self.__eventsModel.getCanvasLowerBoundOffset()) 
+        # Checks if mouse has gone out of bounds to the right 
+        # Stops the node from moving off the canvas
+        x0 = min(x0, canvasWidth - self.__eventsModel.getCanvasUpperBoundOffset() - nodeSize) 
+
+        # Checks if mouse has gone out of bounds by going above the canvas
+        # Stops the node from moving off the canvas 
+        y0 = max(y - nodeoffset, self.__eventsModel.getCanvasLowerBoundOffset()) 
+        # Checks if mouse has gone out of bounds by going below the canvas
+        # Stops the node from moving off the canvas 
+        y0 = min(y0, canvasHeight - self.__eventsModel.getCanvasUpperBoundOffset() - nodeSize)  
+
+        # The above could be done in one line but just because it can doesn't mean it should 
+        # Doing it in one line would make the calculations very hard to read  
+        return(x0, y0, x0 + nodeSize, y0 + nodeSize)
+
+
+    def moveNode(self, canvasNode : CanvasNode, eventCoords : tuple) -> None: 
+        eventX, eventY = eventCoords
+        newCoords = self.__calculateCoords(eventX, eventY)
+        canvasNode.updateCoords(newCoords)

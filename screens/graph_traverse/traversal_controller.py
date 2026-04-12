@@ -7,10 +7,10 @@ if(__name__ == "__main__"):
 
 from typing import TYPE_CHECKING, TypeVar
 from tkinter import Canvas, Event, BOTH 
+from data_structures import Graph
+from graph_visualisation import EventsHandler, CanvasGraph
 from ..algorithm_base import AlgorithmController
-from graph_gui import EventHandler
 
-from data_structures import Array
 
 if TYPE_CHECKING: 
     from graph_traverse import TraversalScreen, TraversalModel
@@ -18,13 +18,14 @@ if TYPE_CHECKING:
 
 S = TypeVar("S", bound="TraversalScreen")
 M = TypeVar("M", bound="TraversalModel")
-D = TypeVar("D", bound="Array")
+D = TypeVar("D", bound="Graph")
 
 class TraversalController(AlgorithmController[S, M, D]):
     def __init__(self, screen : S, model : M, dataStructure : D):
         super().__init__(screen, model, dataStructure)
 
         self.__eventHandler = None
+        self.__canvasGraph = CanvasGraph(self.getDataStructure())
 
         # # Handles creation and deletion of edges 
         # self.__edgeHandler = EdgeHandler(self.__screen.getCanvas(), self, model) 
@@ -36,20 +37,31 @@ class TraversalController(AlgorithmController[S, M, D]):
         # # Refreshes canvas periodically   
         # self.__updateCanvas()
 
-    def refreshCanvas() -> None: pass
 
+    # NOTE temp function for testing 
+    def repeatCanvasRefresh(self) -> None:  
+        # print("Refreshing canvas")
+        self.refreshCanvas() 
+        self.getScreen().getWindow().scheduleFunctionExecution(self.repeatCanvasRefresh, 16)
+
+
+    def refreshCanvas(self, refreshColours:bool=False) -> None: 
+        for canvasNode in self.__canvasGraph.getNodes(): 
+            x0, y0, _, _ = canvasNode.getCoords()
+            self.getScreen().getCanvas().moveto(canvasNode.getCanvasID(), round(x0), round(y0))
+            self.getScreen().getCanvas().itemconfig(canvasNode.getCanvasID(), fill=canvasNode.getColour())
+        self.getScreen().getWindow().update_idle_tasks() 
+        
 
     def createEventHandler(self, canvas : Canvas) -> None: 
-        self.__eventHandler = EventHandler(canvas)
+        self.__eventHandler = EventsHandler(canvas, self.__canvasGraph)
 
 
     # Draws a circle (node) on the canvas 
-    def spawnNode(self, coords: tuple=None): 
+    def spawnNode(self, coords: tuple=()): 
         if self.__eventHandler is None: return
-
-        res = self.__eventHandler.spawnNode(coords)        
-        print(res) 
-        if res == 0: self.getScreen().setAddNodeButtonColour("black")
+        nodeCreated = self.__eventHandler.spawnNode(coords)        
+        if nodeCreated: self.getScreen().setAddNodeButtonColour("black")
         else: self.getScreen().setAddNodeButtonColour("red")
 
 
@@ -59,9 +71,6 @@ class TraversalController(AlgorithmController[S, M, D]):
         return (canvas.winfo_width() // 2, 
                 canvas.winfo_height() // 2)
  
-        
-        # Refresh screen to show changes  
-        self.__screen.getWindow().update()  
 
     # Returns True if an edge is being edited by a user 
     def isEdgeBeingEdited(self) -> bool: 

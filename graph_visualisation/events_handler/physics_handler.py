@@ -6,8 +6,8 @@ if(__name__ == "__main__"):
 
     
 import math
-from ..screens.graph_traverse.traversal_model import TraversalModel 
-from canvas_objects import CanvasNode
+from ...screens.graph_traverse.traversal_model import TraversalModel 
+from graph_visualisation.graph_components import CanvasNode
 
 
 # Handles all physics-based calculations 

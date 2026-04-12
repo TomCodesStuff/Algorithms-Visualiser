@@ -1,22 +1,14 @@
-from canvas_objects import CanvasNode
-
+from ..graph_components import CanvasNode
+from data_structures import Node
 
 class NodeHandler():
     def __init__(self) -> None:
-        # # Store reference to canvas (makes things a lot easier)  
-        # self.__canvas = canvas
-        # # Store reference to model (to access data needed for nodes)
-        # self.__model = model  
-        # # Stores reference to the controller (literally needed for one function only)
-        # self.__controller = controller
-        # # Reference to edge handler (just needed cause events are a pain)
+        # Reference to edge handler (just needed cause events are a pain)
         # self.__edgeHandler = edgeHandler
-        # # Flag to ensure events don't trigger when node being deleted
+        # Flag to ensure events don't trigger when node being deleted
         # self.__isNodeBeingDeleted = False    
 
-        self.__nodes = []
         self.__nodePadding = 10  
-
         self.__defaultX = 5
         self.__defaultY = 5
         self.__defaultNodeSize = 20
@@ -33,9 +25,22 @@ class NodeHandler():
 
 
     def createNode(self, coords) -> CanvasNode:
-        canvasNode = CanvasNode(coords)
-        self.__nodes.append(canvasNode)
-        return canvasNode 
+        return CanvasNode(Node(), coords)
+  
+
+    def onHover(self, canvasNode : CanvasNode) -> None:  
+        canvasNode.setColour("red")
+    
+
+    def onLeave(self, canvasNode : CanvasNode) -> None: 
+        canvasNode.setColour("blue")
+    
+
+    def moveNode(canvasNode : CanvasNode, eventCoords : tuple) -> None:
+        x, y = eventCoords
+
+        return
+    
 
     # # Getter to check if a node is being deleted 
     # def isNodeBeingDeleted(self) -> bool: return self.__isNodeBeingDeleted 
@@ -108,7 +113,7 @@ class NodeHandler():
     #     # Also makes sure centre of node aligns with cursor
     #     xCoord, yCoord = self.__calculateCoords(event.x, event.y)
     #     # Set is dragged flag to True 
-    #     canvasNode.setDragged()
+    #     canvasNode. ()
     #     # Updates coords in the CanvasNode object
     #     canvasNode.updateCoords((xCoord, yCoord, xCoord + circleSize, yCoord + circleSize))
         

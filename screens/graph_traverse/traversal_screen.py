@@ -7,14 +7,14 @@ if(__name__ == "__main__"):
 import tkinter as tk 
 from typing import TYPE_CHECKING, TypeVar
 from ..algorithm_base import AlgorithmScreen
-from data_structures import Array
+from data_structures import Graph
 
 if TYPE_CHECKING: 
     from graph_traverse import TraversalController, TraversalModel
 
 C = TypeVar("C", bound="TraversalController")
 M = TypeVar("M", bound="TraversalModel")
-D = TypeVar("D", bound="Array")
+D = TypeVar("D", bound="Graph")
 
 
 class TraversalScreen(AlgorithmScreen[C, M, D]):  
@@ -180,7 +180,8 @@ class TraversalScreen(AlgorithmScreen[C, M, D]):
     def render(self) -> None: 
         self.createBaseLayout()
         self.__createOptions()  
-        self.getController().createEventHandler(self.getCanvas())
+        self.getController().createEventHandler(self.getCanvas()) 
+        self.getController().repeatCanvasRefresh()
     
 
     # TODO cancel any running functions before algorithm runs 
