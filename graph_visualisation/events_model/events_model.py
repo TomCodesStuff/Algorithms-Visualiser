@@ -24,7 +24,8 @@ class EventsModel():
 
         self.__defaultEdgeWeight = 20
         self.__defaultEdgeColour = "black"
-        self.__defaultEdgeSize = "3"
+        self.__defaultEdgeSize = "3" 
+        self.__edgeHoverWidth = "5"
     
 
     def getDefaultNodeCoords(self) -> tuple: return self.__defaultNodeCoords
@@ -41,4 +42,5 @@ class EventsModel():
     def setCanvasHeight(self, height : int) -> None: self.__canvasHeight = height 
     def getDefaultEdgeWeight(self) -> int: return self.__defaultEdgeWeight
     def getDefaultEdgeColour(self) -> str: return self.__defaultEdgeColour 
-    def getDefaultEdgeSize(self) -> str: return self.__defaultEdgeSize
+    def getDefaultEdgeSize(self) -> str: return self.__defaultEdgeSize 
+    def getEdgeHoverWidth(self) -> str: return self.__edgeHoverWidth

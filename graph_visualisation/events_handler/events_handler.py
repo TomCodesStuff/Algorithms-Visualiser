@@ -154,6 +154,11 @@ class EventsHandler():
     def __addEdgeEvents(self, canvasEdge : CanvasEdge) -> None:          
         # self.__canvas.tag_bind(edge, "<Button-1>", lambda _: self.__editEdgeOnClick(canvasEdge))
         self.__canvas.tag_bind(canvasEdge.getCanvasID(), "<Double-Button-1>", lambda _: self.__deleteEdgeOnDoubleClick(canvasEdge)) 
+        self.__canvas.tag_bind(canvasEdge.getCanvasID(), "<Enter>", 
+                               lambda _: self.__hoverTool.edgeOnHover(self.__canvas, canvasEdge))
+        self.__canvas.tag_bind(canvasEdge.getCanvasID(), "<Leave>", 
+                               lambda _: self.__hoverTool.edgeOnLeave(self.__canvas, canvasEdge)) 
+
 
 
     # Add event handlers to the newly created node
