@@ -61,9 +61,8 @@ class EventsHandler():
             self.__canvas.delete(self.__edgeBeingDrawn.getCanvasID())
             self.__creationTool.deleteEdge(self.__canvasGraph, self.__edgeBeingDrawn) 
             self.__edgeBeingDrawn = None 
-            print(self.__canvasGraph.getEdges())
- 
 
+ 
     def __addCanvasEvents(self) -> None: 
         if self.__canvas is None: return 
         # Add event to delete current edge being drawn when the canvas is clicked
@@ -72,6 +71,7 @@ class EventsHandler():
 
 
     def __moveNode(self, event : Event, canvasNode : CanvasNode) -> None:  
+        self.__resetEdgeDrawingEvent()
         # self.__controller.deleteMovingEdgeEvent()
         self.__isEdgeBeingDrawn = False 
         # Stops the node from only being partially rendered (not sure why this works, I forgot)
@@ -85,19 +85,16 @@ class EventsHandler():
         if self.__isEdgeBeingEdited: return
         self.__isNodeBeingDeleted = True  
 
-        # TODO stop edge being drawn 
-        # The event to draw an edge can still trigger 
-        # so it needs to be deleted
-        # self.__edgeHandler.deleteEdgeBeingDrawn()
+        # The event to draw an edge can still trigger so it needs to be deleted
+        self.__deleteEdge()
+        self.__resetEdgeDrawingEvent()
         
         self.__canvas.delete(canvasNode.getCanvasID())
         self.__creationTool.deleteNode(self.__canvasGraph, canvasNode)
-        # print(self.__canvasGraph.getNodes()) 
-
+       
 
     def __drawEdge(self, eventCoords : tuple, canvasEdge : CanvasEdge) -> None: 
         eventX, eventY = eventCoords
-        print(eventX, eventY)
         object_collisions = self.__canvas.find_overlapping(eventX, eventY, eventX, eventY)
         if canvasEdge.getStartNode().getCanvasID() in object_collisions: return 
         self.__movementTool.moveEdge(canvasEdge, eventCoords)
@@ -112,28 +109,43 @@ class EventsHandler():
 
     def __addCanvasMotionEvent(self, canvasEdge : CanvasEdge) -> None:
         self.__canvas.bind("<Motion>", lambda event: self.__drawEdge((event.x, event.y), canvasEdge))
-        
+
+
+    def __areEdgeNodesSame(self, edgeStartNode : CanvasNode, edgeEndNode : CanvasNode) -> bool:
+        return edgeStartNode == edgeEndNode
+
+
+    def __deleteEdge(self) -> None:  
+        if self.__edgeBeingDrawn is None: return
+        self.__canvas.delete(self.__edgeBeingDrawn.getCanvasID())
+        self.__creationTool.deleteEdge(self.__canvasGraph, self.__edgeBeingDrawn)
+
+
+    def __resetEdgeDrawingEvent(self) -> None:
+        self.__removeCanvasMotionEvent() 
+        self.__isEdgeBeingDrawn = False 
+        self.__edgeBeingDrawn = None  
+
 
     def __nodeOnClick(self, canvasNode : CanvasNode) -> None: 
          # If an edge is being edited, prevent a new one from being created
         if(self.__isEdgeBeingEdited): return
 
+
         # If an edge is already being drawn on screen
         if(self.__isEdgeBeingDrawn):
-            print("Hello")
-            self.__removeCanvasMotionEvent() 
-            self.__isEdgeBeingDrawn = False 
-            self.__edgeBeingDrawn = None 
-            # TODO reimplement establishing connection 
-            # If edge successfully created 
-            #  self.__edgeHandler.handleNodeConnection(canvasNode) 
+            if not self.__areEdgeNodesSame(self.__edgeBeingDrawn.getStartNode(), canvasNode): 
+                self.__edgeBeingDrawn.setEndNode(canvasNode)
+            else: self.__deleteEdge()
+
+            self.__resetEdgeDrawingEvent()
+
         else:
             self.__isEdgeBeingDrawn = True 
             canvasEdge = self.__creationTool.createEdge(canvasNode)
             self.__edgeBeingDrawn = canvasEdge
             self.__addCanvasMotionEvent(canvasEdge) 
-            # canvasEdge = self.__creationTool.renderEdge(canvasEdge)
-
+   
 
     # Add event handlers to the newly created node
     def __addNodeEvents(self, canvasNode : CanvasNode) -> None:     
@@ -165,7 +177,6 @@ class EventsHandler():
         canvasNode = self.__creationTool.createNode(self.__canvasGraph, coords)
         self.__creationTool.renderNode(self.__canvas, canvasNode)
         self.__addNodeEvents(canvasNode) 
-        # print(self.__canvasGraph.getNodes())
         return True 
 
 

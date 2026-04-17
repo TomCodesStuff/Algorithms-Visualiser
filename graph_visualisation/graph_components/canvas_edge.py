@@ -33,7 +33,7 @@ class CanvasEdge():
     def getCoords(self) -> tuple: return self.__coords
     def getStartNode(self) -> CanvasNode|None: return self.__startNode
     def getEndNode(self) -> CanvasNode|None: return self.__endNode
-    def getStartNodes(self) -> tuple: return (self.__startNode, self.__endNode) 
+    def getNodes(self) -> tuple: return (self.__startNode, self.__endNode) 
     def getScreenLen(self) -> int: return self.__screenLen
     def getColour(self) -> str: return self.__colour
     
@@ -48,7 +48,11 @@ class CanvasEdge():
     
 
     def setStartNode(self, canvasNode : CanvasNode) -> None:
-        self.__startNode = canvasNode
+        self.__startNode = canvasNode 
+
+
+    def setEndNode(self, canvasNode : CanvasNode) -> None:
+        self.__endNode = canvasNode 
 
 
     # TODO error handling and adjustment for screen size
