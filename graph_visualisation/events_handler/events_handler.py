@@ -86,7 +86,7 @@ class EventsHandler():
         self.__isNodeBeingDeleted = True  
 
         # The event to draw an edge can still trigger so it needs to be deleted
-        self.__deleteEdge()
+        self.__deleteEdge(self.__edgeBeingDrawn)
         self.__resetEdgeDrawingEvent()
         
         self.__canvas.delete(canvasNode.getCanvasID())
@@ -115,10 +115,10 @@ class EventsHandler():
         return edgeStartNode == edgeEndNode
 
 
-    def __deleteEdge(self) -> None:  
-        if self.__edgeBeingDrawn is None: return
-        self.__canvas.delete(self.__edgeBeingDrawn.getCanvasID())
-        self.__creationTool.deleteEdge(self.__canvasGraph, self.__edgeBeingDrawn)
+    def __deleteEdge(self, canvasEdge : CanvasEdge) -> None:  
+        if canvasEdge is None: return
+        self.__canvas.delete(canvasEdge.getCanvasID())
+        self.__creationTool.deleteEdge(self.__canvasGraph, canvasEdge)
 
 
     def __resetEdgeDrawingEvent(self) -> None:
@@ -130,22 +130,31 @@ class EventsHandler():
     def __nodeOnClick(self, canvasNode : CanvasNode) -> None: 
          # If an edge is being edited, prevent a new one from being created
         if(self.__isEdgeBeingEdited): return
-
-
+        
         # If an edge is already being drawn on screen
         if(self.__isEdgeBeingDrawn):
             if not self.__areEdgeNodesSame(self.__edgeBeingDrawn.getStartNode(), canvasNode): 
                 self.__edgeBeingDrawn.setEndNode(canvasNode)
-            else: self.__deleteEdge()
-
+                self.__addEdgeEvents(self.__edgeBeingDrawn)
+            else: self.__deleteEdge(self.__edgeBeingDrawn)
             self.__resetEdgeDrawingEvent()
-
         else:
             self.__isEdgeBeingDrawn = True 
-            canvasEdge = self.__creationTool.createEdge(canvasNode)
+            canvasEdge = self.__creationTool.createEdge(canvasNode) 
             self.__edgeBeingDrawn = canvasEdge
             self.__addCanvasMotionEvent(canvasEdge) 
-   
+    
+
+    def __deleteEdgeOnDoubleClick(self, canvasEdge : CanvasEdge) -> None:
+        self.__isEdgeBeingDeleted = True 
+        self.__deleteEdge(canvasEdge)
+
+
+    # Add event handlers to edges for interactability 
+    def __addEdgeEvents(self, canvasEdge : CanvasEdge) -> None:          
+        # self.__canvas.tag_bind(edge, "<Button-1>", lambda _: self.__editEdgeOnClick(canvasEdge))
+        self.__canvas.tag_bind(canvasEdge.getCanvasID(), "<Double-Button-1>", lambda _: self.__deleteEdgeOnDoubleClick(canvasEdge)) 
+
 
     # Add event handlers to the newly created node
     def __addNodeEvents(self, canvasNode : CanvasNode) -> None:     
