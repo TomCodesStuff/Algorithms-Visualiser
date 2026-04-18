@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING, TypeVar
 from ..algorithm_base import AlgorithmScreen
 from data_structures import Graph
 
+
 if TYPE_CHECKING: 
     from graph_traverse import TraversalController, TraversalModel
 
@@ -21,11 +22,28 @@ class TraversalScreen(AlgorithmScreen[C, M, D]):
     def __init__(self, window):
         super().__init__(window)
 
+        self.__nodeOptionsFrame = None 
+
+
+    def __createNodeOptions(self) -> None: 
+        self.__nodeOptionsFrame = tk.Frame(self.getOptionsWidgetFrame(), bg="white") 
+        self.__nodeOptionsFrame.pack()
+
+        self.__createAddNodeButton() 
+        self.__createDeleteNodeButton()
+
+
     # Creates the button that lets users add nodes to the canvas 
     def __createAddNodeButton(self) -> None: 
-        self.__addNodeButton = tk.Button(self.getOptionsWidgetFrame(), text="Add Node.", width=10, relief="solid", 
-                  font = (self.getFont(), self.getFontSize()), command=self.getController().spawnNode)
-        self.__addNodeButton.pack(pady = (10, 0)) 
+        self.__addNodeButton = tk.Button(self.__nodeOptionsFrame, text="Spawn.", width=6, relief="solid", 
+                                         font = (self.getFont(), self.getFontSize()), command=self.getController().spawnNode)
+        self.__addNodeButton.grid(row = 0, column = 0, pady = (10, 0), padx=(0, 10))  
+    
+
+    def __createDeleteNodeButton(self) -> None:
+        self.__deleteNodeButton = tk.Button(self.__nodeOptionsFrame, text="Delete.", width=6, relief="solid", 
+                                            font = (self.getFont(), self.getFontSize()), command=lambda : print("Filler"))
+        self.__deleteNodeButton.grid(row = 0, column = 1, pady = (10, 0), padx=(10, 0))  
 
 
     # Changes the text colour of the add nodes button to the passed colour
@@ -157,13 +175,15 @@ class TraversalScreen(AlgorithmScreen[C, M, D]):
     
 
     # Enables egde options so users can toggle them
-    def enableWeightOptions(self, canvasEdge) -> None: 
+    def showEdgeOptions(self, canvasEdge) -> None: 
         # Update weight slider 
         self.__updateWeight(canvasEdge.getWeight())  
-        # Enables buttons and slider (so they work lol)
+        
+        # Enables buttons and slider (so they work)
         self.__saveEdgeButton.config(state="active")
         self.__deleteEdgeButton.config(state="active")  
         self.__weightSlider.config(state="active")
+        
         # Moves thumb of slider to correct value -> scale must be active first 
         self.__weightSlider.set(canvasEdge.getWeight())
 
@@ -172,8 +192,10 @@ class TraversalScreen(AlgorithmScreen[C, M, D]):
 
 
     # Creates the widgets that allows users to toggle the visualisers settings
-    def __createOptions(self) -> None: 
-        self.__createAddNodeButton()
+    def __createOptions(self) -> None:  
+        self.__createNodeOptions()
+        # self.__createAddNodeButton()
+        # self.__createDeleteNodeButton()
         self.__createAddEdgeOption()    
 
 

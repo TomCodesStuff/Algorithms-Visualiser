@@ -1,7 +1,7 @@
 class EventsModel(): 
     def __init__(self):
         self.__nodeSpawnDist = 10  
-        self.__defaultNodeSize = 20
+        self.__defaultNodeSize = 25
         self.__overlapOffset = self.__nodeSpawnDist + self.__defaultNodeSize 
         
         # Default Node Coords

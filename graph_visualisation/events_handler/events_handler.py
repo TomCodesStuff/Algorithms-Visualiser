@@ -1,4 +1,5 @@
-from tkinter import Canvas, Event
+from typing import Callable
+from tkinter import Canvas, Event 
 from ..events_model import EventsModel
 from ..graph_components import CanvasGraph, CanvasNode, CanvasEdge
 from ..tools import * 
@@ -23,7 +24,11 @@ class EventsHandler():
         self.__isEdgeBeingEdited = False  
         self.__isEdgeBeingDeleted = False  
 
-        self.__edgeBeingDrawn = None 
+        self.__edgeBeingDrawn = None  
+        self.__edgeBeingEdited = None 
+
+        # Function to show edge options in the GUI
+        self.__showEdgeOptions = None 
 
         self.__addCanvasEvents()
 
@@ -42,12 +47,12 @@ class EventsHandler():
 
 
     def __spawnNodeDoubleClick(self, event : Event) -> None:
-        if not self.__canSpawnEventTrigger(): return
+        if not self.__canSpawnEventTrigger(): return 
         circleOffset = self.__eventsModel.getNodeOffset()
         x0, y0 = event.x - circleOffset, event.y - circleOffset
         x1, y1 = event.x + circleOffset, event.y + circleOffset 
         self.spawnNode((x0, y0, x1, y1)) 
-
+   
 
     def __deleteEdgeOnClick(self, event : Event) -> None: 
         if self.__isEdgeBeingEdited: return 
@@ -134,7 +139,8 @@ class EventsHandler():
         # If an edge is already being drawn on screen
         if(self.__isEdgeBeingDrawn):
             if not self.__areEdgeNodesSame(self.__edgeBeingDrawn.getStartNode(), canvasNode): 
-                self.__edgeBeingDrawn.setEndNode(canvasNode)
+                self.__edgeBeingDrawn.setEndNode(canvasNode)  
+                self.__movementTool.connectEdgeToNodes(self.__edgeBeingDrawn)
                 self.__addEdgeEvents(self.__edgeBeingDrawn)
             else: self.__deleteEdge(self.__edgeBeingDrawn)
             self.__resetEdgeDrawingEvent()
@@ -150,9 +156,21 @@ class EventsHandler():
         self.__deleteEdge(canvasEdge)
 
 
+    def __editEdgeOnClick(self, canvasEdge : CanvasEdge) -> None:  
+        if(self.__isEdgeBeingDrawn or self.__isEdgeBeingEdited): return 
+        if self.__showEdgeOptions is None: return
+        
+        self.__showEdgeOptions(canvasEdge)
+        # self.__edgeBeingEdited = canvasEdge
+
+
+
+
     # Add event handlers to edges for interactability 
     def __addEdgeEvents(self, canvasEdge : CanvasEdge) -> None:          
-        # self.__canvas.tag_bind(edge, "<Button-1>", lambda _: self.__editEdgeOnClick(canvasEdge))
+        # TODO -> probably best/easiest to have references to relevant screen functions 
+
+        self.__canvas.tag_bind(canvasEdge.getCanvasID(), "<Button-1>", lambda _: self.__editEdgeOnClick(canvasEdge))
         self.__canvas.tag_bind(canvasEdge.getCanvasID(), "<Double-Button-1>", lambda _: self.__deleteEdgeOnDoubleClick(canvasEdge)) 
         self.__canvas.tag_bind(canvasEdge.getCanvasID(), "<Enter>", 
                                lambda _: self.__hoverTool.edgeOnHover(self.__canvas, canvasEdge))
@@ -179,7 +197,6 @@ class EventsHandler():
         self.__canvas.tag_bind(canvasNode.getCanvasID(), "<Double-Button-1>", lambda _: self.__deleteNode(canvasNode)) 
 
 
-
     def spawnNode(self, coords : tuple) -> bool: 
         if self.__isNodeBeingDeleted: 
             self.__isNodeBeingDeleted = False 
@@ -191,6 +208,8 @@ class EventsHandler():
         canvasNode = self.__creationTool.createNode(self.__canvasGraph, coords)
         self.__creationTool.renderNode(self.__canvas, canvasNode)
         self.__addNodeEvents(canvasNode) 
-        return True 
+        return True  
 
 
+    def setShowEdgeOptionsFunc(self, showEdgeOptionsFunc : Callable) -> None:
+        self.__showEdgeOptions = showEdgeOptionsFunc

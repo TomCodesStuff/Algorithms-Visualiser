@@ -59,8 +59,9 @@ class TraversalController(AlgorithmController[S, M, D]):
         
 
     def createEventHandler(self, canvas : Canvas) -> None: 
-        self.__eventHandler = EventsHandler(canvas, self.__canvasGraph)
-
+        self.__eventHandler = EventsHandler(canvas, self.__canvasGraph) 
+        # Update screen to show edge options 
+        self.__eventHandler.setShowEdgeOptionsFunc(self.getScreen().showEdgeOptions)
 
     # Draws a circle (node) on the canvas 
     def spawnNode(self, coords: tuple=()): 
