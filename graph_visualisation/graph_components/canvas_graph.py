@@ -6,21 +6,24 @@ from data_structures import Graph
 class CanvasGraph():
     def __init__(self, graph : Graph): 
         self.__graph = graph
-        self.__nodes = set() 
+        self.__nodes = []
         self.__edges = set()
     
 
 
     def addCanvasNode(self, canvasNode : CanvasNode) -> None: 
-        self.__nodes.add(canvasNode) 
+        self.__nodes.append(canvasNode) 
 
 
     def deleteCanvasNode(self, canvasNode : CanvasNode) -> None: 
         if canvasNode in self.__nodes:
             self.__nodes.remove(canvasNode)
     
-    
-    
+
+    def getLastCreatedNode(self) -> CanvasNode|None: 
+        if len(self.__nodes) == 0: return None 
+        return self.__nodes[-1]
+
 
     def addCanvasEdge(self, canvasEdge) -> None: 
         self.__edges.add(canvasEdge)

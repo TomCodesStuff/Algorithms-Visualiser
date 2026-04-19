@@ -66,9 +66,16 @@ class TraversalController(AlgorithmController[S, M, D]):
     # Draws a circle (node) on the canvas 
     def spawnNode(self, coords: tuple=()): 
         if self.__eventHandler is None: return
-        nodeCreated = self.__eventHandler.spawnNode(coords)        
+        nodeCreated = self.__eventHandler.spawnNode(coords, override=True)        
         if nodeCreated: self.getScreen().setAddNodeButtonColour("black")
-        else: self.getScreen().setAddNodeButtonColour("red")
+        else: self.getScreen().setAddNodeButtonColour("red") 
+    
+
+    def deleteNode(self) -> None: 
+        if self.__eventHandler is None: return 
+        canvasNode = self.__canvasGraph.getLastCreatedNode() 
+        if canvasNode is None: return
+        self.__eventHandler.deleteNode(canvasNode)
 
 
     # Calculates and returns coords of the centre of the canvas  

@@ -29,6 +29,9 @@ class TraversalScreen(AlgorithmScreen[C, M, D]):
         self.__nodeOptionsFrame = tk.Frame(self.getOptionsWidgetFrame(), bg="white") 
         self.__nodeOptionsFrame.pack()
 
+        tk.Label(self.__nodeOptionsFrame, text="Node Options:", font=self.getFont(), bg="white")\
+            .grid(row=0, column=0, pady=(10, 0), columnspan=2)
+
         self.__createAddNodeButton() 
         self.__createDeleteNodeButton()
 
@@ -37,13 +40,14 @@ class TraversalScreen(AlgorithmScreen[C, M, D]):
     def __createAddNodeButton(self) -> None: 
         self.__addNodeButton = tk.Button(self.__nodeOptionsFrame, text="Spawn.", width=6, relief="solid", 
                                          font = (self.getFont(), self.getFontSize()), command=self.getController().spawnNode)
-        self.__addNodeButton.grid(row = 0, column = 0, pady = (10, 0), padx=(0, 10))  
+        self.__addNodeButton.grid(row = 1, column = 0, pady = (5, 0), padx=(0, 10))  
     
 
     def __createDeleteNodeButton(self) -> None:
         self.__deleteNodeButton = tk.Button(self.__nodeOptionsFrame, text="Delete.", width=6, relief="solid", 
-                                            font = (self.getFont(), self.getFontSize()), command=lambda : print("Filler"))
-        self.__deleteNodeButton.grid(row = 0, column = 1, pady = (10, 0), padx=(10, 0))  
+                                            font = (self.getFont(), self.getFontSize()), 
+                                            command=self.getController().deleteNode)
+        self.__deleteNodeButton.grid(row = 1, column = 1, pady = (5, 0), padx=(10, 0))  
 
 
     # Changes the text colour of the add nodes button to the passed colour

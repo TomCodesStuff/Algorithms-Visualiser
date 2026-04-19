@@ -86,7 +86,7 @@ class EventsHandler():
         self.__movementTool.moveNode(canvasNode, (event.x, event.y))
 
 
-    def __deleteNode(self, canvasNode : CanvasNode) -> None:  
+    def deleteNode(self, canvasNode : CanvasNode) -> None:   
         if self.__isEdgeBeingEdited: return
         self.__isNodeBeingDeleted = True  
 
@@ -96,8 +96,8 @@ class EventsHandler():
         
         self.__canvas.delete(canvasNode.getCanvasID())
         self.__creationTool.deleteNode(self.__canvasGraph, canvasNode)
-       
 
+       
     def __drawEdge(self, eventCoords : tuple, canvasEdge : CanvasEdge) -> None: 
         eventX, eventY = eventCoords
         object_collisions = self.__canvas.find_overlapping(eventX, eventY, eventX, eventY)
@@ -194,13 +194,14 @@ class EventsHandler():
         # Add event listener to add an edge when a node is clicked 
         self.__canvas.tag_bind(canvasNode.getCanvasID(), "<Button-1>", lambda _: self.__nodeOnClick(canvasNode))
         # Add event to delete a node when it is double clicked 
-        self.__canvas.tag_bind(canvasNode.getCanvasID(), "<Double-Button-1>", lambda _: self.__deleteNode(canvasNode)) 
+        self.__canvas.tag_bind(canvasNode.getCanvasID(), "<Double-Button-1>", lambda _: self.deleteNode(canvasNode)) 
 
 
-    def spawnNode(self, coords : tuple) -> bool: 
+    def spawnNode(self, coords : tuple, override:bool=False) -> bool:  
         if self.__isNodeBeingDeleted: 
             self.__isNodeBeingDeleted = False 
-            return False
+            # Horrible awful hack to prevent node spwaning from being blocked after user presses the delete button
+            if not override: return False
 
         if not self.__creationTool.canNodeBeSpawned(self.__canvas, coords): 
             return False 
