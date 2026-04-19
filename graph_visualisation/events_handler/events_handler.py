@@ -5,6 +5,12 @@ from ..graph_components import CanvasGraph, CanvasNode, CanvasEdge
 from ..tools import * 
 
 
+# TODO -> let users change edge editing without clicking save 
+# TODO -> find better way to set edge direction 
+# TODO -> change edges colour when being edited
+# TODO -> reimplement editing an edge's setting  
+
+
 class EventsHandler(): 
     def __init__(self, canvas : Canvas, canvasGraph : CanvasGraph):
         self.__canvas = canvas
@@ -152,10 +158,10 @@ class EventsHandler():
                 self.__movementTool.connectEdgeToNodes(self.__edgeBeingDrawn)
                 self.__addEdgeEvents(self.__edgeBeingDrawn) 
                 self.__canvasGraph.addEdgeToNodes(self.__edgeBeingDrawn)
+                self.__showEdgeOptions(self.__edgeBeingDrawn)
             else: self.__deleteEdge(self.__edgeBeingDrawn)
             self.__resetEdgeDrawingEvent()
         else:
-            print("Hello")
             self.__isEdgeBeingDrawn = True 
             canvasEdge = self.__creationTool.createEdge(canvasNode) 
             self.__edgeBeingDrawn = canvasEdge
