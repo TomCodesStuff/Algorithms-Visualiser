@@ -3,7 +3,7 @@ if(__name__ == "__main__"):
     print("This is file shouldn't be run on it's own. \nIt should be imported only.")
     exit() 
 
-
+from typing import Tuple
 from .canvas_node import CanvasNode
 
 
@@ -33,7 +33,7 @@ class CanvasEdge():
     def getCoords(self) -> tuple: return self.__coords
     def getStartNode(self) -> CanvasNode|None: return self.__startNode
     def getEndNode(self) -> CanvasNode|None: return self.__endNode
-    def getNodes(self) -> tuple: return (self.__startNode, self.__endNode) 
+    def getNodes(self) -> Tuple[CanvasNode, CanvasNode]: return (self.__startNode, self.__endNode) 
     def getScreenLen(self) -> int: return self.__screenLen
     def getColour(self) -> str: return self.__colour
     

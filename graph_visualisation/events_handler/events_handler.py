@@ -94,10 +94,14 @@ class EventsHandler():
         self.__deleteEdge(self.__edgeBeingDrawn)
         self.__resetEdgeDrawingEvent()
         
+        # Not to thrilled about making a copy here but it's the best option
+        for canvasEdge in list(canvasNode.getEdges()): 
+            self.__deleteEdge(canvasEdge)
+
         self.__canvas.delete(canvasNode.getCanvasID())
         self.__creationTool.deleteNode(self.__canvasGraph, canvasNode)
+        
 
-       
     def __drawEdge(self, eventCoords : tuple, canvasEdge : CanvasEdge) -> None: 
         eventX, eventY = eventCoords
         object_collisions = self.__canvas.find_overlapping(eventX, eventY, eventX, eventY)
@@ -116,20 +120,25 @@ class EventsHandler():
         self.__canvas.bind("<Motion>", lambda event: self.__drawEdge((event.x, event.y), canvasEdge))
 
 
-    def __areEdgeNodesSame(self, edgeStartNode : CanvasNode, edgeEndNode : CanvasNode) -> bool:
-        return edgeStartNode == edgeEndNode
+    def __areEdgeNodesDifferent(self, edgeStartNode : CanvasNode, edgeEndNode : CanvasNode) -> bool:
+        return edgeStartNode != edgeEndNode
 
 
     def __deleteEdge(self, canvasEdge : CanvasEdge) -> None:  
         if canvasEdge is None: return
         self.__canvas.delete(canvasEdge.getCanvasID())
         self.__creationTool.deleteEdge(self.__canvasGraph, canvasEdge)
-
+        
 
     def __resetEdgeDrawingEvent(self) -> None:
         self.__removeCanvasMotionEvent() 
         self.__isEdgeBeingDrawn = False 
         self.__edgeBeingDrawn = None  
+
+
+    def __canEdgeBeCreated(self, canvasEdge : CanvasEdge, canvasNode : CanvasNode) -> None: 
+        return self.__areEdgeNodesDifferent(canvasEdge.getStartNode(), canvasNode)\
+            and not self.__canvasGraph.areNodesConnected((canvasEdge.getStartNode(), canvasNode))
 
 
     def __nodeOnClick(self, canvasNode : CanvasNode) -> None: 
@@ -138,13 +147,15 @@ class EventsHandler():
         
         # If an edge is already being drawn on screen
         if(self.__isEdgeBeingDrawn):
-            if not self.__areEdgeNodesSame(self.__edgeBeingDrawn.getStartNode(), canvasNode): 
+            if self.__canEdgeBeCreated(self.__edgeBeingDrawn, canvasNode): 
                 self.__edgeBeingDrawn.setEndNode(canvasNode)  
                 self.__movementTool.connectEdgeToNodes(self.__edgeBeingDrawn)
-                self.__addEdgeEvents(self.__edgeBeingDrawn)
+                self.__addEdgeEvents(self.__edgeBeingDrawn) 
+                self.__canvasGraph.addEdgeToNodes(self.__edgeBeingDrawn)
             else: self.__deleteEdge(self.__edgeBeingDrawn)
             self.__resetEdgeDrawingEvent()
         else:
+            print("Hello")
             self.__isEdgeBeingDrawn = True 
             canvasEdge = self.__creationTool.createEdge(canvasNode) 
             self.__edgeBeingDrawn = canvasEdge
@@ -164,8 +175,6 @@ class EventsHandler():
         # self.__edgeBeingEdited = canvasEdge
 
 
-
-
     # Add event handlers to edges for interactability 
     def __addEdgeEvents(self, canvasEdge : CanvasEdge) -> None:          
         # TODO -> probably best/easiest to have references to relevant screen functions 
@@ -176,7 +185,6 @@ class EventsHandler():
                                lambda _: self.__hoverTool.edgeOnHover(self.__canvas, canvasEdge))
         self.__canvas.tag_bind(canvasEdge.getCanvasID(), "<Leave>", 
                                lambda _: self.__hoverTool.edgeOnLeave(self.__canvas, canvasEdge)) 
-
 
 
     # Add event handlers to the newly created node

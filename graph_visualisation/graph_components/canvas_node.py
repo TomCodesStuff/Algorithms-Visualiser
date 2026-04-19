@@ -1,10 +1,15 @@
+from __future__ import annotations
+
 # If the file is run as is message this returned and program exits
 if(__name__ == "__main__"):
     print("This is file shouldn't be run on it's own. \nIt should be imported only.")
     exit()
 
-
+from typing import Set, TYPE_CHECKING
 from data_structures import Node 
+
+if TYPE_CHECKING: 
+    from ..graph_components import CanvasEdge
 
 
 class CanvasNode():
@@ -24,13 +29,9 @@ class CanvasNode():
         
         # ID of the node on the canvas
         self.__canvasID = -1  
-        
-        # Dictionary mapping nodes connected by edges 
-        # Keys are the node objects with the values being the weight of the connection
-        self.__connectedNodes = {} 
-        
-        # A List containing references to edges that connects nodes to eachother 
-        self.__edges = []
+
+        # A set containing references to edges that connects nodes to eachother 
+        self.__edges = set()
         
         # Values that adjust the nodes position on screen, determined by forces applied on the Node 
         self.__forceX, self.__forceY = 0, 0 
@@ -50,38 +51,21 @@ class CanvasNode():
     def getCoords(self) -> tuple: return self.__coords
     def getID(self) -> int: return self.__ID    
     def getColour(self) -> str: return self.__node.getColour()
-    def getConnectionsSet(self) -> set: return self.__edges 
-
+    def getEdges(self) -> Set[CanvasEdge]: return self.__edges
 
     # Setters 
     def setCanvasID(self, canvasID : int) -> None:  self.__canvasID = canvasID
     def setColour(self, colour : str) -> None: self.__node.setColour(colour) 
 
 
-    # Adds a connection between this node and another node
-    def addConnection(self, nodeID : int, weight : int) -> None: 
-        self.__connectedNodes[nodeID] = weight 
-
-
-    # Gets a connection and it's weight given a node
-    # Returns -1 if the connection doesn't exist
-    def getConnection(self, nodeID: int) -> int:
-        if(nodeID not in self.__connectedNodes): return -1 
-        return self.__connectedNodes[nodeID] 
-
-
     # Adds a CanvasEdge Object to the list 
-    def addConnectionToSet(self, edge) -> None: self.__edges.append(edge) 
+    def addEdge(self, canvasEdge : CanvasEdge) -> None: 
+        self.__edges.add(canvasEdge) 
 
 
-    # Delete a CanvasEdge from the list 
-    # (Otherwise errors happen when an edge is deleted)
-    def deleteConnectionFromSet(self, egde) -> None:  
-        self.__edges.remove(egde)   
-
-
-    # Return all edges connected the node 
-    def getEdges(self) -> list: return self.__edges
+    def removeEdge(self, canvasEdge : CanvasEdge) -> None: 
+        if canvasEdge in self.__edges: 
+            self.__edges.remove(canvasEdge)
 
 
     # Adjust Force applied in X-axis
