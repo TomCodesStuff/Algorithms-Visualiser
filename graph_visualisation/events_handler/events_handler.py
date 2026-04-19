@@ -178,9 +178,9 @@ class EventsHandler():
     # Add event handlers to edges for interactability 
     def __addEdgeEvents(self, canvasEdge : CanvasEdge) -> None:          
         # TODO -> probably best/easiest to have references to relevant screen functions 
-
         self.__canvas.tag_bind(canvasEdge.getCanvasID(), "<Button-1>", lambda _: self.__editEdgeOnClick(canvasEdge))
-        self.__canvas.tag_bind(canvasEdge.getCanvasID(), "<Double-Button-1>", lambda _: self.__deleteEdgeOnDoubleClick(canvasEdge)) 
+        self.__canvas.tag_bind(canvasEdge.getCanvasID(), "<Double-Button-1>", 
+                               lambda _: self.__deleteEdgeOnDoubleClick(canvasEdge)) 
         self.__canvas.tag_bind(canvasEdge.getCanvasID(), "<Enter>", 
                                lambda _: self.__hoverTool.edgeOnHover(self.__canvas, canvasEdge))
         self.__canvas.tag_bind(canvasEdge.getCanvasID(), "<Leave>", 

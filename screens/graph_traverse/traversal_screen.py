@@ -52,7 +52,11 @@ class TraversalScreen(AlgorithmScreen[C, M, D]):
 
     # Changes the text colour of the add nodes button to the passed colour
     def setAddNodeButtonColour(self, colour : str) -> None: 
-        self.__addNodeButton.config(fg = colour)
+        self.__addNodeButton.config(fg = colour) 
+    
+
+    def setDeleteNodeButtonColour(self, colour: str) -> None:
+        self.__deleteNodeButton.config(fg = colour)
 
 
     # Creates options to add edges or edit existing ones

@@ -67,14 +67,19 @@ class TraversalController(AlgorithmController[S, M, D]):
     def spawnNode(self, coords: tuple=()): 
         if self.__eventHandler is None: return
         nodeCreated = self.__eventHandler.spawnNode(coords, override=True)        
-        if nodeCreated: self.getScreen().setAddNodeButtonColour("black")
+        if nodeCreated: 
+            self.getScreen().setAddNodeButtonColour("black")
+            self.getScreen().setDeleteNodeButtonColour("black")
         else: self.getScreen().setAddNodeButtonColour("red") 
     
 
     def deleteNode(self) -> None: 
         if self.__eventHandler is None: return 
         canvasNode = self.__canvasGraph.getLastCreatedNode() 
-        if canvasNode is None: return
+        if canvasNode is None:
+            self.getScreen().setDeleteNodeButtonColour("red") 
+            return 
+        self.getScreen().setDeleteNodeButtonColour("black")
         self.__eventHandler.deleteNode(canvasNode)
 
 
