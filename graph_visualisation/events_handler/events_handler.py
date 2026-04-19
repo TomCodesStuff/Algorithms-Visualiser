@@ -7,7 +7,7 @@ from ..tools import *
 
 # TODO -> let users change edge editing without clicking save 
 # TODO -> find better way to set edge direction 
-# TODO -> change edges colour when being edited
+# TODO -> change edges colour when being edited (done)
 # TODO -> reimplement editing an edge's setting  
 
 
@@ -158,7 +158,7 @@ class EventsHandler():
                 self.__movementTool.connectEdgeToNodes(self.__edgeBeingDrawn)
                 self.__addEdgeEvents(self.__edgeBeingDrawn) 
                 self.__canvasGraph.addEdgeToNodes(self.__edgeBeingDrawn)
-                self.__showEdgeOptions(self.__edgeBeingDrawn)
+                self.__editEdge(self.__edgeBeingDrawn)
             else: self.__deleteEdge(self.__edgeBeingDrawn)
             self.__resetEdgeDrawingEvent()
         else:
@@ -173,12 +173,15 @@ class EventsHandler():
         self.__deleteEdge(canvasEdge)
 
 
+    def __editEdge(self, canvasEdge : CanvasEdge) -> None:
+        canvasEdge.setColour(self.__eventsModel.getEdgeEditColour())
+        self.__showEdgeOptions(canvasEdge)
+
+
     def __editEdgeOnClick(self, canvasEdge : CanvasEdge) -> None:  
         if(self.__isEdgeBeingDrawn or self.__isEdgeBeingEdited): return 
         if self.__showEdgeOptions is None: return
-        
-        self.__showEdgeOptions(canvasEdge)
-        # self.__edgeBeingEdited = canvasEdge
+        self.__editEdge(canvasEdge)
 
 
     # Add event handlers to edges for interactability 

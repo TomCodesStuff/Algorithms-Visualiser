@@ -13,6 +13,7 @@ class CanvasEdge():
         self.__coords = coords
         # Weight/cost
         self.__weight = weight 
+        # On screen colour
         self.__colour = colour
         
         # ID used to identify edge on the canvas
@@ -60,7 +61,11 @@ class CanvasEdge():
 
 
     def setCanvasID(self, val : int) -> None: 
-        self.__canvasID = val 
+        self.__canvasID = val  
+
+    
+    def setColour(self, colour : str) -> None: 
+        self.__colour = colour
 
 
 # Listen to Live Forever by Oasis 

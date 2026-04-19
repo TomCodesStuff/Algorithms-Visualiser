@@ -53,6 +53,7 @@ class TraversalController(AlgorithmController[S, M, D]):
         
         for canvasEdge in self.__canvasGraph.getEdges(): 
             self.getScreen().getCanvas().coords(canvasEdge.getCanvasID(), canvasEdge.getCoords())
+            self.getScreen().getCanvas().itemconfig(canvasEdge.getCanvasID(), fill=canvasEdge.getColour())
         
         self.getScreen().getWindow().update_idle_tasks()  
 

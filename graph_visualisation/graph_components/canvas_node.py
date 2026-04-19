@@ -23,7 +23,7 @@ class CanvasNode():
         self.__coords = coords
         # Size of the node 
         self.__nodeSize = nodeSize
-        
+
         self.__ID = CanvasNode.nodeID 
         CanvasNode.nodeID += 1 
         
@@ -55,8 +55,8 @@ class CanvasNode():
 
     # Setters 
     def setCanvasID(self, canvasID : int) -> None:  self.__canvasID = canvasID
-    def setColour(self, colour : str) -> None: self.__node.setColour(colour) 
-
+    def setColour(self, colour : str) -> None: self.__node.setColour(colour)  
+    
 
     # Adds a CanvasEdge Object to the list 
     def addEdge(self, canvasEdge : CanvasEdge) -> None: 
