@@ -51,7 +51,9 @@ class TraversalModel(AlgorithmModel):
         self.__maxScreenDist = 50 
 
         # Time delay when updating the canvas   
-        self.__updateDelay = 50
+        self.__updateDelay = 50 
+
+        self.__arrowsFont = "Courier New"
 
 
     # Getters for distances between nodes on screen 
@@ -93,7 +95,10 @@ class TraversalModel(AlgorithmModel):
 
 
     def getEdgeMinScreenLen(self) -> int: return self.__edgeMinScreenLen
-    def getEdgeMaxScreenLen(self) -> int: return self.__edgeMaxScreenLen
+    def getEdgeMaxScreenLen(self) -> int: return self.__edgeMaxScreenLen 
+
+
+    def getArrowFont(self) -> str: return self.__arrowsFont 
 
 
 # Listen to Jigsaws Falling Into Place by Radiohead
