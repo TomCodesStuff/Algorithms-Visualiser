@@ -20,6 +20,7 @@ D = TypeVar("D", bound="Graph")
 
 # TODO Make sure to hide graph options when algorithm is run 
 
+DEFAULT_WEIGHT = 0
 
 class TraversalScreen(AlgorithmScreen[C, M, D]):  
     def __init__(self, window):
@@ -57,18 +58,20 @@ class TraversalScreen(AlgorithmScreen[C, M, D]):
         self.__createDeleteNodeButton()
 
 
-    # Changes the text colour of the add nodes button to the passed colour
+    # Changes the text colour of the add node button to the passed colour
     def setAddNodeButtonColour(self, colour : str) -> None: 
         self.__addNodeButton.config(fg = colour) 
     
 
+    # Changes the text colour of the delete node button to the passed colour
     def setDeleteNodeButtonColour(self, colour: str) -> None:
         self.__deleteNodeButton.config(fg = colour)
 
 
     # Updates text in label above weight slider 
-    def __updateWeight(self, value : str) -> None:
-        self.__weightSlider.config(label = f"Weight: {value}")    
+    def __updateWeight(self, value : str|int) -> None:
+        self.__weightSlider.config(label = f"Weight: {value}")   
+        if value > 0: self.getController().updateEdgeWeight(value)
 
 
     # Create option to let users change an edges weight/cost
@@ -81,7 +84,7 @@ class TraversalScreen(AlgorithmScreen[C, M, D]):
                                        length = self.getOptionsWidgetFrame().winfo_width(), orient="horizontal", showvalue=False, 
                                        bg = "white", highlightbackground="white", command=self.__updateWeight)
         
-        self.__updateWeight("No Edge Selected")
+        self.__updateWeight(0)
         self.__weightSlider.pack()
 
 
@@ -106,7 +109,7 @@ class TraversalScreen(AlgorithmScreen[C, M, D]):
     # Create button to save edge 
     def __createFinishButton(self) -> None:
         self.__saveEdgeButton = tk.Button(self.__edgeConfirmationFrame, text = "Finish.", width=6, relief = "solid", 
-                                          font=(self.getFont(), self.getFontSize()), command=self.__saveEdge)
+                                          font=(self.getFont(), self.getFontSize()), command=self.__finishEdgeEdit)
         self.__saveEdgeButton.grid(row=0, column=0, padx=(0, 10)) 
 
 
@@ -125,25 +128,20 @@ class TraversalScreen(AlgorithmScreen[C, M, D]):
         self.__createDeleteEdgeButton()
 
 
-
-    def __showEdgeOptions(self) -> None: 
-        self.__edgeOptionsFrame.pack()
-
-
-    def __saveEdge(self) -> None:     
-        # Updates egdes weight 
-        self.getController().saveEdge(self.__weightSlider.get())
-        # Hides options to edit edge from view
-        # self.disableWeightOptions()   
+    def __finishEdgeEdit(self) -> None:    
+        # This is just calling the event handler function to finish editing the edge  
+        self.getController().finishEdgeEdit() 
+        # Hides edge edit options from view
+        self.__nodeOptionsFrame.tkraise()
 
 
     def __deleteEdge(self) -> None:  
         # Deletes newly drawn weight or pre-existing weight 
         # TODO RE-implement this btw 
         self.getController().deleteEdge()
-        # Hides options to edit edge from view 
-        # self.disableWeightOptions()
-  
+        self.__nodeOptionsFrame.tkraise()
+
+
 
     # Updates weight displayed in the slider bar 
     def updateWeightOnScreen(self, edgeWeight : int) -> None: 
@@ -165,16 +163,9 @@ class TraversalScreen(AlgorithmScreen[C, M, D]):
     # Enables egde options so users can toggle them
     def showEdgeOptions(self, canvasEdge : CanvasEdge) -> None: 
         # Update weight slider 
-        self.__updateWeight(canvasEdge.getWeight())  
-        
-        # Enables buttons and slider (so they work)
-        self.__saveEdgeButton.config(state="active")
-        self.__deleteEdgeButton.config(state="active")  
-        self.__weightSlider.config(state="active")
-        
+        self.__updateWeight(canvasEdge.getWeight())          
         # Moves thumb of slider to correct value -> scale must be active first 
         self.__weightSlider.set(canvasEdge.getWeight())
-
         # Show edge options 
         self.__edgeOptionsFrame.tkraise()
 

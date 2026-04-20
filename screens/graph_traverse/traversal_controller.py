@@ -64,6 +64,7 @@ class TraversalController(AlgorithmController[S, M, D]):
         # Update screen to show edge options 
         self.__eventHandler.setShowEdgeOptionsFunc(self.getScreen().showEdgeOptions)
 
+
     # Draws a circle (node) on the canvas 
     def spawnNode(self, coords: tuple=()): 
         if self.__eventHandler is None: return
@@ -81,7 +82,19 @@ class TraversalController(AlgorithmController[S, M, D]):
             self.getScreen().setDeleteNodeButtonColour("red") 
             return 
         self.getScreen().setDeleteNodeButtonColour("black")
-        self.__eventHandler.deleteNode(canvasNode)
+        self.__eventHandler.deleteNode(canvasNode) 
+
+
+    def deleteEdge(self) -> None: 
+        self.__eventHandler.deleteEdge()
+
+
+    def finishEdgeEdit(self) -> None: 
+        self.__eventHandler.finishEdgeEdit()
+
+
+    def updateEdgeWeight(self, weight : int) -> None:
+        self.__eventHandler.updateEdgeWeight(weight)
 
 
     # Calculates and returns coords of the centre of the canvas  
@@ -90,80 +103,6 @@ class TraversalController(AlgorithmController[S, M, D]):
         return (canvas.winfo_width() // 2, 
                 canvas.winfo_height() // 2)
  
-
-    # Returns True if an edge is being edited by a user 
-    def isEdgeBeingEdited(self) -> bool: 
-        return self.__edgeHandler.isEdgeBeingEdited()
-
-
-    # Updates Screen to display options
-    def enableEdgeWeightOptions(self) -> None:
-        self.__screen.enableWeightOptions(self.__edgeHandler.getEdgeBeingEdited()) 
-    
-
-    # Updates Screen to hide options
-    def disableEdgeWeightOptions(self) -> None:
-        self.__screen.disableWeightOptions()
-
-
-    def handleNodeClickEvent(self, canvasNode) -> None: 
-         # If an edge is being edited, prevent a new one from being created
-        if(self.__edgeHandler.isEdgeBeingEdited()): return
-
-        # If an edge is already being drawn on screen
-        if(self.__edgeHandler.isEdgeBeingDrawn()):
-            # If edge successfully created 
-            self.__edgeHandler.handleNodeConnection(canvasNode) 
-        # If an edge is not currently being draw on screen
-        else: 
-            self.__createMovingEdge(canvasNode)
-            self.__edgeHandler.setConnectionStartNode(canvasNode)
-        # Updates window to display changes
-        self.__screen.getWindow().update()   
-
-
-    # Enables canvas events and sets boolean variable to true 
-    def __createMovingEdge(self, canvasNode) -> None:
-        # Adds canvas event to draw lines
-        self.__addMovingEdgeEvent(canvasNode)
-        # Sets variable to True
-        self.__edgeHandler.setEdgeBeingDrawn(True)
-
-
-    # Disables canvas event that causes edge to follow mouse 
-    def stopMovingEdge(self) -> None:
-        # Remove event that draws line
-        self.deleteMovingEdgeEvent()
-        # Set edge being drawn to False
-        self.__edgeHandler.setEdgeBeingDrawn(False)
-
-
-    # Changes weight of current edge to passed value 
-    def saveEdge(self, newWeight : int) -> None: 
-        # Update weight of current edge object
-        self.__edgeHandler.getCurrentEdgeObj().setWeight(newWeight)  
-        # Update screen length if edge
-        self.__edgeHandler.getCurrentEdgeObj().setscreenLen(self.__edgeHandler.calculateEdgeScreenLength(newWeight))
-        # Clear variables used  
-        self.__edgeHandler.clearVariables()  
-
-    
-    # Delete an edge from screen and relevant data structures
-    def deleteEdge(self) -> None: 
-        canvas = self.__screen.getCanvas()
-        canvas.delete(self.__edgeHandler.getCurrentEdgeID())
-        self.__model.deleteEdge(self.__edgeHandler.getCurrentEdgeObj())
-        # Clear Variables 
-        self.__edgeHandler.clearVariables()
-
-    
-    # Returns the Edge Canvas object
-    def __getCanvasEdge(self): 
-        connectedEdges = (self.__edgeHandler.getEdgeStartNode(), self.__edgeHandler.getEdgeEndNode())
-        if(connectedEdges in self.__model.getEdges()): 
-            return self.__model.getEdge(connectedEdges)
-        else: return self.__model.getEdge(connectedEdges[::-1]) 
-
 
     def centreEdge(self) -> tuple: 
         circleOffset = self.__model.getCircleSize() // 2 
@@ -207,26 +146,6 @@ class TraversalController(AlgorithmController[S, M, D]):
             canvas.coords(self.__edgeHandler.getCurrentEdgeID(), lineCoords)
 
             
-    # Add event to draw a line representing an edge
-    def __addMovingEdgeEvent(self, canvasNode): 
-        self.__screen.getCanvas().bind("<Motion>", lambda event: self.__drawEdge(event, canvasNode))
-
-
-    # Removes the event that draws lines representing edges 
-    def deleteMovingEdgeEvent(self):  
-        canvas = self.__screen.getCanvas()
-        if("<Motion>" in canvas.bind()):
-            canvas.unbind("<Motion>")
-
-
-    # Updates position of nodes on the canvas
-    def __redrawNodes(self): 
-        canvas = self.__screen.getCanvas()
-        for node in self.__model.getNodes():  
-            x0, y0, _, _ = node.getCoords()
-            canvas.moveto(node.getCanvasID(), round(x0), round(y0))
-    
-
     # Update positions of edges on the canvas 
     def __redrawEdges(self):  
         circleOffset = self.__model.getCircleSize() // 2
@@ -247,33 +166,6 @@ class TraversalController(AlgorithmController[S, M, D]):
             # Updates the lines coordinates  
             canvas.coords(self.__edgeHandler.getCurrentEdgeID(), newCoords)
 
-
-    # Spawns node when user double clicks the canvas 
-    def __spawnNodeOnDoubleClick(self, event : Event) -> None:  
-        # Sanity checking to prevent event triggering when it shouldn't 
-        if(self.__nodeHandler.isNodeBeingDeleted()):
-            self.__nodeHandler.setNodeBeingDeleted(False)
-            return  
-        if(self.__edgeHandler.isEdgeBeingDeleted()): 
-            self.__edgeHandler.setEdgeBeingDeleted(False)
-            return 
-        if(self.__edgeHandler.isEdgeBeingDrawn() or 
-           self.__edgeHandler.isEdgeBeingDrawn()): return
-        
-        circleOffset = self.__model.getCircleSize() // 2
-        # X-Y coords of new node is where the users clicks 
-        x0, y0, x1, y1 = event.x - circleOffset, event.y - circleOffset,\
-            event.x + circleOffset, event.y + circleOffset
-        self.spawnNode((x0, y0, x1, y1))
-        
-
-    # Add events to the canvas so users can interact with it 
-    def addCanvasEvents(self): 
-        canvas = self.__screen.getCanvas() 
-        # Add event to delete current edge being drawn when the canvas is clicked
-        canvas.bind("<Button-1>", lambda event: self.__edgeHandler.deleteEdgeOnClick(event))
-        canvas.bind("<Double-Button-1>", lambda event: self.__spawnNodeOnDoubleClick(event))
-    
 
     # Updates canvas to display nodes and edges interacting  
     # Need way to stop this being called when screen moves 

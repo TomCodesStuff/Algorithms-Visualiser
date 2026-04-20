@@ -175,7 +175,8 @@ class EventsHandler():
 
     def __editEdge(self, canvasEdge : CanvasEdge) -> None:
         canvasEdge.setColour(self.__eventsModel.getEdgeEditColour())
-        self.__showEdgeOptions(canvasEdge)
+        if self.__showEdgeOptions: self.__showEdgeOptions(canvasEdge)
+        self.__edgeBeingEdited = canvasEdge
 
 
     def __editEdgeOnClick(self, canvasEdge : CanvasEdge) -> None:  
@@ -226,8 +227,23 @@ class EventsHandler():
         canvasNode = self.__creationTool.createNode(self.__canvasGraph, coords)
         self.__creationTool.renderNode(self.__canvas, canvasNode)
         self.__addNodeEvents(canvasNode) 
-        return True  
+        return True   
 
+
+    def deleteEdge(self) -> None:
+        if self.__edgeBeingEdited: 
+            self.__deleteEdge(self.__edgeBeingEdited)
+
+
+    def finishEdgeEdit(self) -> float: 
+        if self.__edgeBeingEdited: 
+            self.__edgeBeingEdited.setColour(self.__eventsModel.getDefaultEdgeColour())
+        self.__edgeBeingEdited = None 
+    
+
+    def updateEdgeWeight(self, weight : int) -> None: 
+        if self.__edgeBeingEdited: self.__edgeBeingEdited.setWeight(weight)
+    
 
     def setShowEdgeOptionsFunc(self, showEdgeOptionsFunc : Callable) -> None:
         self.__showEdgeOptions = showEdgeOptionsFunc
