@@ -57,4 +57,5 @@ class CreationTool():
     def deleteEdge(self, canvasGraph : CanvasGraph, canvasEdge : CanvasEdge) -> None: 
         canvasGraph.deleteCanvasEdge(canvasEdge)
 
-        
+
+# Listen to Perfect by The Smashing Pumpkins

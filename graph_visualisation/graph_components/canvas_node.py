@@ -102,4 +102,5 @@ class CanvasNode():
     def setDragged(self) -> bool: self.__isBeingDragged = True
     def resetDragged(self) -> bool: self.__isBeingDragged = False
 
+
 # Listen to Paralyzer by Finger Eleven     

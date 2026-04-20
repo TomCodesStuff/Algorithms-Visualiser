@@ -20,4 +20,7 @@ class HoverTool():
 
 
     def edgeOnLeave(self, canvas : Canvas, canvasEdge : CanvasEdge) -> None:
-        canvas.itemconfig(canvasEdge.getCanvasID(), width=self.__eventsModel.getDefaultEdgeSize())
+        canvas.itemconfig(canvasEdge.getCanvasID(), width=self.__eventsModel.getDefaultEdgeSize()) 
+    
+
+# Listen to Hey Jude by The Beatles

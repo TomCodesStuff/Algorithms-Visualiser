@@ -247,3 +247,5 @@ class EventsHandler():
 
     def setShowEdgeOptionsFunc(self, showEdgeOptionsFunc : Callable) -> None:
         self.__showEdgeOptions = showEdgeOptionsFunc
+
+# Listen to Why does it always rain on me by Travis  

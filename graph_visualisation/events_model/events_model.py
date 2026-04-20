@@ -50,4 +50,7 @@ class EventsModel():
     def getDefaultEdgeColour(self) -> str: return self.__defaultEdgeColour 
     def getEdgeEditColour(self) -> str: return self.__editEdgeColour
     def getDefaultEdgeSize(self) -> str: return self.__defaultEdgeSize 
-    def getEdgeHoverWidth(self) -> str: return self.__edgeHoverWidth 
+    def getEdgeHoverWidth(self) -> str: return self.__edgeHoverWidth  
+
+
+# Listen to Just Like Heaven by The Cure

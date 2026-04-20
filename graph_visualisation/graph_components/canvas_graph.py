@@ -66,3 +66,6 @@ class CanvasGraph():
  
     def getNodes(self) -> List[CanvasNode]: return self.__nodes  
     def getEdges(self) -> List[CanvasEdge]: return self.__edges
+
+
+# Listen to Hertz by Amyl and the Sniffers 
