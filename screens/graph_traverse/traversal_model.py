@@ -9,29 +9,24 @@ from ..algorithm_base import AlgorithmModel
 from graph_visualisation.graph_components import CanvasNode, CanvasEdge
 
 
+RESOLUTION = 1
+MIN_DELAY = 1
+MAX_DELAY = 1000
+
+
 class TraversalModel(AlgorithmModel):
     def __init__(self): 
         super().__init__() 
 
         self.setDelayToMilliseconds()
-        self.setResolution(1)
-        self.setMinDelay(1)
-        self.setMaxDelay(1000)
+        self.setResolution(RESOLUTION)
+        self.setMinDelay(MIN_DELAY)
+        self.setMaxDelay(MAX_DELAY)
 
 
-        # Canvas upper and lower bounds
-        self.__canvasUpperBoundOffset = 4
-        self.__canvasLowerBoundOffset = 2 
-        
-        # Minimum space between nodes 
-        self.__nodesSpacingOffset = 20  
         # Number of nodes that can be on screen at once
         self.__maxNumNodes = 20
-               
-        # Array to contain references to CanvasNode objects
-        self.__nodes = []
-        # Set for edges
-        self.__edges = set()
+        
         # Minimum Weight edges can be 
         self.__minWeight = 1
         # Maximum weight edges can be 
@@ -63,26 +58,7 @@ class TraversalModel(AlgorithmModel):
 
     def getMaxNumNodes(self) -> int: return self.__maxNumNodes
 
-
-    # Getters for minimum and maximum bounds of the canvas
-    def getCanvasUpperBoundOffset(self) -> int: return self.__canvasUpperBoundOffset
-    def getCanvasLowerBoundOffset(self) -> int: return self.__canvasLowerBoundOffset 
-    def getSpaceBetweenNodes(self) -> int: return self.__nodesSpacingOffset 
-
-
-    # Getters and setters for nodes array
-    def getNodes(self) -> list[CanvasNode]: return self.__nodes
-    def getNode(self, idx: int) -> CanvasNode: return self.__nodes[idx]
-    def addNode(self, canvasNode : CanvasNode) -> None: self.__nodes.append(canvasNode)  
-    def deleteNode(self, canvasNode : CanvasNode) -> None: self.__nodes.remove(canvasNode)
-
-
-    # Getters and setters for edges set 
-    def getEdges(self) -> Set[CanvasEdge]: return self.__edges 
-    def addEdge(self, edge : CanvasEdge) -> None: self.__edges.add(edge)
-    def deleteEdge(self, edge : CanvasEdge) -> None: self.__edges.discard(edge)
-
-
+#
     # Getters for edge weight 
     def getMinWeight(self) -> int: return self.__minWeight
     def getMaxWeight(self) -> int: return self.__maxWeight 

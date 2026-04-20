@@ -20,7 +20,7 @@ D = TypeVar("D", bound="Graph")
 
 # TODO Make sure to hide graph options when algorithm is run 
 
-DEFAULT_WEIGHT = 0
+INITIAL_WEIGHT = 0
 
 class TraversalScreen(AlgorithmScreen[C, M, D]):  
     def __init__(self, window):
@@ -71,7 +71,7 @@ class TraversalScreen(AlgorithmScreen[C, M, D]):
     # Updates text in label above weight slider 
     def __updateWeight(self, value : str|int) -> None:
         self.__weightSlider.config(label = f"Weight: {value}")   
-        if value > 0: self.getController().updateEdgeWeight(value)
+        if value > INITIAL_WEIGHT: self.getController().updateEdgeWeight(value)
 
 
     # Create option to let users change an edges weight/cost
@@ -84,7 +84,7 @@ class TraversalScreen(AlgorithmScreen[C, M, D]):
                                        length = self.getOptionsWidgetFrame().winfo_width(), orient="horizontal", showvalue=False, 
                                        bg = "white", highlightbackground="white", command=self.__updateWeight)
         
-        self.__updateWeight(0)
+        self.__updateWeight(INITIAL_WEIGHT)
         self.__weightSlider.pack()
 
 
