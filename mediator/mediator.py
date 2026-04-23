@@ -1,13 +1,13 @@
 import sys
 import time
 from typing import Callable
-from thread_handler import ThreadHandler
+from thread_handlers import AlgorithmThread
 
 
 class Mediator():
-    def __init__(self, delayFunc : Callable, threadHandler : ThreadHandler): 
+    def __init__(self, delayFunc : Callable, threadHandler : AlgorithmThread): 
         self.__delayFunc = delayFunc
-        self.__threadHandler = threadHandler
+        self.__algorithmThread = threadHandler
         
 
     def getDelay(self) -> float:  
@@ -16,15 +16,15 @@ class Mediator():
 
     def __pauseAlgorithm(self):
         # Attempts to acquire lock, pausing the thread
-        self.__threadHandler.acquirePauseLock()
+        self.__algorithmThread.acquirePauseLock()
         # If the lock is not released then the GUI thread will freeze next time pause button is pressed
-        self.__threadHandler.releasePauseLock()
+        self.__algorithmThread.releasePauseLock()
 
     
     # Used to check is the algorithm needs to halt
     def __hasAlgorithmStopped(self): 
         # Checks if the algorithm needs to stop
-        if(self.__threadHandler.hasAlgorithmStopped()): 
+        if(self.__algorithmThread.hasAlgorithmStopped()): 
             # Output message confirming thread termination
             print("Algorithm Thread has terminated safely") 
             # Exit thread
@@ -37,7 +37,7 @@ class Mediator():
         while(i < delay):
             self.__hasAlgorithmStopped() 
             # Checks if the GUI thread is holding the pause lock
-            if(self.__threadHandler.isAlgorithmPaused()): self.__pauseAlgorithm()
+            if(self.__algorithmThread.isAlgorithmPaused()): self.__pauseAlgorithm()
             time.sleep(interval) 
             i += interval  
 

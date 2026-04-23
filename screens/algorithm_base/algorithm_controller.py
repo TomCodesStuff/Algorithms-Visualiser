@@ -1,7 +1,6 @@
 from __future__ import annotations
-from typing import Callable
 
-# If this isn't at the top the program breaks :/
+# If this isn't at the top the program breaks :/ 
 # If the file is run as is message this returned and program exits
 if(__name__ == "__main__"):
     print("This is file shouldn't be run on it's own. \nIt should be imported only.")
@@ -10,7 +9,7 @@ if(__name__ == "__main__"):
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, TypeVar, Generic
 from mediator import Mediator
-from thread_handler import ThreadHandler
+from thread_handlers import AlgorithmThread
 from data_structures import DataStructure
 from enums import AlgorithmType
 
@@ -31,7 +30,7 @@ class AlgorithmController(ABC, Generic[S, M, D]):
         self.__screen = screen
         self.__model = model
         self.__dataStructure = dataStructure
-        self.__threadHandler = ThreadHandler() 
+        self.__algorithmThread = AlgorithmThread() 
     
     @abstractmethod
     def refreshCanvas(self, refreshColours:bool=False) -> None: pass
@@ -48,7 +47,7 @@ class AlgorithmController(ABC, Generic[S, M, D]):
     def startAlgorithmThread(self, algorithmType : AlgorithmType, algorithmName : str) -> None:    
         algorithmClass = self.getScreen().getWindow().getAlgorithmClass(algorithmType, algorithmName) 
         if algorithmClass is None: return 
-        mediator = Mediator(self.getAlgorithmDelay, self.__threadHandler)
+        mediator = Mediator(self.getAlgorithmDelay, self.__algorithmThread)
         
         try:
             algorithmObj = algorithmClass()
@@ -66,46 +65,46 @@ class AlgorithmController(ABC, Generic[S, M, D]):
             return
         
         # Pass reference to ending animation so it can be called
-        self.__threadHandler.setEndingAnimationFunc(self.getScreen().runCoolEndingAnimation)
-        self.__threadHandler.startAlgorithm(algorithmObj)
+        self.__algorithmThread.setEndingAnimationFunc(self.getScreen().runCoolEndingAnimation)
+        self.__algorithmThread.startAlgorithm(algorithmObj)
         self.__handleAlgorithmExecution()
 
 
     def stopAlgorithmThread(self) -> None: 
         self.cancelScheduledProcesses()
-        self.__threadHandler.stopAlgorithm()
+        self.__algorithmThread.stopAlgorithm()
 
-        self.__threadHandler.setAlgorithmStopFlag() 
-        if self.__threadHandler.isAlgorithmPaused(): 
-            self.__threadHandler.releasePauseLock() 
+        self.__algorithmThread.setAlgorithmStopFlag() 
+        if self.__algorithmThread.isAlgorithmPaused(): 
+            self.__algorithmThread.releasePauseLock() 
     
 
     def resumeAlgorithm(self) -> None: 
-        self.__threadHandler.releasePauseLock() 
+        self.__algorithmThread.releasePauseLock() 
 
 
     def pauseAlgorithm(self) -> None: 
-        self.__threadHandler.acquirePauseLock() 
+        self.__algorithmThread.acquirePauseLock() 
     
 
     def isAlgorithmPaused(self) -> bool: 
-        return self.__threadHandler.isAlgorithmPaused()
+        return self.__algorithmThread.isAlgorithmPaused()
     
     
     def isAlgorithmRunning(self) -> bool: 
-        return self.__threadHandler.isThreadAlive()
+        return self.__algorithmThread.isThreadAlive()
 
 
     def updateAlgorithmDelay(self, delay : float) -> None: 
-        self.__threadHandler.acquireDelayLock() 
+        self.__algorithmThread.acquireDelayLock() 
         self.__model.setDelay(delay)
-        self.__threadHandler.releaseDelayLock() 
+        self.__algorithmThread.releaseDelayLock() 
 
 
     def getAlgorithmDelay(self) -> float:
-        self.__threadHandler.acquireDelayLock() 
+        self.__algorithmThread.acquireDelayLock() 
         delay = self.__model.getDelay()
-        self.__threadHandler.releaseDelayLock() 
+        self.__algorithmThread.releaseDelayLock() 
         return delay
 
 
@@ -119,7 +118,7 @@ class AlgorithmController(ABC, Generic[S, M, D]):
 
     
     def __handleAlgorithmExecution(self) -> None: 
-        if not self.__threadHandler.isThreadAlive(): 
+        if not self.__algorithmThread.isThreadAlive(): 
             self.refreshCanvas(refreshColours=False)
             self.getScreen().algorithmComplete()
         else: 
@@ -128,6 +127,6 @@ class AlgorithmController(ABC, Generic[S, M, D]):
        
     
     def isAlgorithmRunning(self) -> None: 
-        return self.__threadHandler.isThreadAlive()
+        return self.__algorithmThread.isThreadAlive()
     
 # Listen to Catch These Fists by Wet Leg     

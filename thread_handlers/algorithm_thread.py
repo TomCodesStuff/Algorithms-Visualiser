@@ -6,7 +6,7 @@ from algorithms import Algorithm
 THREAD_TIMEOUT = 1
 
 
-class ThreadHandler():
+class AlgorithmThread():
     def __init__(self):
         self.__algorithmThread = None 
         self.__algorithmStarted = threading.Event()
