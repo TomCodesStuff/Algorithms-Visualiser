@@ -5,11 +5,10 @@ from ..graph_components import CanvasGraph, CanvasNode, CanvasEdge
 from ..tools import * 
 
 
-# TODO -> let users change edge editing without clicking save 
-# TODO -> find better way to set edge direction 
+# TODO -> let users change edge editing without clicking save (done)
+# TODO -> find better way to set edge direction (done)
 # TODO -> change edges colour when being edited (done)
-# TODO -> reimplement editing an edge's setting  
-
+# TODO -> reimplement editing an edge's setting (done) 
 
 class EventsHandler(): 
     def __init__(self, canvas : Canvas, canvasGraph : CanvasGraph):

@@ -70,6 +70,7 @@ class TraversalScreen(AlgorithmScreen[C, M, D]):
 
     # Updates text in label above weight slider 
     def __updateWeight(self, value : str|int) -> None:
+        value = int(value )
         self.__weightSlider.config(label = f"Weight: {value}")   
         if value > INITIAL_WEIGHT: self.getController().updateEdgeWeight(value)
 
@@ -210,7 +211,10 @@ class TraversalScreen(AlgorithmScreen[C, M, D]):
 
     # TODO cancel any running functions before algorithm runs 
     def prepare() -> None: pass 
-    def coolEndingAnimation(self) -> None: pass 
+    def animationSetup(self) -> None: pass 
+    def coolAnimationFrame(self) -> None: pass  
+
+ 
 
 
 # Listen Glass Spiders by Hot Milk

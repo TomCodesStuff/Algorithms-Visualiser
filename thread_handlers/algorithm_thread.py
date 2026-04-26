@@ -13,16 +13,19 @@ class AlgorithmThread():
         self.__algorithmStopped = threading.Event()
         self.__algorithmPauseLock = threading.Lock()
         self.__delayLock = threading.Lock() 
-        self.__coolEndingAnimationFunc = None 
+
+        self.__algorithmSuccess = False 
 
 
     def runAlgorithm(self, algorithm : Algorithm): 
+        self.__algorithmSuccess = False
         self.__algorithmStarted.set() 
         try:
-            algorithm.run()  
-            if self.__coolEndingAnimationFunc: self.__coolEndingAnimationFunc()
+            algorithm.run()   
+            self.__algorithmSuccess = True 
         except Exception as e:
-            print(f"ERROR: Algorithm broke at some point :(.\nException: {e}")
+            print(f"ERROR: Algorithm broke at some point :(.\nException: {e}") 
+            self.__algorithmSuccess = False
             
 
     def isThreadAlive(self) -> bool:
@@ -62,9 +65,9 @@ class AlgorithmThread():
         self.__delayLock.release()
 
 
-    def setEndingAnimationFunc(self, endingAnimationFunc : Callable) -> None: 
-        self.__coolEndingAnimationFunc = endingAnimationFunc
-
+    def wasAlgorithmSuccessful(self) -> bool:
+        return self.__algorithmSuccess 
+    
 
     def stopAlgorithm(self) -> None: 
         if(self.isAlgorithmPaused()): self.releasePauseLock() 

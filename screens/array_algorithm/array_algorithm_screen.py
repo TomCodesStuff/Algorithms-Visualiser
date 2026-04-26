@@ -21,14 +21,15 @@ M = TypeVar("M", bound="ArrayAlgorithmModel")
 D = TypeVar("D", bound="Array")
 
 
-BRIEF_DELAY = 0.5
-TINY_DELAY = 0.1
+TINY_DELAY_MS = 50
 NUM_BAR_FLASHES = 3
 
 
 class ArrayAlgorithmScreen(AlgorithmScreen[C, M, D]):
     def __init__(self, window):
-        super().__init__(window)
+        super().__init__(window) 
+
+        self.__animationIndex = 0
 
 
     # Creates a slider that allows users to alter an arrays size
@@ -80,29 +81,42 @@ class ArrayAlgorithmScreen(AlgorithmScreen[C, M, D]):
         self.getController().adjustArray(1)
     
 
-    def coolEndingAnimation(self) -> None: 
-        time.sleep(BRIEF_DELAY)
-        array = self.getDataStructure()
-        array.resetBarColours() 
+    def animationSetup(self) -> None: 
+        # Reset bar colours
+        self.getDataStructure().resetBarColours() 
         self.getController().refreshCanvas()
-        time.sleep(TINY_DELAY)
+        self.__animationIndex = 0 
+
+
+    def coolAnimationFrame(self) -> None:  
+        array = self.getDataStructure() 
+        array.setColourAt(self.__animationIndex, "green")
+        self.__animationIndex += 1
+        self.setFrameDelay(TINY_DELAY_MS)
+        if self.__animationIndex == array.size(): self.endAnimation()
+
+        # time.sleep(BRIEF_DELAY)
+        # array = self.getDataStructure()
+        # array.resetBarColours() 
+        # self.getController().refreshCanvas()
+        # time.sleep(TINY_DELAY)
         
-        for i in range(len(array)): 
-            array.resetBarColours()
-            array.setColourAt(i, "green")
-            self.getController().refreshCanvas(refreshColours=False)
-            time.sleep(0.01)
+        # for i in range(len(array)): 
+        #     array.resetBarColours()
+        #     array.setColourAt(i, "green")
+        #     self.getController().refreshCanvas(refreshColours=False)
+        #     time.sleep(0.01)
         
-        for _ in range(NUM_BAR_FLASHES): 
-            array.resetBarColours() 
-            self.getController().refreshCanvas(refreshColours=False)
-            time.sleep(TINY_DELAY)
-            array.setAllColours("green")
-            self.getController().refreshCanvas(refreshColours=False)
-            time.sleep(TINY_DELAY) 
+        # for _ in range(NUM_BAR_FLASHES): 
+        #     array.resetBarColours() 
+        #     self.getController().refreshCanvas(refreshColours=False)
+        #     time.sleep(TINY_DELAY)
+        #     array.setAllColours("green")
+        #     self.getController().refreshCanvas(refreshColours=False)
+        #     time.sleep(TINY_DELAY) 
         
-        array.resetBarColours()
-        self.getController().refreshCanvas()
+        # array.resetBarColours()
+        # self.getController().refreshCanvas()
    
 
 # Listen to Almost by Bowling For Soup
