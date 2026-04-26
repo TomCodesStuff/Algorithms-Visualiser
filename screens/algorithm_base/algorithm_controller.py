@@ -120,7 +120,7 @@ class AlgorithmController(ABC, Generic[S, M, D]):
     def __handleAlgorithmExecution(self) -> None: 
         if not self.__algorithmThread.isThreadAlive(): 
             self.refreshCanvas(refreshColours=False)
-            self.getScreen().algorithmComplete(self.__threadHandler.wasAlgorithmSuccessful())
+            self.getScreen().algorithmComplete(self.__algorithmThread.wasAlgorithmSuccessful())
         else: 
             self.refreshCanvas(refreshColours=False)
             self.getScreen().getWindow().scheduleFunctionExecution(self.__handleAlgorithmExecution, EXECUTION_DELAY) 
