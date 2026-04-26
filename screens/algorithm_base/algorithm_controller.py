@@ -23,7 +23,8 @@ S = TypeVar("S", bound="AlgorithmScreen")
 M = TypeVar("M", bound="AlgorithmModel")
 D = TypeVar("D", bound="DataStructure")
 
-EXECUTION_DELAY = 0
+# 16MS = ~ 60 FPS
+EXECUTION_DELAY = 16
 
 class AlgorithmController(ABC, Generic[S, M, D]):  
 
@@ -65,8 +66,7 @@ class AlgorithmController(ABC, Generic[S, M, D]):
             print(f"ERROR: {e}")
             return
         
-        # Pass reference to ending animation so it can be called
-        self.__threadHandler.setEndingAnimationFunc(self.getScreen().runCoolEndingAnimation)
+
         self.__threadHandler.startAlgorithm(algorithmObj)
         self.__handleAlgorithmExecution()
 
@@ -121,7 +121,7 @@ class AlgorithmController(ABC, Generic[S, M, D]):
     def __handleAlgorithmExecution(self) -> None: 
         if not self.__threadHandler.isThreadAlive(): 
             self.refreshCanvas(refreshColours=False)
-            self.getScreen().algorithmComplete()
+            self.getScreen().algorithmComplete(self.__threadHandler.wasAlgorithmSuccessful())
         else: 
             self.refreshCanvas(refreshColours=False)
             self.getScreen().getWindow().scheduleFunctionExecution(self.__handleAlgorithmExecution, EXECUTION_DELAY) 

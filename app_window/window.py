@@ -96,7 +96,7 @@ class Window():
     # Schedule the passed function to be executed after the passed amount of time
     # Assumes function has no parameters
     def scheduleFunctionExecution(self, function : Callable, delay : int) -> None:
-        self.__window.after(int(delay), function)
+        self.__window.after(delay, function)
     
 
     def getNumScheduledFunctions(self) -> int:

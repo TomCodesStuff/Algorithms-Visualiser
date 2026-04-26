@@ -25,7 +25,7 @@ class Algorithm(Generic[D], ABC):
 
 
     @abstractmethod 
-    def run(self): pass
+    def run(self) -> int: pass
 
 
     def setDataStructure(self, dataStructure : D) -> None: 

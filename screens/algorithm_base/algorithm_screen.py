@@ -24,6 +24,7 @@ D = TypeVar("D", bound="DataStructure")
 
 
 FRAME_HEIGHT = 50
+START_DELAY_MS = 500
 
 # All screens that visualise the algorithms have the same fundamental layout
 # This class delegates the reponsiblity of creating the basic layout
@@ -51,24 +52,38 @@ class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
         self.__toggleableWidgets = []
 
         self.__isAlgorithmRunning = False 
-    
-        self.__algorithmType = None 
+        self.__algorithmType = None   
+
+        self.__animationRunning = False
+        self.__frameDelay = 0
 
 
     # Abstract method, child screens will call before running an algorithm
     @abstractmethod
     def prepare(self) -> None: pass  
 
+
     @abstractmethod
     def render(self) -> None: pass 
 
-    @abstractmethod 
-    def coolEndingAnimation(self) -> None: pass  
 
-    def __animationStarting(self) -> None:
+    @abstractmethod 
+    def animationSetup(self) -> None: pass 
+
+
+    @abstractmethod 
+    def coolAnimationFrame(self) -> None: pass  
+
+
+    def __animationStarting(self) -> None: 
+        # Disable Buttons
         self.__runButton.config(state="disabled")
         self.__stateButton.config(state="disabled")
         self.__homeButton.config(state="disabled")
+
+        self.animationSetup()
+        self.__animationRunning = True
+
 
     def __animationEnding(self) -> None:
         self.__runButton.config(state="active")
@@ -76,11 +91,29 @@ class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
         self.__homeButton.config(state="active")
     
 
-    def runCoolEndingAnimation(self) -> None:
-        self.__animationStarting() 
-        self.coolEndingAnimation() 
-        self.__animationEnding()
+    def endAnimation(self) -> None: 
+        self.__animationRunning = False  
+    
 
+    def setFrameDelay(self, delay : int) -> None: 
+        self.__frameDelay = max(0, delay)
+
+
+    def coolEndingAnimation(self) -> None: 
+        if(self.__animationRunning): 
+            self.coolAnimationFrame()
+            self.getController().refreshCanvas(refreshColours=False)
+            self.getWindow().scheduleFunctionExecution(self.coolEndingAnimation, self.__frameDelay) 
+        else: 
+            self.getController().refreshCanvas(refreshColours=True)
+            self.__animationEnding()
+
+
+    def runCoolEndingAnimation(self) -> None:
+        self.__animationStarting()  
+        self.getWindow().scheduleFunctionExecution(self.coolEndingAnimation, START_DELAY_MS)
+        
+    
     def displayAlgorithmOptions(self) -> None: 
         self.__algorithmOptions["values"] = self.getWindow().getAlgorithmNames(self.__algorithmType) 
 
@@ -336,11 +369,14 @@ class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
             self.__updateWidgets()
             self.prepare()            
             self.__controller.startAlgorithmThread(self.__algorithmType, self.__getAlgorithmChoice())
-            
-    # TODO add flag to play animation if algorithm terminated successfully
-    def algorithmComplete(self) -> None:
-        self.__stopAlgorithm()
 
+
+    # TODO add flag to play animation if algorithm terminated successfully
+    def algorithmComplete(self, playAnimation : bool) -> None: 
+        self.__stopAlgorithm()
+        if playAnimation: 
+            self.getWindow().scheduleFunctionExecution(self.runCoolEndingAnimation, START_DELAY_MS)
+            
 
     # Forces current running algorithm thread to terminate (safely, I hope)
     def __stopAlgorithm(self) -> None:
