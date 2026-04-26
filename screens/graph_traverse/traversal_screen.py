@@ -70,6 +70,7 @@ class TraversalScreen(AlgorithmScreen[C, M, D]):
 
     # Updates text in label above weight slider 
     def __updateWeight(self, value : str|int) -> None:
+        value = int(value )
         self.__weightSlider.config(label = f"Weight: {value}")   
         if value > INITIAL_WEIGHT: self.getController().updateEdgeWeight(value)
 
