@@ -12,6 +12,7 @@ class AlgorithmThread():
         self.__algorithmStarted = threading.Event()
         self.__algorithmStopped = threading.Event()
         self.__algorithmPauseLock = threading.Lock()
+        
         self.__delayLock = threading.Lock() 
 
         self.__algorithmSuccess = False 

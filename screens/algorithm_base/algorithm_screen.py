@@ -57,7 +57,7 @@ class AlgorithmScreen(Generic[C, M ,D], ScreenInterface):
         self.__animationRunning = False
         self.__frameDelay = 0
 
-
+        
     # Abstract method, child screens will call before running an algorithm
     @abstractmethod
     def prepare(self) -> None: pass  

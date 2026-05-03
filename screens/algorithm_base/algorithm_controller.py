@@ -9,7 +9,7 @@ if(__name__ == "__main__"):
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, TypeVar, Generic
 from mediator import Mediator
-from thread_handlers import AlgorithmThread
+from thread_handlers import AlgorithmThread, ManagedThread
 from data_structures import DataStructure
 from enums import AlgorithmType
 
@@ -31,7 +31,12 @@ class AlgorithmController(ABC, Generic[S, M, D]):
         self.__screen = screen
         self.__model = model
         self.__dataStructure = dataStructure
+        
+        
         self.__algorithmThread = AlgorithmThread() 
+
+        self.__managedThreads = []
+
     
     @abstractmethod
     def refreshCanvas(self, refreshColours:bool=False) -> None: pass
@@ -54,17 +59,19 @@ class AlgorithmController(ABC, Generic[S, M, D]):
             algorithmObj = algorithmClass()
         except Exception as e: 
             print(f"ERROR: Unable to create algorithm object: {e}")
-            self.getScreen().algorithmComplete()
+            self.getScreen().algorithmComplete(playAnimation=False)
             return
         
         try:
             algorithmObj.setDataStructure(self.getDataStructure())
             algorithmObj.setMediator(mediator)
         except Exception as e:
-            self.getScreen().algorithmComplete()
+            self.getScreen().algorithmComplete(playAnimation=False)
             print(f"ERROR: {e}")
             return
         
+
+
         # Pass reference to ending animation so it can be called
         self.__algorithmThread.startAlgorithm(algorithmObj)
         self.__handleAlgorithmExecution()
@@ -128,5 +135,19 @@ class AlgorithmController(ABC, Generic[S, M, D]):
     
     def isAlgorithmRunning(self) -> None: 
         return self.__algorithmThread.isThreadAlive()
+    
+
+    def addManagedThread(self, managedThread : ManagedThread) -> None:
+        self.__managedThreads.append(managedThread)
+    
+
+    def stopThreads(self) -> None:
+        for thread in self.__managedThreads: 
+            thread.stopThread()  
+
+    
+    def isThreadAlive(self) -> None: 
+        return any([x.isThreadAlive() for x in self.__managedThreads])
+
     
 # Listen to Catch These Fists by Wet Leg     

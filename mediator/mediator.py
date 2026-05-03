@@ -4,6 +4,8 @@ from typing import Callable
 from thread_handlers import AlgorithmThread
 
 
+BRIEF_DELAY = 0.5
+
 class Mediator():
     def __init__(self, delayFunc : Callable, threadHandler : AlgorithmThread): 
         self.__delayFunc = delayFunc
@@ -43,7 +45,7 @@ class Mediator():
 
 
     def briefDelay(self) -> None: 
-        self.__delayAlgorithm(0.5)
+        self.__delayAlgorithm(BRIEF_DELAY)
 
 
     def delay(self) -> None:  
