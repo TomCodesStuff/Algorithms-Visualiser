@@ -35,25 +35,33 @@ class ManagedThread(ABC, threading.Thread):
         else: print("Thread Terminated :)")  
     
 
-    def acquirePauseLock(self) -> None:
-        self.__threadPauseLock.acquire()
+    def acquirePauseLock(self) -> None: self.__threadPauseLock.acquire()
     
 
-    def releasePauseLock(self) -> None: 
-        self.__threadPauseLock.release()  
+    def releasePauseLock(self) -> None: self.__threadPauseLock.release()  
     
 
-    def isThreadPaused(self) -> bool:
-        return self.__threadPauseLock.locked() 
+    def isThreadPaused(self) -> bool: return self.__threadPauseLock.locked() 
 
 
-    def isThreadAlive(self) -> bool:
-        return self.is_alive()
+    def isThreadAlive(self) -> bool: return self.is_alive()
+    
+
+    @abstractmethod 
+    def threadOnExecute(self) -> None: pass 
 
     
-    # What will actually get run by the thread 
-    @abstractmethod
-    def run(self) -> None: pass 
-
+    def threadOnStart(self) -> None: pass 
     
+    
+    def threadOnEnd(self) -> None: pass 
+
+
+    def run(self) -> None:
+        self.__threadStarted.set() 
+        self.__threadStarted.wait(timeout=THREAD_TIMEOUT)
+        self.threadOnStart() 
+        self.threadOnExecute() 
+        self.threadOnEnd()
+
 
